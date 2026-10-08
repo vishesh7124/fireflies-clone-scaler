@@ -34,24 +34,26 @@ The real app canvas is a near-black with a purple tint; panels are one step ligh
 
 ### Core tokens (dark theme — primary)
 
-> **Revision (Oct 9, after `original.png` vs `clone.png` comparison):** the app is a **warm plum-toned** dark UI, not a cold near-black. Values below supersede the first estimates; hero/promo surfaces sit in the same plum family (`#2A1F3D` fill, `#4A3A5A` border).
+> **Revision 2 (Oct 9, original-vs-clone round 2, sampled at native res):** the app is a **neutral dark-gray UI** — purple is an *accent* (buttons, links), never a surface tint. The hero is a **warm brown/copper** card, Quick Start tiles are **solid tinted** surfaces, greens are **muted forest**, and radii run **small** (pills 4px · controls 6px · cards 12px).
 
 | Token | Value | Usage |
 |---|---|---|
-| `--bg-base` | `#0E0A17` | App canvas (deep warm purple-black + subtle radial glow) |
-| `--bg-surface` | `#161021` | Sidebar, panels, cards |
-| `--bg-elevated` | `#1D1630` | Popovers, active rows, dropdowns, input fields |
-| `--accent` (plum pill) | `#251C3D` | Active nav pill, hover fills, hero-family surfaces |
-| `--border-subtle` | `rgba(255,255,255,0.10)` | Hairline borders, dividers |
-| `--text-primary` | `#F5F5F7` | Headings, titles |
-| `--text-secondary` | `#BFB5CC` | Body text (warm lilac) |
-| `--text-muted` | `#8A8298` | Timestamps, helper copy, placeholders |
-| `--brand-purple` | `#7C5CFF` | Primary buttons, active nav/tab, links, focus rings, send buttons |
-| `--brand-purple-hover` | `#6B4CF0` | Hover state |
-| `--logo-pink` | `#FF3D8B` → `#C2185B` gradient | F logo, pink accents, gradient icon tiles |
-| `--success-green` | `#3DDC97` | "NEW"/"Upgrade" text, REC tag, check icons, compliance chips |
-| `--warning-amber` | `#F59E0B` | Hero card tints, warm accents |
-| Accent tints | red `#E5484D` · teal `#2DD4BF` | Quick Start tile icon colors |
+| `--bg-base` | `#141314` | App canvas (neutral warm black) |
+| `--bg-surface` | `#1E1E1F` | Sidebar, panels, cards, search bar |
+| `--bg-elevated` | `#26262A` | Popovers, dropdowns, inputs |
+| `--accent` (active/hover pill) | `#2F2F34` | Active nav pill (subtle!), tab container `#2C2D31`, active tab `#3A3A3D` |
+| `--border-subtle` | `rgba(255,255,255,0.09)` | Hairline borders, dividers |
+| `--text-primary` | `#F5F5F7` | Headings, titles (hero text warm off-white `#F5EDE4`) |
+| `--text-secondary` | `#B8B8BC` | Body text (neutral gray — no pink/lilac cast) |
+| `--text-muted` | `#9A9A9E` | Timestamps, helper copy, placeholders |
+| `--brand-purple` | `#6938EF` | Capture/primary buttons (deep indigo-violet); **soft purple `#8B7CFF` for links** |
+| `--logo-pink` | `#FF3D8B` → `#C2185B` gradient | F logo mark, meeting-row thumbnails |
+| `--success-green` | `#3BA774` text · badge `#3B8156` · pill bg `#11321F`/`#0F2A1C` | "Upgrade" pill, "3" badge, "40% OFF", NEW pills (muted forest, not neon) |
+| Hero card | fill gradient `#3A1F0F → #5A2D12` (warm brown/copper), border `#241812`, copper laptop mockup `#E8955C` accents | Welcome hero |
+| Quick Start tiles | solid tinted: maroon `#3A1423` · teal `#0C2622` · indigo `#17152E` | No inner icon square — glyph directly on tinted tile |
+| `--radius` scale | pills **4px** · buttons/inputs/search **6px** · cards/hero/tiles **12px** | The original is barely rounded |
+
+**Other (round-2) notes:** trial banner strip = deep indigo `#17152E`; help bubble = filled lavender circle `#C4C4E8` w/ dark glyph; "Invite coworkers" promo card sits at the **sidebar bottom** (purple "Create Team" button + carousel dots), not floating; sidebar has a faint separator line between nav groups; "Try Email Assistant" is a purple-highlighted promo item.
 
 ### Speaker palette (distinct chips — "revised speaker avatars so you can easily distinguish each speaker")
 
@@ -59,10 +61,10 @@ The real app canvas is a near-black with a purple tint; panels are one step ligh
 
 ### Shape & elevation
 
-- Cards/panels: **radius 12–16px**; buttons/inputs: **radius 8–10px**; pills fully rounded
-- **1px hairline borders** (`rgba(255,255,255,0.08)`) instead of heavy shadows
+- Radii run **small** (round-2 confirmation): nav pills & active tabs **4px**, buttons/inputs/search bar **6px**, cards/hero/tiles **12px** — the original is barely rounded
+- **1px hairline borders** (`rgba(255,255,255,0.09)`) instead of heavy shadows
 - Focus ring: 2px `--brand-purple`
-- Sidebar ~200px expanded (icon + label rows; active item = dark pill + purple text)
+- Sidebar **240px** (icon + label rows; active item = *subtle neutral pill*, white icon/text)
 - Comfortable spacing, 8px grid; lists are roomy, not dense
 
 ## 4. The app shell (every screen after login)

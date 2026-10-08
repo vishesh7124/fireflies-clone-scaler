@@ -26,7 +26,7 @@ export function Logo({
         width="32"
         height="32"
         rx="8"
-        fill={variant === "tile" ? "#161021" : "url(#fireflies-f)"}
+        fill={variant === "tile" ? "#1e1e1f" : "url(#fireflies-f)"}
         stroke={variant === "tile" ? "rgba(255,255,255,0.1)" : undefined}
       />
       <rect x="7" y="8" width="15" height="4.5" rx="2.25" fill={glyph} />

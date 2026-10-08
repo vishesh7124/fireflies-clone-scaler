@@ -31,20 +31,20 @@ export function Topbar() {
       <button
         type="button"
         onClick={() => toast.info("Global search lands in Phase 7")}
-        className="mx-auto flex h-9 w-full max-w-md items-center gap-2 rounded-lg border border-border bg-elevated/60 px-3 text-sm text-subtle transition-colors hover:border-ring/40"
+        className="mx-auto flex h-9 w-full max-w-md items-center gap-2 rounded-lg border border-border bg-surface px-3 text-sm text-subtle transition-colors hover:border-ring/40"
       >
         <SearchIcon className="size-4" />
         <span className="truncate">Search by title or keyword</span>
         <span className="ml-auto flex shrink-0 items-center gap-1 font-mono text-[10px] text-muted-foreground">
-          <kbd className="rounded border border-border bg-surface px-1.5 py-0.5">Ctrl</kbd>+
-          <kbd className="rounded border border-border bg-surface px-1.5 py-0.5">K</kbd>
+          <kbd className="rounded border border-border bg-elevated px-1.5 py-0.5">Ctrl</kbd>+
+          <kbd className="rounded border border-border bg-elevated px-1.5 py-0.5">K</kbd>
         </span>
       </button>
 
       <div className="flex items-center gap-2">
-        {/* free-plan chip — green count badge + label (like the real top bar) */}
+        {/* free-plan chip — muted forest-green circle + label (like the original) */}
         <span className="hidden items-center gap-1.5 text-xs text-subtle md:flex">
-          <span className="rounded-full bg-success px-1.5 py-0.5 text-[10px] font-bold text-background">
+          <span className="flex size-4 items-center justify-center rounded-full bg-[#3b8156] text-[10px] font-bold text-white">
             3
           </span>
           Free meetings
@@ -53,7 +53,7 @@ export function Topbar() {
         <button
           type="button"
           onClick={() => toast.info("Upgrade — coming soon")}
-          className="rounded-md px-2.5 py-1.5 text-sm font-medium text-success transition-colors hover:bg-success/10"
+          className="rounded-md bg-[#11321f] px-2.5 py-1.5 text-sm font-medium text-success transition-colors hover:bg-[#17452c]"
         >
           Upgrade
         </button>

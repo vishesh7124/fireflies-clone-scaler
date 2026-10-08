@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "cn";
+import { Button } from "@/components/ui/button";
 
 /** Nav items + layout replicate the real app shell (docs/01 §4). */
 const MAIN_NAV: { label: string; href: string; icon: LucideIcon }[] = [
@@ -32,32 +33,19 @@ const MAIN_NAV: { label: string; href: string; icon: LucideIcon }[] = [
 ];
 
 const BOTTOM_NAV: { label: string; href: string; icon: LucideIcon }[] = [
-  { label: "Try Email Assistant", href: "/integrations", icon: MailIcon },
   { label: "Integrations", href: "/integrations", icon: PuzzleIcon },
   { label: "Settings", href: "/settings", icon: SettingsIcon },
 ];
 
 /**
- * Workspace switcher avatar — mosaic block in the purple family
- * (the real app's workspace chip, toned to match its monochrome look).
+ * Active state = subtle neutral pill, white icon+text (like the original —
+ * purple is reserved for the highlighted promo items, not nav).
  */
-function WorkspaceAvatar() {
-  return (
-    <span className="grid size-6 shrink-0 grid-cols-2 gap-[2px] rounded-md" aria-hidden="true">
-      <span className="rounded-[2px] bg-[#9d8bff]" />
-      <span className="rounded-[2px] bg-[#7c5cff]" />
-      <span className="rounded-[2px] bg-[#5b3ee6]" />
-      <span className="rounded-[2px] bg-[#b197fc]" />
-    </span>
-  );
-}
-
-/** Active = plum pill + purple text; inactive = muted (like the real sidebar). */
 const navLinkClass = (active: boolean) =>
   cn(
-    "flex items-center gap-3 rounded-lg whitespace-nowrap px-3 py-2.5 text-[15px] font-medium transition-colors",
+    "flex items-center gap-3 rounded-md whitespace-nowrap px-3 py-2.5 text-[15px] font-medium transition-colors",
     active
-      ? "bg-accent text-primary"
+      ? "bg-accent text-foreground"
       : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
   );
 
@@ -66,7 +54,7 @@ function NavLink({ href, label, icon: Icon }: { href: string; label: string; ico
   const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
   return (
     <Link href={href} className={navLinkClass(active)}>
-      <Icon className="size-4" />
+      <Icon className="size-4 text-foreground" />
       {label}
     </Link>
   );
@@ -75,38 +63,68 @@ function NavLink({ href, label, icon: Icon }: { href: string; label: string; ico
 export function Sidebar() {
   return (
     <aside className="flex h-full w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
-      {/* workspace switcher */}
+      {/* workspace switcher — initials avatar (the original shows a user photo) */}
       <button
         type="button"
         onClick={() => toast.info("Workspace switcher — coming soon")}
         className="flex items-center gap-2.5 px-5 pb-2 pt-5 text-left"
       >
-        <WorkspaceAvatar />
+        <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-elevated text-[11px] font-bold text-foreground">
+          V
+        </span>
         <span className="text-[15px] font-semibold tracking-wide text-foreground">VISHESH</span>
         <ChevronDownIcon className="size-3.5 text-muted-foreground" />
       </button>
 
-      <nav className="mt-3 flex-1 space-y-1 px-3">
+      <nav className="mt-3 flex-1 space-y-0.5 px-3">
         {MAIN_NAV.map((item) => (
           <NavLink key={item.label} {...item} />
         ))}
 
-        {/* Upgrade — green text badge only (no filled pill, like the original) */}
+        {/* Upgrade — muted green pill badge (like the original) */}
         <button
           type="button"
           onClick={() => toast.info("Upgrade — coming soon")}
           className={cn(navLinkClass(false), "w-full")}
         >
-          <CrownIcon className="size-4" />
+          <CrownIcon className="size-4 text-foreground" />
           Upgrade
-          <span className="ml-auto text-[11px] font-semibold text-success">40% OFF</span>
+          <span className="ml-auto rounded-[4px] bg-[#0f2a1c] px-1.5 py-0.5 text-[11px] font-semibold text-success">
+            40% OFF
+          </span>
         </button>
-      </nav>
 
-      <div className="space-y-1 px-3 pb-5">
+        {/* faint separator between nav groups (original has one) */}
+        <div className="mx-3 my-2 h-px bg-border" />
+
+        {/* highlighted promo item — deep-purple pill in the original */}
+        <Link
+          href="/integrations"
+          className="flex items-center gap-3 rounded-md bg-primary/15 px-3 py-2.5 text-[15px] font-medium text-primary-soft transition-colors hover:bg-primary/25"
+        >
+          <MailIcon className="size-4" />
+          Try Email Assistant
+        </Link>
+
         {BOTTOM_NAV.map((item) => (
           <NavLink key={item.label} {...item} />
         ))}
+      </nav>
+
+      {/* invite card — bottom of sidebar, like the original's cycling promo */}
+      <div className="mx-3 mb-4 rounded-xl border border-border bg-elevated p-3.5">
+        <p className="text-[13px] font-medium leading-snug text-foreground">
+          Invite coworkers to your Fireflies team
+        </p>
+        <div className="mt-2.5 flex items-center justify-between">
+          <Button size="sm" onClick={() => toast.info("Create team — coming soon")}>
+            Create Team
+          </Button>
+          <span className="flex gap-1.5">
+            <span className="size-1.5 rounded-full bg-primary" />
+            <span className="size-1.5 rounded-full bg-muted" />
+          </span>
+        </div>
       </div>
     </aside>
   );

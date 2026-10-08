@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   CalendarPlusIcon,
   ChevronRightIcon,
@@ -11,7 +10,6 @@ import {
   SettingsIcon,
   SmartphoneIcon,
   UploadIcon,
-  XIcon,
   type LucideIcon,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -20,48 +18,51 @@ import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/layout/logo";
 
 /**
- * Home — replicates the real app's layout (docs/01 §5.2): welcome hero,
- * Quick Start tiles, Recent/Upcoming/AI Feed tabs, Try More cards, and the
- * floating promo card. Lists are static placeholders until the mock data
- * layer lands in Phase 1-2 (TODO(phase-2)).
+ * Home — replicates the real app's layout (docs/01 §5.2): warm copper hero,
+ * solid-tinted Quick Start tiles, Recent/Upcoming/AI Feed tabs, Try More cards.
+ * Lists are static placeholders until the mock data layer lands (Phase 1-2).
  */
 
-const TILES: { label: string; icon: LucideIcon; tint: string }[] = [
-  { label: "Schedule Meeting", icon: CalendarPlusIcon, tint: "bg-[#e5484d]/15 text-[#e5484d]" },
-  { label: "Upload File", icon: UploadIcon, tint: "bg-[#2dd4bf]/15 text-[#2dd4bf]" },
-  { label: "Capture Meeting", icon: PlusIcon, tint: "bg-primary/15 text-primary" },
+// Solid tinted tiles (colors sampled from the original screenshot)
+const TILES: { label: string; icon: LucideIcon; bg: string; iconColor: string }[] = [
+  { label: "Schedule Meeting", icon: CalendarPlusIcon, bg: "bg-[#3a1423]", iconColor: "text-[#f2a4b4]" },
+  { label: "Upload File", icon: UploadIcon, bg: "bg-[#0c2622]", iconColor: "text-[#8ee6d3]" },
+  { label: "Capture Meeting", icon: PlusIcon, bg: "bg-[#17152e]", iconColor: "text-[#a5a0ff]" },
 ];
 
 const TABS = ["Recent", "Upcoming", "AI Feed"];
 
 export default function HomePage() {
-  const [promoVisible, setPromoVisible] = useState(true);
   const soon = (what: string) => () => toast.info(`${what} — coming soon`);
 
   return (
     <div className="mx-auto w-full max-w-[880px] space-y-8 p-8">
-      {/* welcome hero — plum fill + visible border (original.png) */}
-      <section className="flex items-center gap-8 rounded-xl border border-[#4a3a5a] bg-[#2a1f3d] p-6">
+      {/* welcome hero — warm brown/copper gradient card, like the original */}
+      <section className="flex items-center gap-8 rounded-xl border border-[#241812] bg-gradient-to-b from-[#3a1f0f] to-[#5a2d12] p-6">
         <div className="min-w-0 space-y-2">
-          <h1 className="font-display text-2xl font-semibold text-foreground">
+          <h1 className="font-display text-2xl font-semibold text-[#f5ede4]">
             Welcome aboard, VISHESH!
           </h1>
-          <p className="text-sm leading-relaxed text-muted-foreground">
+          <p className="text-sm leading-relaxed text-[#d8ccbd]">
             Fireflies is now ready to automate your meetings and streamline your
             workflows.
           </p>
         </div>
 
-        {/* video preview thumbnail — gradient, play button, avatar (like the original) */}
-        <div className="relative hidden aspect-video w-56 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-gradient-to-br from-primary/60 via-primary/25 to-transparent sm:block">
-          <span className="absolute inset-0 m-auto flex size-10 items-center justify-center rounded-full bg-background/80">
-            <PlayIcon className="size-4 text-foreground" />
-          </span>
-          <span className="absolute bottom-2 left-2 size-5 rounded-full border border-background/40 bg-primary/80" />
+        {/* stylized laptop mockup with copper border (like the original) */}
+        <div className="hidden w-52 shrink-0 sm:block">
+          <div className="rounded-lg border border-[#e8955c]/40 bg-gradient-to-b from-[#7a4520] to-[#4a2610] p-2">
+            <div className="relative aspect-video rounded-md bg-gradient-to-br from-[#e8955c]/25 via-[#c97b3d]/10 to-transparent">
+              <span className="absolute inset-0 m-auto flex size-9 items-center justify-center rounded-full bg-[#f5ede4]/90">
+                <PlayIcon className="size-4 text-[#5a2d12]" />
+              </span>
+            </div>
+            <div className="mx-auto mt-1.5 h-1.5 w-3/4 rounded-full bg-[#e8955c]/25" />
+          </div>
         </div>
       </section>
 
-      {/* quick start tiles — one-line labels, 52px rows */}
+      {/* quick start — solid tinted tiles, one-line labels, 52px rows */}
       <section className="space-y-3">
         <h2 className="font-display text-lg font-semibold text-foreground">Quick Start</h2>
         <p className="text-sm text-muted-foreground">
@@ -69,20 +70,19 @@ export default function HomePage() {
           action.
         </p>
         <div className="grid gap-3 sm:grid-cols-3">
-          {TILES.map(({ label, icon: Icon, tint }) => (
+          {TILES.map(({ label, icon: Icon, bg, iconColor }) => (
             <button
               key={label}
               type="button"
               onClick={soon(label)}
-              className="flex h-[52px] items-center gap-3 rounded-lg border border-border bg-surface px-4 text-left transition-colors hover:border-ring/40"
+              className={cn(
+                "flex h-[52px] items-center gap-3 rounded-xl px-4 text-left transition-opacity hover:opacity-90",
+                bg,
+              )}
             >
-              <span
-                className={`flex size-9 shrink-0 items-center justify-center rounded-lg ${tint}`}
-              >
-                <Icon className="size-4" />
-              </span>
+              <Icon className={cn("size-4 shrink-0", iconColor)} />
               <span className="truncate text-sm font-medium text-foreground">{label}</span>
-              <ChevronRightIcon className="ml-auto size-4 shrink-0 text-subtle" />
+              <ChevronRightIcon className="ml-auto size-4 shrink-0 text-foreground/60" />
             </button>
           ))}
         </div>
@@ -91,7 +91,7 @@ export default function HomePage() {
       {/* recent / upcoming / ai feed — TODO(phase-2): live lists */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1 rounded-lg bg-surface p-1">
+          <div className="flex items-center gap-1 rounded-lg bg-[#2c2d31] p-1">
             {TABS.map((tab, i) => (
               <button
                 key={tab}
@@ -100,7 +100,7 @@ export default function HomePage() {
                 className={cn(
                   "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
                   i === 0
-                    ? "bg-elevated text-foreground"
+                    ? "bg-[#3a3a3d] text-foreground"
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
@@ -122,9 +122,9 @@ export default function HomePage() {
         <button
           type="button"
           onClick={soon("Open meeting")}
-          className="flex w-full items-center gap-3 rounded-lg border border-transparent p-3 text-left transition-colors hover:border-border hover:bg-surface"
+          className="flex w-full items-center gap-3 rounded-lg p-3 text-left transition-colors hover:bg-surface"
         >
-          <Logo variant="mark" className="size-10 shrink-0 rounded-lg" />
+          <Logo variant="mark" className="size-10 shrink-0 rounded-[10px]" />
           <span className="min-w-0">
             <span className="block truncate text-sm font-medium text-foreground">
               Fireflies AI Platform Quick Overview
@@ -174,35 +174,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* floating promo card — bottom-left, dismissible (like the real app) */}
-      {promoVisible && (
-        <div className="fixed bottom-6 left-[264px] z-40 hidden max-w-xs flex-col gap-3 rounded-xl border border-border bg-surface p-4 shadow-lg lg:flex">
-          <div className="flex items-start justify-between gap-2">
-            <p className="text-sm font-medium text-foreground">
-              Bot-less meetings with Desktop App
-            </p>
-            <button
-              type="button"
-              onClick={() => setPromoVisible(false)}
-              aria-label="Dismiss promo"
-              className="text-subtle transition-colors hover:text-foreground"
-            >
-              <XIcon className="size-3.5" />
-            </button>
-          </div>
-          <div className="flex items-center justify-between">
-            <Button size="sm" onClick={soon("Desktop app")}>
-              <DownloadIcon className="size-3.5" />
-              Download
-            </Button>
-            <span className="flex gap-1.5">
-              <span className="size-1.5 rounded-full bg-primary" />
-              <span className="size-1.5 rounded-full bg-muted" />
-            </span>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
