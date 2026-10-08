@@ -1,0 +1,105 @@
+{
+  "title": "Sprint Retrospective — Team Phoenix",
+  "meeting_date": "2026-09-25T14:00:00Z",
+  "description": "Sprint 14 retro: what went well, what didn't, what we'll change.",
+  "channel": "My Meetings",
+  "source": "seed",
+  "language": "en",
+  "tags": ["engineering", "retro"],
+  "participants": [
+    { "name": "Arjun Mehta", "email": "arjun@northstar.io", "host": true },
+    { "name": "Priya Sharma", "email": "priya@northstar.io" },
+    { "name": "Rahul Verma", "email": "rahul@northstar.io" },
+    { "name": "Diya Patel", "email": "diya@northstar.io" },
+    { "name": "Sneha Rao", "email": "sneha@northstar.io" }
+  ],
+  "transcript": [
+    "00:03 Arjun Mehta: Welcome to the Sprint 14 retro, everyone. Same format as always — what went well, what didn't, and what we'll change. Brutal honesty is welcome and, uh, encouraged.",
+    "00:19 Priya Sharma: Can we start with the wins? I think we need to hear those first this sprint.",
+    "00:26 Arjun Mehta: Agreed. Wins first.",
+    "00:29 Priya Sharma: The design system migration finished two days early. We converted 40 components with only three regressions, and all three were fixed the same day.",
+    "00:44 Diya Patel: The CI pipeline update was a huge win too. Build times went from 14 minutes down to 4, which basically gave everyone back an hour a day.",
+    "00:58 Rahul Verma: I'll add one — the on-call rotation change. Nobody got paged more than twice this sprint. Last sprint I got paged nine times in one week, which was honestly brutal.",
+    "01:14 Arjun Mehta: Those are three genuinely great wins. Anything else before we move to the hard part?",
+    "01:20 Sneha Rao: Small thing, but the research summaries you all started putting in the channel — really helpful. Keep doing that.",
+    "01:29 Arjun Mehta: Noted, we'll keep it up. Okay — what didn't go well? Who's brave?",
+    "01:37 Rahul Verma: I'll go. The migration backfill was a disaster. We scoped it at eight hours and it took closer to thirty. We hit row-count limits we should have known about in advance.",
+    "01:53 Arjun Mehta: Why didn't we catch that in planning? Was it unknown or just unlooked?",
+    "02:00 Rahul Verma: Honestly, a bit of both. We never load-tested against the legacy dataset, and the dataset is ten times bigger than what we designed for.",
+    "02:13 Arjun Mehta: So the lesson is we size migration work against real data volumes, not estimated ones. Can we make that a planning checklist item?",
+    "02:23 Diya Patel: I can add it to the planning template — a mandatory data-volume check for any migration ticket.",
+    "02:30 Arjun Mehta: Please do. Next — anything else that hurt?",
+    "02:35 Priya Sharma: The handoff between design and engineering broke down mid-sprint. We had three days where engineering built from outdated Figma files because the version links weren't updated.",
+    "02:51 Arjun Mehta: How do we prevent that? Is this a tooling problem or a process problem?",
+    "02:57 Priya Sharma: A bit of both, but I think a single source-of-truth link in the ticket would solve 90% of it.",
+    "03:05 Arjun Mehta: Let's do that — every design ticket gets a canonical Figma link in the description. I'll own updating the ticket template.",
+    "03:16 Diya Patel: One more from me — the incident on the 12th. The caching outage took 40 minutes to diagnose because our runbook was out of date.",
+    "03:29 Arjun Mehta: That one's on all of us. The runbook hadn't been touched since April.",
+    "03:35 Rahul Verma: We could do a runbook review day — once a sprint, two hours, we all review one service's runbook together.",
+    "03:45 Arjun Mehta: I like that. Rotating ownership, one service per sprint. Who wants to own the first one?",
+    "03:52 Rahul Verma: I'll take the first — the caching service, obviously, since it just burned us.",
+    "03:59 Arjun Mehta: Perfect. Okay, let's also do a quick temperature check — how's morale, honestly? One word each?",
+    "04:09 Priya Sharma: Optimistic.",
+    "04:12 Diya Patel: Tired, but good tired.",
+    "04:16 Rahul Verma: Recovering. This sprint was much better than the last.",
+    "04:22 Sneha Rao: Energized — the research velocity is finally picking up.",
+    "04:28 Arjun Mehta: Mine is grateful. This team handled a rough sprint without pointing fingers, and that's rare. Okay — action items. Let me read them back and confirm owners.",
+    "04:41 Arjun Mehta: Diya adds the data-volume check to the planning template. Diya, by next sprint planning?",
+    "04:49 Diya Patel: Yes, I'll have it in the template before planning on Monday.",
+    "04:53 Arjun Mehta: I update the ticket template with the canonical Figma link. That's on me by Wednesday.",
+    "05:00 Arjun Mehta: Rahul runs the first runbook review on the caching service. When?",
+    "05:06 Rahul Verma: Let's say the 28th, two hours, whole team invited.",
+    "05:12 Arjun Mehta: And one carryover — the backfill. Rahul, where does it stand?",
+    "05:18 Rahul Verma: Fixed as of yesterday, finally. The batching approach worked. Zero data loss, verified counts.",
+    "05:27 Arjun Mehta: Good. Last one — I'll take sharing these retro outcomes with the stakeholders in the weekly update by Friday. Anything I missed?",
+    "05:38 Sneha Rao: One small ask — can the design handoff fix also include a comment from design when something changes? Not just the link.",
+    "05:47 Priya Sharma: Yes, I'll add a change-note convention to the design system docs by Thursday.",
+    "05:55 Arjun Mehta: All right, that's the retro. Great sprint recovery, everyone. Thanks!",
+    "06:03 Diya Patel: Thanks all!"
+  ],
+  "summary": {
+    "template": "general",
+    "overview": "Sprint 14 retrospective. Wins: the design system migration finished two days early (40 components, 3 same-day-fixed regressions), CI build times dropped from 14 to 4 minutes, and the on-call rotation change reduced pages (Rahul: 9/week last sprint → max 2 this sprint). Misses: the migration backfill took ~30 hours against an 8-hour estimate (real data volumes 10× the design assumption), design-engineering handoff broke down over outdated Figma links (3 lost days), and the September 12th caching outage took 40 minutes to diagnose due to a stale runbook. Agreements: data-volume checks in planning, canonical Figma links in tickets, rotating runbook reviews. Morale: recovering and optimistic.",
+    "notes": [
+      "Design system migration done two days early — 40 components, 3 regressions fixed same-day",
+      "CI build time improved from 14 minutes to 4",
+      "On-call pages down dramatically (max 2 per person vs 9/week previously)",
+      "Backfill mis-estimated: 8 hours scoped, ~30 hours actual — real data is 10× the design volume",
+      "Design handoff broke down — 3 days built from outdated Figma versions",
+      "Sept 12th caching outage took 40 minutes to diagnose; runbook stale since April",
+      "Agreements: data-volume check in planning template, canonical Figma link per ticket, rotating 2-hour runbook reviews",
+      "Morale check: optimistic, tired-but-good, recovering, energized, grateful"
+    ],
+    "topics": [
+      { "text": "What went well", "at": "00:00", "end": "01:29" },
+      { "text": "What didn't: backfill, handoffs, incident", "at": "01:29", "end": "03:52" },
+      { "text": "Morale check & action items", "at": "03:52", "end": "06:05" }
+    ],
+    "metrics": [
+      { "text": "40 components migrated, 3 regressions", "at": "00:29" },
+      { "text": "Build time 14 minutes → 4 minutes", "at": "00:44" },
+      { "text": "Backfill: 8 hours scoped, ~30 actual", "at": "01:37" },
+      { "text": "Legacy dataset 10× the designed volume", "at": "02:00" },
+      { "text": "3 days lost to outdated Figma files", "at": "02:35" },
+      { "text": "Outage diagnosis took 40 minutes; runbook stale since April", "at": "03:16" },
+      { "text": "9 pages/week last sprint vs max 2 this sprint", "at": "00:58" }
+    ],
+    "action_items": [
+      { "text": "Add the mandatory data-volume check to the planning template", "speaker": "Diya Patel", "at": "04:41", "status": "done", "due": "2026-09-28" },
+      { "text": "Update the ticket template with a canonical Figma link", "speaker": "Arjun Mehta", "at": "04:53", "status": "done", "due": "2026-09-30" },
+      { "text": "Run the first runbook review on the caching service on the 28th", "speaker": "Rahul Verma", "at": "05:06", "status": "done", "due": "2026-09-28" },
+      { "text": "Share retro outcomes with stakeholders in the weekly update", "speaker": "Arjun Mehta", "at": "05:27", "status": "done", "due": "2026-10-02" },
+      { "text": "Add a change-note convention to the design system docs", "speaker": "Priya Sharma", "at": "05:47", "status": "in_progress", "due": "2026-10-08" }
+    ]
+  },
+  "comments": [
+    { "by": "Arjun Mehta", "at": "01:14", "body": "Three straight sprints of build-time improvement — worth celebrating in the all-hands." },
+    { "by": "Diya Patel", "at": "02:13", "body": "The planning checklist change should prevent this whole class of mis-estimates." }
+  ],
+  "bookmarks": [
+    { "at": "02:00", "label": "Why the backfill exploded" },
+    { "at": "03:45", "label": "Runbook review day proposal" }
+  ],
+  "soundbites": [],
+  "chat": []
+}

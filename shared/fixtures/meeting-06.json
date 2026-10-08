@@ -1,0 +1,77 @@
+{
+  "title": "1:1 — Vishesh & Priya",
+  "meeting_date": "2026-09-28T15:30:00Z",
+  "description": "Weekly 1:1: wins, growth areas, and the design review.",
+  "channel": "My Meetings",
+  "source": "seed",
+  "language": "en",
+  "tags": ["1:1"],
+  "participants": [
+    { "name": "Vishesh Gupta", "email": "vishesh@northstar.io", "host": true },
+    { "name": "Priya Sharma", "email": "priya@northstar.io" }
+  ],
+  "transcript": [
+    "00:03 Vishesh Gupta: Hey Priya, how's your week been? Let's do the usual — wins, growth areas, then logistics.",
+    "00:12 Priya Sharma: It's been a good week, honestly. The two-panel Notepad layout is done in Figma, and I think it's the best work the team has shipped this year.",
+    "00:26 Vishesh Gupta: I agree — the review feedback was overwhelmingly positive. People especially loved the collapsible icon rail.",
+    "00:36 Priya Sharma: That was actually the hardest part. It took three iterations to get the collapse behavior feeling right.",
+    "00:44 Vishesh Gupta: Tell me about the iterations — what changed?",
+    "00:49 Priya Sharma: The first version was a drawer, which felt heavy. The second had the icons jumping around when it collapsed. The third one — the one we shipped — keeps the icons in a fixed rail so your muscle memory doesn't break.",
+    "01:07 Vishesh Gupta: That attention to detail is exactly what we need more of. I want you to present this at the October 21st leadership review.",
+    "01:17 Priya Sharma: Really? That's a little outside my comfort zone, but I'd love to.",
+    "01:23 Vishesh Gupta: You'll be great. We'll prep together — how about we do a dry run on the 20th?",
+    "01:29 Priya Sharma: Let's do it. I'll prepare the deck this week and share it by Thursday.",
+    "01:36 Vishesh Gupta: Perfect. How are things otherwise — anything blocking you?",
+    "01:41 Priya Sharma: Two things. First, I'm still waiting on the accessibility audit for the dark theme — I asked for it two weeks ago and it's stuck with the vendor.",
+    "01:54 Vishesh Gupta: That's on me — I'll chase them today and get you a date before end of week.",
+    "02:01 Priya Sharma: Thank you. Second, the mobile app designs are lagging because we deprioritized them for the Notepad work. I'm worried we're building up a design debt balloon.",
+    "02:15 Vishesh Gupta: I hear you. Let's scope mobile properly at the kickoff for the next sprint — I don't want it bolted on later.",
+    "02:25 Priya Sharma: That's all I ask. Can we put 30 minutes on the calendar for it next Monday?",
+    "02:31 Vishesh Gupta: Yes, I'll book it today — Monday at 3pm.",
+    "02:36 Priya Sharma: Great. On growth areas, I'd love feedback on how I handled the sprint planning session last week.",
+    "02:44 Vishesh Gupta: Honestly, it was strong. One thing — you went quiet when Arjun pushed back on the timeline. In planning sessions, push back visibly, not just in the doc afterwards.",
+    "02:58 Priya Sharma: That's fair. I knew I disagreed in the room but I second-guessed myself. I'll work on it — maybe I'll script my pushbacks before the next session.",
+    "03:11 Vishesh Gupta: Small thing, big impact. Okay — anything you need from me, or from the company?",
+    "03:18 Priya Sharma: The team asked about the hack week in December. Is that still happening?",
+    "03:24 Vishesh Gupta: It's still on — I'll confirm the dates by next Friday. I know people are excited about it.",
+    "03:33 Priya Sharma: People are definitely excited. Okay, that's everything from me.",
+    "03:38 Vishesh Gupta: Great session. To recap — you prep the deck by Thursday, we dry run on the 20th, I chase the audit vendor today, book mobile scoping Monday, and confirm hack week dates by Friday.",
+    "03:56 Priya Sharma: Sounds like a plan. Thanks, Vishesh!"
+  ],
+  "summary": {
+    "template": "one_on_one",
+    "overview": "Weekly 1:1. Wins: the two-panel Notepad layout shipped after three iterations on the collapsible icon rail, receiving strongly positive review feedback. Priya will present it at the October 21st leadership review, with a dry run on the 20th. Blockers: the accessibility audit is stuck with the vendor (Vishesh chasing today), and mobile designs are accumulating debt — scoping session booked Monday 3pm. Growth area: visible pushback in planning sessions.",
+    "notes": [
+      "Notepad two-panel layout complete — best-reviewed work of the year",
+      "The icon rail took three iterations; the final version preserves muscle memory",
+      "Priya presents at the October 21st leadership review; dry run on the 20th",
+      "Accessibility audit stuck with the vendor for two weeks — escalated",
+      "Mobile design debt flagged; 30-minute scoping session booked Monday 3pm",
+      "Growth area: push back visibly in planning sessions, not in docs afterwards"
+    ],
+    "topics": [
+      { "text": "Wins: the Notepad layout", "at": "00:00", "end": "01:36" },
+      { "text": "Blockers: audit vendor & mobile debt", "at": "01:36", "end": "02:36" },
+      { "text": "Growth areas & logistics", "at": "02:36", "end": "03:58" }
+    ],
+    "metrics": [
+      { "text": "Three iterations on the icon rail", "at": "00:36" },
+      { "text": "Audit requested two weeks ago", "at": "01:41" },
+      { "text": "30-minute mobile scoping on Monday", "at": "02:25" }
+    ],
+    "action_items": [
+      { "text": "Prepare the leadership review deck and share by Thursday", "speaker": "Priya Sharma", "at": "01:29", "status": "in_progress", "due": "2026-10-09" },
+      { "text": "Chase the accessibility audit vendor and get a date", "speaker": "Vishesh Gupta", "at": "01:54", "status": "done", "due": "2026-10-02" },
+      { "text": "Book the mobile scoping session Monday at 3pm", "speaker": "Vishesh Gupta", "at": "02:31", "status": "done", "due": "2026-09-29" },
+      { "text": "Confirm hack week dates by next Friday", "speaker": "Vishesh Gupta", "at": "03:24", "status": "open", "due": "2026-10-09" }
+    ]
+  },
+  "comments": [
+    { "by": "Vishesh Gupta", "at": "01:07", "body": "Priya presenting at the leadership review — career moment. Make sure the dry run is on both calendars." }
+  ],
+  "bookmarks": [
+    { "at": "02:44", "label": "Growth feedback" }
+  ],
+  "soundbites": [],
+  "chat": []
+}

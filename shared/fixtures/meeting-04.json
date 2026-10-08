@@ -1,0 +1,93 @@
+{
+  "title": "User Research Interview — Onboarding Flow",
+  "meeting_date": "2026-10-02T13:30:00Z",
+  "description": "Interview with Maya about first-time onboarding friction.",
+  "channel": "My Meetings",
+  "source": "seed",
+  "language": "en",
+  "tags": ["research"],
+  "participants": [
+    { "name": "Sneha Rao", "email": "sneha@northstar.io", "host": true },
+    { "name": "Maya Iyer", "email": "maya@example.com" }
+  ],
+  "transcript": [
+    "00:03 Sneha Rao: Thanks so much for making time, Maya. Today I'd love to walk through your experience signing up — what happened, where it went well, where it didn't. Sound okay?",
+    "00:18 Maya Iyer: Sounds good, happy to help.",
+    "00:21 Sneha Rao: Let's start from the very beginning. What brought you to the product in the first place?",
+    "00:28 Maya Iyer: My manager asked our team to try it for meeting notes. Honestly, I signed up because I hate writing minutes — I always miss things.",
+    "00:40 Sneha Rao: When you say you miss things, can you give me an example?",
+    "00:46 Maya Iyer: Last month I was in a 90-minute planning call and I literally took two pages of notes and still forgot who owned which task. Basically the notes were useless by the next morning.",
+    "01:02 Sneha Rao: Got it. So what happened when you first opened the app?",
+    "01:08 Maya Iyer: So the sign-up itself was fine — Google login, one click. But then, um, I got dropped into this almost empty dashboard with no meetings and no real hint of what to do next.",
+    "01:26 Sneha Rao: What did you expect to see?",
+    "01:30 Maya Iyer: I guess I expected it to just join my calendar meetings, like automatically? I didn't realize I had to connect my calendar first. The invite step made me want to give up, honestly.",
+    "01:46 Sneha Rao: That's really helpful — the invite step. Can you tell me more about what happened there?",
+    "01:52 Maya Iyer: It asked me to pick which meetings it should join, but the list only showed three meetings, and none of them were the ones I actually cared about. I kind of guessed and moved on.",
+    "02:08 Sneha Rao: And after you picked those, what happened next?",
+    "02:13 Maya Iyer: Nothing, for like two days. No meetings got recorded because — I found out later — my team uses Meet links in the body, not calendar invites, if that makes sense. Nobody told me that.",
+    "02:31 Sneha Rao: So for two days you thought it was broken? Did you look for help?",
+    "02:37 Maya Iyer: I Googled it, found a help article eventually, but the article was about Zoom, not Google Meet. That was frustrating.",
+    "02:49 Sneha Rao: Okay, noted. If we could wave a magic wand, what would have made that first week better?",
+    "02:57 Maya Iyer: I'd love a checklist, like a little progress thing — connect calendar, join a meeting, see your first summary. Oh, and maybe a sample meeting so I could see what a good transcript looks like before my own meetings showed up.",
+    "03:17 Sneha Rao: A sample meeting — interesting. Has anyone else mentioned that?",
+    "03:22 Maya Iyer: My teammate Raj asked the same thing in our standup, actually. He wanted to see what the output would look like before trusting it with real calls.",
+    "03:36 Sneha Rao: Let's talk about the first time a real meeting did show up. What was that like?",
+    "03:44 Maya Iyer: Oh, that was the aha moment, honestly. The summary was scarily good — it caught action items I didn't even remember being assigned. That's when I told my manager we should pay for it.",
+    "04:02 Sneha Rao: What specifically in the summary sold you?",
+    "04:07 Maya Iyer: The action items section with people's names on each task. And the chapter things — the topics with timestamps. I could jump right to the pricing discussion without scrubbing the whole recording.",
+    "04:24 Sneha Rao: If you had to keep exactly one feature, which one?",
+    "04:30 Maya Iyer: The action items. Everything else is nice, but the action items are why I don't take notes anymore.",
+    "04:40 Sneha Rao: Last couple of questions. How often do you go back to old meetings?",
+    "04:46 Maya Iyer: Every Friday, basically, for our team retro. I search for stuff like what did we promise the client last week. That search is clutch.",
+    "05:00 Sneha Rao: What would you change about that search, if anything?",
+    "05:04 Maya Iyer: Maybe search within a single meeting from the player? I sometimes remember the meeting but not the exact words. But honestly, it's fine.",
+    "05:18 Sneha Rao: Great. Any final thoughts before we wrap up?",
+    "05:23 Maya Iyer: Just — make the first week less confusing, and this product is basically perfect for people like me. The empty dashboard nearly lost us as customers.",
+    "05:37 Sneha Rao: That is gold, thank you Maya. I'll share the takeaways with the team this week. Have a great day!",
+    "05:45 Maya Iyer: Thanks, you too!"
+  ],
+  "summary": {
+    "template": "general",
+    "overview": "Research interview with Maya (ops team lead) on first-time onboarding. Sign-up itself was frictionless (Google one-click), but the empty dashboard gave no guidance, the calendar-connect step was undiscoverable, and Google Meet links in the body weren't captured — leaving the user thinking the product was broken for two days. The retention moment was the first real summary (accurate action items with owners and timestamped topics). Requested fixes: an onboarding checklist, a sample meeting, and meeting-scoped search from the player.",
+    "notes": [
+      "Sign-up via Google was one click and painless",
+      "Empty dashboard with no meetings and no next-step hints — first friction point",
+      "Calendar connection was undiscoverable; user expected auto-join without setup",
+      "Google Meet links in the email body weren't captured — product appeared broken for two days",
+      "Help article found via Google was Zoom-focused, adding to the confusion",
+      "Aha moment: first real summary — action items with owners, topics with timestamps",
+      "Weekly habit: searching past meetings every Friday for the team retro",
+      "Teammate Raj independently requested a sample meeting to preview output quality"
+    ],
+    "topics": [
+      { "text": "Background & sign-up", "at": "00:00", "end": "01:26" },
+      { "text": "Onboarding friction: invite step & missing meetings", "at": "01:26", "end": "03:17" },
+      { "text": "First summary & value moments", "at": "03:17", "end": "05:00" },
+      { "text": "Improvement wishes & wrap-up", "at": "05:00", "end": "05:47" }
+    ],
+    "metrics": [
+      { "text": "Two days thinking the product was broken", "at": "02:13" },
+      { "text": "90-minute planning call with two pages of notes", "at": "00:46" },
+      { "text": "Only three meetings shown at connect step", "at": "01:52" }
+    ],
+    "action_items": [
+      { "text": "Design an onboarding checklist with clear progress states", "speaker": "Sneha Rao", "at": "02:57", "status": "open", "due": "2026-10-16" },
+      { "text": "Ship a sample meeting with the first-run experience", "speaker": "Sneha Rao", "at": "02:57", "status": "in_progress", "due": "2026-10-20" },
+      { "text": "Fix detection of Google Meet links in invite bodies", "speaker": "Sneha Rao", "at": "02:13", "status": "open", "due": "2026-10-23" },
+      { "text": "Share research takeaways with the team", "speaker": "Sneha Rao", "at": "05:37", "status": "done", "due": "2026-10-03" }
+    ]
+  },
+  "comments": [
+    { "by": "Sneha Rao", "at": "01:30", "body": "Calendar-connect discoverability came up in 3 of 4 interviews so far — this is systemic." },
+    { "by": "Vishesh Gupta", "at": "04:30", "body": "Action items being the #1 feature matches the product analytics — 78% of DAU interact with them weekly." }
+  ],
+  "bookmarks": [
+    { "at": "01:30", "label": "The invite-step drop-off" },
+    { "at": "03:44", "label": "The aha moment" }
+  ],
+  "soundbites": [
+    { "title": "The invite flow made me want to give up", "at": "01:30", "end": "01:46" },
+    { "title": "Action items are why I stopped taking notes", "at": "04:30", "end": "04:40" }
+  ],
+  "chat": []
+}

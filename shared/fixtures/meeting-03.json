@@ -1,0 +1,85 @@
+{
+  "title": "Weekly Engineering Sync",
+  "meeting_date": "2026-10-05T11:00:00Z",
+  "description": "Weekly sync: blockers, latency work, and the October 20th deploy.",
+  "channel": "My Meetings",
+  "source": "seed",
+  "language": "en",
+  "tags": ["engineering"],
+  "participants": [
+    { "name": "Arjun Mehta", "email": "arjun@northstar.io", "host": true },
+    { "name": "Rahul Verma", "email": "rahul@northstar.io" },
+    { "name": "Diya Patel", "email": "diya@northstar.io" },
+    { "name": "Vishesh Gupta", "email": "vishesh@northstar.io" }
+  ],
+  "transcript": [
+    "00:03 Arjun Mehta: Morning everyone. Quick agenda — blockers, the latency milestone, and the October 20th deploy. Who wants to start?",
+    "00:16 Diya Patel: I'll start. Good news first — the new indexing branch cut p95 latency from 320 milliseconds to 140 milliseconds in staging. Bad news is it breaks the filters migration in two edge cases.",
+    "00:36 Rahul Verma: What are the edge cases? Is it the timezone boundaries again?",
+    "00:43 Diya Patel: One is timezone boundaries, the other is meetings that span midnight UTC. I think I can fix both by Friday if I focus on it.",
+    "00:55 Arjun Mehta: Do you need help, or is it a solo job?",
+    "01:00 Diya Patel: I'd rather own it, but Rahul, can you review the PR once it's up? Maybe Thursday?",
+    "01:08 Rahul Verma: Sure, Thursday works. I have to be honest though, my migration script is also failing — the data backfill for old meetings is timing out at about 10,000 rows.",
+    "01:22 Arjun Mehta: Is that blocking the deploy, or can we ship without the backfill?",
+    "01:28 Rahul Verma: We can ship without it — new meetings migrate fine. The backfill only affects recordings older than 90 days.",
+    "01:37 Arjun Mehta: Okay, so it's a P2. Let's not hold the October 20th deploy for it. Can you file the issue and timebox it to next week?",
+    "01:48 Rahul Verma: Yes, I'll file it today and timebox it to eight hours next week.",
+    "01:55 Vishesh Gupta: Quick question from the product side — will the latency fix be user-visible, or is it all under the hood?",
+    "02:04 Diya Patel: Users will feel it — transcript search and smart filters respond in under 150 milliseconds now instead of that sluggish 320.",
+    "02:16 Vishesh Gupta: That's great, let's include it in the release notes. Anything else going into the October 20th deploy?",
+    "02:25 Arjun Mehta: Yes — the new pagination on the meetings list, the export service, and the settings page. We'll freeze the branch on the 17th and spend the 18th and 19th on hardening and QA.",
+    "02:41 Diya Patel: Are we doing a load test before the freeze?",
+    "02:46 Arjun Mehta: Good point. Let's run a load test on the 16th — Diya, can you own that?",
+    "02:52 Diya Patel: Yes, I'll run it against staging with a 500-concurrent-user profile and share the report by end of day Thursday.",
+    "03:03 Rahul Verma: I can prep the rollback plan meanwhile. If anything breaks, we revert within 15 minutes.",
+    "03:11 Arjun Mehta: Love it. Rollback plan in the deploy doc by Wednesday, please.",
+    "03:18 Vishesh Gupta: One more thing — the stakeholders asked about uptime this quarter. What are we at?",
+    "03:26 Arjun Mehta: We're at 99.8% for the quarter. The one incident was the September 12th caching outage, about 40 minutes.",
+    "03:38 Vishesh Gupta: I'll include that in the investor update. Anything else? Blockers, concerns, anything?",
+    "03:45 Rahul Verma: One small thing — can we get the API docs regenerated before the deploy? They're out of date since the pagination change.",
+    "03:55 Arjun Mehta: Sure, I'll regenerate them as part of the release checklist. Okay, quick recap — Diya fixes the edge cases by Friday, reviews Thursday; Rahul files the backfill issue; load test on the 16th; rollback plan Wednesday; freeze on the 17th; deploy on the 20th.",
+    "04:16 Diya Patel: That covers it. Thanks everyone!",
+    "04:20 Rahul Verma: Thanks all."
+  ],
+  "summary": {
+    "template": "general",
+    "overview": "Weekly engineering sync ahead of the October 20th deploy. Headline: Diya's indexing branch cut p95 latency from 320ms to 140ms in staging but breaks the filters migration in two edge cases (timezone boundaries, midnight-spanning meetings) — fix targeted by Friday. Rahul's legacy backfill is timing out at ~10k rows but is a P2, not deploy-blocking. The deploy freezes on the 17th with a load test on the 16th. Quarterly uptime is 99.8%.",
+    "notes": [
+      "p95 latency improved from 320ms to 140ms in staging via the new indexing branch",
+      "Two edge cases block the filters migration: timezone boundaries and meetings spanning midnight UTC",
+      "Backfill for 90-day-old meetings times out at ~10,000 rows — P2, not deploy-blocking",
+      "October 20th deploy: pagination, export service, settings page; branch freeze on the 17th",
+      "Load test on the 16th with a 500-concurrent-user profile",
+      "Rollback plan targets a 15-minute revert",
+      "Quarterly uptime at 99.8%; single incident Sept 12th (~40 minutes)"
+    ],
+    "topics": [
+      { "text": "Blockers: latency edge cases & backfill", "at": "00:00", "end": "02:16" },
+      { "text": "October 20th deploy plan", "at": "02:16", "end": "03:45" },
+      { "text": "Recap & owners", "at": "03:45", "end": "04:20" }
+    ],
+    "metrics": [
+      { "text": "p95 latency 320ms → 140ms", "at": "00:16" },
+      { "text": "Backfill timeout at ~10,000 rows", "at": "01:08" },
+      { "text": "Rollback within 15 minutes", "at": "03:03" },
+      { "text": "99.8% uptime; Sept 12th incident ~40 minutes", "at": "03:26" },
+      { "text": "500-concurrent-user load test", "at": "02:52" }
+    ],
+    "action_items": [
+      { "text": "Fix the two migration edge cases and open the PR by Friday", "speaker": "Diya Patel", "at": "00:43", "status": "in_progress", "due": "2026-10-10" },
+      { "text": "Review Diya's PR on Thursday", "speaker": "Rahul Verma", "at": "01:08", "status": "open", "due": "2026-10-09" },
+      { "text": "File and timebox the backfill issue to eight hours", "speaker": "Rahul Verma", "at": "01:48", "status": "done", "due": "2026-10-06" },
+      { "text": "Run the load test on the 16th and share the report", "speaker": "Diya Patel", "at": "02:52", "status": "open", "due": "2026-10-16" },
+      { "text": "Write the rollback plan into the deploy doc", "speaker": "Rahul Verma", "at": "03:11", "status": "open", "due": "2026-10-08" },
+      { "text": "Regenerate the API docs for the release checklist", "speaker": "Arjun Mehta", "at": "03:55", "status": "open", "due": "2026-10-17" }
+    ]
+  },
+  "comments": [
+    { "by": "Arjun Mehta", "at": "00:16", "body": "Latency win is the headline for the release notes — let's not bury it." }
+  ],
+  "bookmarks": [
+    { "at": "02:46", "label": "Load test decision" }
+  ],
+  "soundbites": [],
+  "chat": []
+}

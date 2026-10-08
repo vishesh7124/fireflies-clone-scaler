@@ -1,0 +1,21 @@
+{
+  "title": "Design Review — Notepad Layout (scheduled)",
+  "meeting_date": "2026-10-12T10:30:00Z",
+  "description": "Walkthrough of the Notepad two-panel layout with the design team.",
+  "channel": "My Meetings",
+  "source": "schedule",
+  "language": "en",
+  "tags": ["product"],
+  "status": "scheduled",
+  "participants": [
+    { "name": "Vishesh Gupta", "email": "vishesh@northstar.io", "host": true },
+    { "name": "Priya Sharma", "email": "priya@northstar.io" },
+    { "name": "Sneha Rao", "email": "sneha@northstar.io" }
+  ],
+  "transcript": [],
+  "summary": null,
+  "comments": [],
+  "bookmarks": [],
+  "soundbites": [],
+  "chat": []
+}

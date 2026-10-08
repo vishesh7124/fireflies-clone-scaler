@@ -35,13 +35,14 @@
 - **Review round 1 (Oct 9, `original.png` vs `clone.png`):** applied — warm plum palette (`#0E0A17` canvas / `#251C3D` accents / mint `#3DDC97`), sidebar 240px w/ 15px nav + plum active pill + green-text `40% OFF`, topbar (real search copy, `Ctrl`+`K` keycaps, red bell dot, camera-icon Capture), centered 880px content column, hero (plum fill + visible border + richer thumbnail), one-line Quick Start tiles, Recent/Upcoming/AI Feed tabs + recent row, Try More cards, trial banner, floating promo card, help bubble, ambient canvas glow.
 - **Review round 2 (Oct 9):** corrected round 1's over-purple — **neutral dark-gray base** (`#141314` canvas / `#1E1E1F` sidebar), purple as accent only (`#6938EF` buttons, `#8B7CFF` links), **warm brown/copper hero** (`#3A1F0F→#5A2D12` + copper laptop mockup), **solid tinted Quick Start tiles** (maroon/teal/indigo), muted forest greens (Upgrade pill / 3 badge / 40% OFF pill), neutral grays for text (`#B8B8BC` / `#9A9A9E`), **smaller radii** (pills 4 · controls 6 · cards 12), lavender help bubble, promo card moved into sidebar bottom ("Invite coworkers" + Create Team), "Try Email Assistant" purple-highlighted, sidebar group separator, initials workspace avatar.
 
-## Phase 1 — Shared fixtures + mock layer (2h)
+## Phase 1 — Shared fixtures + mock layer (2h) — ✅ done (Oct 9)
 
-- [ ] `shared/fixtures/`: author the 8 meetings from doc 03 §6 as JSON (title/date/duration/participants/**60–120 transcript segments each**/structured summaries/action items w/ provenance/tags; comments+bookmarks+soundbites on meetings 4–5; chat threads on 2 & 5; 2 upcoming `scheduled` meetings) — shaped **exactly** like the API payloads in doc 03 §2.4
-- [ ] `lib/types.ts` — the full contract types (these are frozen now; backend Pydantic schemas will mirror them)
-- [ ] `lib/api.ts` adapter: `USE_MOCKS ? mockApi : httpApi` — one interface, both implementations
-- [ ] `mock/` store: in-memory fixtures + **localStorage persistence** (mutations survive refresh) + simulated `processing → ready` transition with 2–4s delay on create
-- **Checkpoint:** data layer demoable in React Query devtools; fixtures double as future seed content.
+- [x] `shared/fixtures/`: 10 meetings as compact JSON (8 ready w/ full transcripts 47–80 lines each + structured summaries/action items w/ provenance/tags; comments+bookmarks+soundbites on meetings 2/4/5/8; chat threads on 2 & 5; 2 upcoming `scheduled`) — format spec in `shared/fixtures/README.md`
+- [x] `lib/types.ts` — full contract types + `ApiClient` interface (frozen; backend Pydantic mirrors in Phase 5)
+- [x] `lib/api.ts` adapter (`NEXT_PUBLIC_USE_MOCKS` flag) + `lib/http-api.ts` (real FastAPI paths, wired in Phase 7)
+- [x] `mock/` layer: `load.ts` (fixture parser → normalized db), `engine.ts` (smart-search classification, stats/WPM/sentiment, rules-based summary generation, AskFred retrieval w/ citations, txt/md/srt/vtt/json exports), `store.ts` (localStorage persistence + processing→ready simulation), `api.ts` (contract impl w/ latency)
+- [x] React Query provider mounted in `(app)/layout.tsx`; `npm run smoke` — end-to-end data-layer test, all green
+- **Checkpoint:** `npm run smoke` prints the full roundtrip (list/filters, transcript/stats, summary, AskFred w/ citations, create→process→ready, action-item toggle, 5 exports, engagement CRUD).
 
 ## Phase 2 — Login, Home, Meetings library (3.5h)
 

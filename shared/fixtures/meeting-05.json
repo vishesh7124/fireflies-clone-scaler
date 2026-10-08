@@ -1,0 +1,107 @@
+{
+  "title": "Marketing Sync — Q3 Launch",
+  "meeting_date": "2026-10-01T16:00:00Z",
+  "description": "Q3 launch campaign planning: channels, budget, and timeline.",
+  "channel": "My Meetings",
+  "source": "seed",
+  "language": "en",
+  "tags": ["marketing", "launch"],
+  "participants": [
+    { "name": "Vishesh Gupta", "email": "vishesh@northstar.io", "host": true },
+    { "name": "Neha Kulkarni", "email": "neha@northstar.io" },
+    { "name": "Aditya Joshi", "email": "aditya@northstar.io" }
+  ],
+  "transcript": [
+    "00:04 Vishesh Gupta: Hey both, thanks for joining. Today is all about the Q3 launch — the October 28th launch date is locked, so we need to finalize channels, budget, and the timeline today.",
+    "00:21 Neha Kulkarni: The campaign concept is finalized on my side — the whole angle is stop taking notes, start taking action. I think it's our strongest hook yet.",
+    "00:34 Aditya Joshi: I agree, it tested really well. In the message tests, it beat our previous positioning by 28% on both recall and click-through.",
+    "00:46 Vishesh Gupta: That's great news. What's the media plan looking like, Neha?",
+    "00:51 Neha Kulkarni: Core channels are LinkedIn, YouTube pre-roll, and the newsletter. We'll add paid search in week three once we know which landing pages convert.",
+    "01:04 Aditya Joshi: What's the split on the budget?",
+    "01:08 Neha Kulkarni: Total budget is $12,000 — roughly $5,000 on LinkedIn, $4,000 on YouTube, $2,000 on paid search, and $1,000 for creative production.",
+    "01:22 Vishesh Gupta: Does that include the launch event?",
+    "01:26 Neha Kulkarni: The virtual launch event is separate — that's the $3,000 line item in the brand budget, not the campaign budget.",
+    "01:36 Aditya Joshi: I'm a little worried about LinkedIn only getting $5,000. Our last two launches, LinkedIn drove 60% of demo signups.",
+    "01:47 Neha Kulkarni: That's fair. What if we shift $500 from paid search into LinkedIn in week two if the CPL is under $40?",
+    "01:57 Aditya Joshi: That works for me. A conditional shift keeps us honest.",
+    "02:02 Vishesh Gupta: Let's make that a decision — conditional $500 shift in week two if CPL is under $40. Neha, can you own that?",
+    "02:13 Neha Kulkarni: Yes, I'll set the trigger in the dashboard and report on it in our weekly sync.",
+    "02:20 Vishesh Gupta: Aditya, how's the content engine coming?",
+    "02:25 Aditya Joshi: Good — we have the launch post, a customer story with Maya's team, and the product demo video. The demo video is 90 seconds, and we'll cut it into six shorts.",
+    "02:39 Vishesh Gupta: Six shorts from one video? Ambitious. When do they ship?",
+    "02:44 Aditya Joshi: The first two ship on launch day, then two per week for the following two weeks.",
+    "02:52 Neha Kulkarni: I'd love to coordinate the shorts with the newsletter sends. If we can pair each short with a send, we get twice the mileage.",
+    "03:01 Aditya Joshi: Works for me. I'll share the shorts calendar by Wednesday and you can map the sends against it.",
+    "03:09 Vishesh Gupta: What about the landing page? Is it on track?",
+    "03:14 Neha Kulkarni: The copy is final, and the dev build goes live in staging on October 20th. We have a week of QA buffer before launch day.",
+    "03:26 Vishesh Gupta: And the customer story — do we have approval from Maya's team?",
+    "03:32 Aditya Joshi: I spoke to Maya yesterday. They're happy to be featured, but legal wants to review the final cut before we publish anything.",
+    "03:42 Vishesh Gupta: Okay, let's get legal the draft early. Aditya, when can you send it?",
+    "03:47 Aditya Joshi: I'll send the draft to Maya's legal by Friday, which gives them a full week before our publish date of October 24th.",
+    "03:58 Vishesh Gupta: Good. One thing I want on the record — the success metric. What are we measuring this launch on?",
+    "04:06 Neha Kulkarni: The north star is 500 demo signups in the first two weeks, with a stretch goal of 800.",
+    "04:15 Aditya Joshi: And we'll track CPL weekly — if it holds under $40, we're healthy.",
+    "04:22 Vishesh Gupta: 500 signups in two weeks, CPL under $40. Clear. What are the risks? Anything keeping you both up at night?",
+    "04:31 Neha Kulkarni: Honestly, the timeline is tight. If the landing page slips past the 20th, we lose the QA buffer, and that's when launches get messy.",
+    "04:42 Aditya Joshi: My risk is the customer story — if legal wants changes, the publish date moves, and the story anchors our week two content.",
+    "04:52 Vishesh Gupta: Okay, so let's mitigate both. Neha, lock the landing page scope today — no new asks. Aditya, get the draft to legal early and front-load that review.",
+    "05:06 Neha Kulkarni: Agreed, I'll lock the scope with the web team this afternoon.",
+    "05:12 Aditya Joshi: And I'll get the legal draft out by Friday, plus a backup plan — if the story slips, we promote the demo video harder in week two.",
+    "05:24 Vishesh Gupta: Perfect. Let's recap owners and dates, then we're done.",
+    "05:29 Neha Kulkarni: Landing page scope locked today, live in staging October 20th. Conditional $500 budget shift decision in week two. Weekly CPL reporting in our sync.",
+    "05:44 Aditya Joshi: Shorts calendar by Wednesday, legal draft by Friday, customer story publishes October 24th if approved.",
+    "05:55 Vishesh Gupta: And I'll present the full launch plan at the leadership review on October 21st. Thanks both — this was a really productive sync. Talk next week!",
+    "06:12 Neha Kulkarni: Thanks, bye!"
+  ],
+  "summary": {
+    "template": "general",
+    "overview": "Q3 launch sync for the October 28th launch. Campaign concept is locked (\"stop taking notes, start taking action\" — beat previous positioning by 28% in tests). Media plan: LinkedIn, YouTube, newsletter + week-three paid search on a $12,000 campaign budget (plus a separate $3,000 event line). Decision made: conditional $500 shift from search to LinkedIn in week two if CPL < $40. Success metric: 500 demo signups in two weeks (stretch 800). Risks: landing-page timeline (staging Oct 20, no slippage) and legal review of the customer story.",
+    "notes": [
+      "Launch date locked for October 28th; leadership review on October 21st",
+      "Campaign concept outperformed previous positioning by 28% on recall and CTR",
+      "Budget: $12,000 — $5k LinkedIn, $4k YouTube, $2k paid search, $1k creative",
+      "Virtual launch event funded separately ($3,000 brand line)",
+      "Decision: shift $500 from search to LinkedIn in week two if CPL is under $40",
+      "North-star metric: 500 demo signups in two weeks, stretch goal 800",
+      "Six short-form videos planned from one 90-second demo video",
+      "Risks: landing page must hit staging October 20th; customer story pending legal review"
+    ],
+    "topics": [
+      { "text": "Campaign concept & media plan", "at": "00:00", "end": "01:36" },
+      { "text": "Budget & channel split", "at": "01:36", "end": "02:20" },
+      { "text": "Content engine & customer story", "at": "02:20", "end": "04:06" },
+      { "text": "Metrics, risks & owner recap", "at": "04:06", "end": "06:14" }
+    ],
+    "metrics": [
+      { "text": "Launch date October 28th", "at": "00:04" },
+      { "text": "Positioning beat previous by 28%", "at": "00:34" },
+      { "text": "$12,000 total campaign budget", "at": "01:08" },
+      { "text": "LinkedIn drove 60% of demo signups historically", "at": "01:36" },
+      { "text": "CPL threshold $40", "at": "01:57" },
+      { "text": "90-second demo video cut into six shorts", "at": "02:25" },
+      { "text": "500 demo signups target, 800 stretch", "at": "04:06" },
+      { "text": "$3,000 separate event budget", "at": "01:26" }
+    ],
+    "action_items": [
+      { "text": "Set the $500 conditional shift trigger and report weekly CPL", "speaker": "Neha Kulkarni", "at": "02:13", "status": "open", "due": null },
+      { "text": "Share the shorts calendar by Wednesday", "speaker": "Aditya Joshi", "at": "03:01", "status": "done", "due": "2026-10-07" },
+      { "text": "Send the customer story draft to Maya's legal by Friday", "speaker": "Aditya Joshi", "at": "03:47", "status": "in_progress", "due": "2026-10-09" },
+      { "text": "Lock landing page scope with the web team today", "speaker": "Neha Kulkarni", "at": "05:06", "status": "done", "due": "2026-10-01" },
+      { "text": "Present the full launch plan at the October 21st leadership review", "speaker": "Vishesh Gupta", "at": "05:55", "status": "open", "due": "2026-10-21" }
+    ]
+  },
+  "comments": [
+    { "by": "Neha Kulkarni", "at": "01:47", "body": "The conditional shift idea is worth making standard playbook for future launches." },
+    { "by": "Vishesh Gupta", "at": "04:31", "body": "Timeline risk is real — if staging slips we should escalate immediately, not wait for the next sync." }
+  ],
+  "bookmarks": [
+    { "at": "02:02", "label": "Budget shift decision" },
+    { "at": "04:06", "label": "Success metrics" }
+  ],
+  "soundbites": [
+    { "title": "Stop taking notes, start taking action", "at": "00:21", "end": "00:34" }
+  ],
+  "chat": [
+    { "role": "user", "content": "What were the action items from this meeting?" }
+  ]
+}

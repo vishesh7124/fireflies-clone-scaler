@@ -1,0 +1,96 @@
+{
+  "title": "Investor Update Call — Northwind Ventures",
+  "meeting_date": "2026-09-22T17:00:00Z",
+  "description": "Quarterly metrics walkthrough with Northwind's partners.",
+  "channel": "My Meetings",
+  "source": "seed",
+  "language": "en",
+  "tags": ["investors"],
+  "participants": [
+    { "name": "Vishesh Gupta", "email": "vishesh@northstar.io", "host": true },
+    { "name": "Krish Menon", "email": "krish@northwind.vc" },
+    { "name": "Meera Nair", "email": "meera@northwind.vc" }
+  ],
+  "transcript": [
+    "00:04 Vishesh Gupta: Hi Krish, hi Meera — thanks for the time. I'll walk through the Q3 numbers, then the roadmap, and then open it up for questions. Should take about 20 minutes of content.",
+    "00:22 Krish Menon: Perfect, let's dive in. I've been looking forward to this one.",
+    "00:27 Vishesh Gupta: So the headline numbers. We closed the quarter at $2.4 million in ARR, which is 18% quarter-over-quarter growth. Churn came in at 2.1%, down from 2.8% last quarter, and net revenue retention is 112%.",
+    "00:51 Meera Nair: That NRR number is excellent. What's driving it — expansion within teams, or new use cases?",
+    "00:59 Vishesh Gupta: Mostly expansion. Seat growth within existing accounts is running at about 40% of new bookings. The enterprise tier we launched in July is contributing too — eight enterprise logos this quarter, including two of the Fortune 1000 names from our pipeline.",
+    "01:20 Krish Menon: Eight enterprise logos in the first full quarter of the tier — that's ahead of the plan we discussed in June, right?",
+    "01:29 Vishesh Gupta: Correct — we had planned for five to six, so we're roughly 40% ahead on enterprise acquisition.",
+    "01:37 Meera Nair: How's the enterprise motion affecting the pipeline timeline? Enterprise cycles are longer — are you seeing that?",
+    "01:46 Vishesh Gupta: We are — enterprise cycles average 45 days versus 12 days for the self-serve tier, but the ACV is roughly 20 times higher, so the math still favors it strongly.",
+    "02:02 Krish Menon: Let's talk burn. What are we at now?",
+    "02:07 Vishesh Gupta: Net burn is $180,000 a month, which gives us about 14 months of runway at the current pace. With the Q4 plan, we'd project 11 months, but the board-approved hiring plan adds six roles in January, which brings it back to about 10.",
+    "02:30 Meera Nair: Are you comfortable with 10 months? That's getting close to the zone where you want to be raising, not recruiting.",
+    "02:38 Vishesh Gupta: That's exactly why we're starting seed-extension conversations in Q1. With the current metrics — 18% growth and 112% NRR — we'd be raising from strength, not need.",
+    "02:53 Krish Menon: Agreed. For what it's worth, the Q3 numbers would put you in the top quartile of our portfolio for this stage.",
+    "03:02 Vishesh Gupta: That's good to hear. Let me walk through the roadmap, then — the three priorities for Q4 are the mobile app, the conversation intelligence suite, and the enterprise admin controls.",
+    "03:18 Meera Nair: Which of those three do you think moves the revenue needle most?",
+    "03:24 Vishesh Gupta: Honestly, the admin controls. They unlock two enterprise deals currently stalled on security review — combined ACV of about $240,000 a year.",
+    "03:38 Meera Nair: That's a compelling reason to prioritize them. What's the timeline?",
+    "03:44 Vishesh Gupta: Engineering says 90 days, so we're targeting GA by end of January, with beta in December for the two stalled accounts.",
+    "03:56 Krish Menon: Before we run out of time — headcount. Where are we?",
+    "04:01 Vishesh Gupta: We're at 22 today, ending the year at 24, then the six January roles take us to 30 by end of Q1. The plan stays inside the burn envelope we just discussed.",
+    "04:17 Meera Nair: And the team composition — any change in the ratio?",
+    "04:22 Vishesh Gupta: Slightly heavier on engineering this cycle — four of the six January roles are engineers, one is product design, one is enterprise sales.",
+    "04:35 Krish Menon: Makes sense given the roadmap. Okay, I think we have what we need for the partner meeting on Monday. Can you send the metric pack by Thursday?",
+    "04:46 Vishesh Gupta: Will do — I'll send the full metric pack, including the cohort breakdowns, by Thursday.",
+    "04:53 Meera Nair: One more request — can you include the enterprise pipeline detail? The two stalled deals, specifically.",
+    "05:01 Vishesh Gupta: Sure — I'll anonymize the account names but include the deal sizes and the blockers, which is the useful part anyway.",
+    "05:10 Meera Nair: Perfect. Thanks Vishesh, this was a great quarter.",
+    "05:15 Krish Menon: Agreed. Talk at the next quarterly, or sooner if anything material changes.",
+    "05:22 Vishesh Gupta: Will do. Thanks both — have a great week!"
+  ],
+  "summary": {
+    "template": "general",
+    "overview": "Quarterly investor update to Northwind Ventures. Q3 closed at $2.4M ARR (+18% QoQ), churn improved to 2.1% (from 2.8%), NRR at 112%, and 8 enterprise logos (vs. 5–6 planned). Net burn is $180k/month — ~14 months runway, ~10 months after January hiring. Seed-extension conversations planned for Q1 to raise from strength. Q4 priorities: mobile app, conversation intelligence, enterprise admin controls (unblocking ~$240k ACV in stalled deals, GA end of January). Headcount 22 → 30 by end of Q1. Deliverables: full metric pack (incl. anonymized enterprise pipeline detail) by Thursday.",
+    "notes": [
+      "ARR $2.4M, +18% QoQ; churn 2.1% (from 2.8%); NRR 112%",
+      "8 enterprise logos vs. 5–6 planned (~40% ahead)",
+      "Expansion within existing accounts drives ~40% of new bookings",
+      "Enterprise cycles: 45 days vs. 12 self-serve, but ~20× ACV",
+      "Net burn $180k/month; ~14 months runway, ~10 after January hiring",
+      "Seed-extension conversations starting Q1 — raising from strength",
+      "Q4 roadmap: mobile app, conversation intelligence, enterprise admin controls",
+      "Admin controls unblock two stalled deals (~$240k combined ACV); beta December, GA end of January",
+      "Headcount: 22 today → 24 by year end → 30 by end of Q1 (4 engineers, 1 design, 1 enterprise sales)"
+    ],
+    "topics": [
+      { "text": "Q3 metrics: ARR, churn, NRR, enterprise", "at": "00:00", "end": "02:02" },
+      { "text": "Burn, runway & fundraise plan", "at": "02:02", "end": "02:53" },
+      { "text": "Q4 roadmap & headcount plan", "at": "02:53", "end": "04:35" },
+      { "text": "Follow-ups & wrap-up", "at": "04:35", "end": "05:24" }
+    ],
+    "metrics": [
+      { "text": "ARR $2.4M", "at": "00:27" },
+      { "text": "Growth 18% QoQ", "at": "00:27" },
+      { "text": "Churn 2.1%, down from 2.8%", "at": "00:27" },
+      { "text": "NRR 112%", "at": "00:27" },
+      { "text": "8 enterprise logos vs. 5–6 planned", "at": "00:59" },
+      { "text": "Expansion = ~40% of new bookings", "at": "00:59" },
+      { "text": "Enterprise cycles 45 days vs. 12; ACV ~20×", "at": "01:46" },
+      { "text": "Net burn $180k/month; runway 14 months", "at": "02:07" },
+      { "text": "Runway ~10–11 months after Q4 plan", "at": "02:07" },
+      { "text": "Two stalled deals ~$240k combined ACV", "at": "03:24" },
+      { "text": "Admin controls GA by end of January (90-day build)", "at": "03:44" },
+      { "text": "Headcount 22 → 24 → 30 by end of Q1", "at": "04:01" }
+    ],
+    "action_items": [
+      { "text": "Send the full metric pack with cohort breakdowns by Thursday", "speaker": "Vishesh Gupta", "at": "04:46", "status": "done", "due": "2026-09-24" },
+      { "text": "Include anonymized enterprise pipeline detail in the pack", "speaker": "Vishesh Gupta", "at": "05:01", "status": "done", "due": "2026-09-24" }
+    ]
+  },
+  "comments": [
+    { "by": "Vishesh Gupta", "at": "02:30", "body": "Meera's runway pushback is the signal to start the Q1 raise prep early — bring this up with the board." }
+  ],
+  "bookmarks": [
+    { "at": "00:27", "label": "The headline numbers" },
+    { "at": "02:38", "label": "Raise-from-strength framing" }
+  ],
+  "soundbites": [
+    { "title": "Top-quartile metrics", "at": "02:53", "end": "03:02" }
+  ],
+  "chat": []
+}

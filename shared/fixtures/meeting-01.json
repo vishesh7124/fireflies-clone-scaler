@@ -1,0 +1,104 @@
+{
+  "title": "Product Kickoff — Fireflies Clone v2",
+  "meeting_date": "2026-10-08T10:00:00Z",
+  "description": "Kickoff for v2: scope, design direction, and milestones.",
+  "channel": "My Meetings",
+  "source": "seed",
+  "language": "en",
+  "tags": ["product", "engineering"],
+  "participants": [
+    { "name": "Vishesh Gupta", "email": "vishesh@northstar.io", "host": true },
+    { "name": "Priya Sharma", "email": "priya@northstar.io" },
+    { "name": "Arjun Mehta", "email": "arjun@northstar.io" },
+    { "name": "Sneha Rao", "email": "sneha@northstar.io" },
+    { "name": "Rahul Verma", "email": "rahul@northstar.io" }
+  ],
+  "transcript": [
+    "00:04 Vishesh Gupta: Alright, thanks for joining everyone. Today we're officially kicking off v2 of the platform, so let's align on scope, design direction, and the roadmap.",
+    "00:22 Priya Sharma: Before we dive in, are we still targeting the October 30th launch date?",
+    "00:29 Vishesh Gupta: Yes, October 30th is the plan. That gives us roughly three sprints, so we'll need to be disciplined about scope.",
+    "00:41 Arjun Mehta: What's the headline feature set for v2? Is it the new Notepad or the mobile app?",
+    "00:49 Vishesh Gupta: Both, actually. The new Notepad layout is the priority — the two-panel view with the summary on the left and transcript on the right. Mobile ships right after.",
+    "01:05 Priya Sharma: I've been working on the two-panel layout in Figma. The key change is the collapsible icon rail on the left for smart search, soundbites, and comments.",
+    "01:18 Vishesh Gupta: Can you walk us through the main screens?",
+    "01:23 Priya Sharma: Sure. There are five core screens: the dashboard, the meetings library, the Notepad detail view, the tasks page, and the settings page. I'll share the Figma link after this call.",
+    "01:39 Sneha Rao: What about the interactive transcript? I remember we wanted clicking a line to jump the audio to that moment.",
+    "01:48 Vishesh Gupta: That's still the plan. Clicking any transcript line seeks the player to that timestamp, and the active line highlights while audio plays.",
+    "02:00 Arjun Mehta: How are we syncing playback with the transcript? Is that a polling approach or event-driven?",
+    "02:08 Vishesh Gupta: Event-driven — we subscribe to time updates and use a binary search over the sorted segments to find the active line. It should stay smooth even for hour-long meetings.",
+    "02:24 Rahul Verma: On the backend side, I'll design the database schema this week. We're looking at meetings, participants, transcript segments, summaries, and action items as the core tables.",
+    "02:39 Vishesh Gupta: Perfect. Rahul, when can you share the schema draft?",
+    "02:44 Rahul Verma: I'll have a first draft by Wednesday. I want to get the relationships right — especially how action items link back to the transcript segments they came from.",
+    "02:58 Sneha Rao: I have a question about the AI summaries. Are we generating them from the transcripts, or is there a rules engine?",
+    "03:09 Vishesh Gupta: Both. We'll ship a rules engine first — keyword extraction, topic detection, that kind of thing — and layer in LLM generation later behind a feature flag.",
+    "03:22 Sneha Rao: Got it. I'd love to run some user research on the new summary format before we lock it in.",
+    "03:30 Vishesh Gupta: Good idea. Sneha, can you plan three or four interviews next week? We want to validate the summary sections — overview, action items, topics, and metrics.",
+    "03:45 Sneha Rao: Absolutely, I'll schedule those for next Tuesday through Thursday and share a research plan by Monday.",
+    "03:56 Arjun Mehta: For the engineering side, I'll set up the new repository structure and the CI pipeline. I think we should split it into a Next.js frontend and a FastAPI backend.",
+    "04:10 Vishesh Gupta: Yes, let's do that. Two deployables, one repo. Arjun, can you own the frontend scaffolding?",
+    "04:19 Arjun Mehta: Sure, I'll have the scaffold with the design tokens ready by Friday.",
+    "04:27 Priya Sharma: One thing I want to flag — we should agree on the dark theme palette early, because everything cascades from the tokens.",
+    "04:38 Vishesh Gupta: Agreed. Let's use the neutral dark-gray base with purple accents. I'll send the palette reference in Slack today.",
+    "04:51 Rahul Verma: What about audio? Do we need real recordings for testing?",
+    "04:57 Vishesh Gupta: We'll generate placeholder audio — soft tones per speaker turn — so the player and the transcript sync behave realistically without shipping big files.",
+    "05:12 Priya Sharma: That's clever. How do we handle meetings that don't have audio at all?",
+    "05:19 Vishesh Gupta: The player falls back to a virtual clock, so seek, speed control, and transcript highlighting still work.",
+    "05:31 Arjun Mehta: Nice. That means we can demo the interactive transcript even on scheduled meetings.",
+    "05:38 Vishesh Gupta: Exactly. Okay, let's talk milestones. Sprint one is foundations — schema, scaffolding, design tokens, and the app shell. Sprint two is the Notepad. Sprint three is polish, search, and exports.",
+    "06:00 Priya Sharma: Will we have a design review before sprint two starts?",
+    "06:06 Vishesh Gupta: Yes, I'd like a full walkthrough on October 16th. Everyone should attend, and we'll compare side by side with the reference screenshots.",
+    "06:19 Sneha Rao: I'll bring the research findings to that review if the interviews go well.",
+    "06:25 Vishesh Gupta: Perfect. Rahul, what's the story with migrations? Are we using Alembic?",
+    "06:32 Rahul Verma: Yes, Alembic from day one. A clean baseline migration, and we seed demo data on startup so the app is immediately usable.",
+    "06:44 Vishesh Gupta: Love it. One more thing — action items. Let me make sure we're all clear on owners.",
+    "06:52 Priya Sharma: I own the Figma screens and the two-panel layout spec. I'll share both by Wednesday.",
+    "07:00 Arjun Mehta: I own the repo setup, CI, and the frontend scaffold by Friday.",
+    "07:06 Rahul Verma: I own the schema draft by Wednesday and the seeder by Friday.",
+    "07:12 Sneha Rao: I own the research plan by Monday and the interviews next week.",
+    "07:18 Vishesh Gupta: And I'll align with the stakeholders and send a status update to the leadership channel every Friday. I think that covers it — any blockers?",
+    "07:30 Arjun Mehta: No blockers on my end, but I'm curious about the smart search filters. Are those rule-based?",
+    "07:38 Vishesh Gupta: Yes, rule-based classification — questions, tasks, dates, metrics, pricing, and sentiment. The filters show counts and jump you into the transcript.",
+    "07:52 Priya Sharma: That sounds really useful for sales calls. I can already see the team using the pricing filter every day.",
+    "08:01 Vishesh Gupta: Alright, great kickoff everyone. Let's reconvene on Monday for sprint planning. Thanks all!",
+    "08:12 Rahul Verma: Thanks everyone. I'll send the schema link to the channel as soon as it's ready."
+  ],
+  "summary": {
+    "template": "general",
+    "overview": "The team kicked off v2 of the platform, targeting an October 30th launch across three sprints. Core scope covers the new two-panel Notepad, an interactive transcript synced to the player, a rules-based summary engine with LLM support later, and a new neutral dark theme with purple accents. Owners agreed on week-one deliverables: Figma screens, database schema, frontend scaffold, and a research plan.",
+    "notes": [
+      "Launch target is October 30th, structured across three sprints",
+      "Notepad redesign is the priority — two-panel layout with a collapsible icon rail",
+      "Transcript-player sync uses an event-driven binary search over sorted segments",
+      "Summaries ship rule-based first, LLM generation lands later behind a feature flag",
+      "Placeholder audio is synthesized per speaker turn; a virtual clock covers meetings without media",
+      "Design tokens use a neutral dark-gray base with purple accents, agreed early to avoid rework",
+      "Full design review scheduled for October 16th, compared against reference screenshots"
+    ],
+    "topics": [
+      { "text": "Scope & launch timeline", "at": "00:00", "end": "04:30" },
+      { "text": "Notepad layout & interactive transcript", "at": "04:31", "end": "08:00" },
+      { "text": "Milestones, owners & next steps", "at": "08:01", "end": "08:12" }
+    ],
+    "metrics": [
+      { "text": "Three sprints planned", "at": "00:41" },
+      { "text": "Five core screens", "at": "01:23" },
+      { "text": "Three to four user interviews", "at": "03:45" },
+      { "text": "Sprint two review on October 16th", "at": "06:06" }
+    ],
+    "action_items": [
+      { "text": "Share the Figma link and the two-panel layout spec", "speaker": "Priya Sharma", "at": "06:52", "status": "done", "due": "2026-10-11" },
+      { "text": "Set up the repository structure and CI pipeline", "speaker": "Arjun Mehta", "at": "07:00", "status": "in_progress", "due": "2026-10-12" },
+      { "text": "Draft the database schema with Alembic baseline", "speaker": "Rahul Verma", "at": "07:06", "status": "in_progress", "due": "2026-10-11" },
+      { "text": "Plan three to four user research interviews", "speaker": "Sneha Rao", "at": "07:12", "status": "open", "due": "2026-10-13" },
+      { "text": "Send weekly status updates to the leadership channel", "speaker": "Vishesh Gupta", "at": "07:18", "status": "open", "due": null }
+    ]
+  },
+  "comments": [
+    { "by": "Priya Sharma", "at": "01:23", "body": "The five-screen breakdown is the clearest framing so far — let's reuse it in the stakeholder deck." }
+  ],
+  "bookmarks": [
+    { "at": "02:08", "label": "Transcript sync approach" }
+  ],
+  "soundbites": [],
+  "chat": []
+}

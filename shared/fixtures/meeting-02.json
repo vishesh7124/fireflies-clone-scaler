@@ -1,0 +1,107 @@
+{
+  "title": "Sales Discovery Call — Acme Corp",
+  "meeting_date": "2026-10-06T15:00:00Z",
+  "description": "Discovery call with Acme's ops team about meeting automation.",
+  "channel": "My Meetings",
+  "source": "seed",
+  "language": "en",
+  "tags": ["sales", "pricing"],
+  "participants": [
+    { "name": "Sarah Watts", "email": "sarah@northstar.io", "host": true },
+    { "name": "Tom Reyes", "email": "tom@acme.com" },
+    { "name": "Emily Chen", "email": "emily@acme.com" }
+  ],
+  "transcript": [
+    "00:05 Sarah Watts: Hi Tom, hi Emily — thanks for making time today. I believe we're exploring how Fireflies could fit into your team's workflow, so let's start with what's on your mind.",
+    "00:21 Tom Reyes: Thanks Sarah. Basically, our sales team runs around 40 discovery and demo calls a week, and we lose so much time writing notes and updating the CRM afterwards.",
+    "00:36 Sarah Watts: Got it — how are you capturing those calls today?",
+    "00:41 Tom Reyes: Honestly, it's a mess. Some people type notes live, others write them after the call, and about half the details never make it into HubSpot. Our reps spend maybe 3 hours a day on notes and admin.",
+    "00:59 Emily Chen: And from a management perspective, I can't answer simple questions like which objections came up this week without asking every rep individually.",
+    "01:12 Sarah Watts: That's exactly the pattern we see with teams your size. Fireflies joins your calls automatically, transcribes everything, and generates a structured summary — overview, action items, topics, and metrics — within minutes of the call ending.",
+    "01:30 Tom Reyes: Does it work with Google Meet? That's our main platform.",
+    "01:35 Sarah Watts: Yes — Google Meet, Zoom, and Teams, plus uploaded audio and video files if you have existing recordings.",
+    "01:44 Tom Reyes: What about accuracy? We had a bad experience with another notetaker last year — the transcripts were unusable.",
+    "01:53 Sarah Watts: I hear you. Our transcription is best-in-class, around 95% accurate, and it handles overlapping speech and noisy environments. I'm happy to run a live demo on a real call so you can judge for yourself.",
+    "02:10 Emily Chen: That would help. Can you also show how the CRM sync works? If this doesn't reduce our HubSpot admin time, it's a non-starter.",
+    "02:21 Sarah Watts: Absolutely. Notes and action items push to HubSpot automatically, and we can tag calls by deal stage. Let me show you a sample call summary in the Notepad view.",
+    "02:34 Tom Reyes: This is the transcript view? Clicking a line jumps the audio?",
+    "02:40 Sarah Watts: Exactly — every timestamp is clickable, and you can search within the transcript or filter by questions, tasks, metrics, or pricing mentions.",
+    "02:51 Emily Chen: The pricing filter would be great for deal reviews. How much is this, by the way?",
+    "02:58 Sarah Watts: The Growth plan is $19 per user per month, billed annually, and the Pro plan is $29 per user per month with unlimited recordings and advanced analytics.",
+    "03:12 Tom Reyes: What's the difference for us at 120 seats?",
+    "03:16 Sarah Watts: At 120 seats, Growth runs about $2,280 a month. Pro would be $3,480. Given your volume — 40 calls a week — I'd actually start a pilot on Pro for the sales team only, maybe 25 seats, and evaluate for 30 days.",
+    "03:36 Tom Reyes: That's an interesting approach. Our budget is capped at $30k this quarter for new tools, so a pilot in that range would fit.",
+    "03:47 Emily Chen: I'd want the security review done before we roll anything out. What's your posture there?",
+    "03:54 Sarah Watts: We're SOC 2 Type 2 certified, GDPR and HIPAA compliant, with 256-bit encryption in transit and at rest. I'll send our security documentation and the standard questionnaire after this call.",
+    "04:08 Tom Reyes: Great, that goes to our legal team. What does onboarding look like? We're not super technical.",
+    "04:16 Sarah Watts: It's genuinely light — you connect your calendar, set which meetings the notetaker should join, and you're live. Most teams are fully onboarded in under an hour.",
+    "04:29 Emily Chen: Can we control which meetings it joins? Some of our calls are sensitive.",
+    "04:35 Sarah Watts: Yes, you can set it to join only external calls, only meetings with a web-conferencing link, or fully manual. Admins can also set team-wide policies.",
+    "04:48 Tom Reyes: What kind of ROI are your similar teams seeing?",
+    "04:53 Sarah Watts: Teams like yours typically report about 5 hours saved per rep per week and a 30% lift in CRM data completeness. For 25 reps, that's meaningful.",
+    "05:07 Emily Chen: The ROI math works if the pilot proves the accuracy claim. Tom, shall we propose the pilot to leadership next week?",
+    "05:16 Tom Reyes: Yes. Sarah, can you send the pilot proposal with the 25-seat pricing? I'd like it before our leadership sync on Thursday.",
+    "05:26 Sarah Watts: Will do — proposal with the 25-seat breakdown and the security docs, both by tomorrow.",
+    "05:33 Tom Reyes: Perfect. And can we schedule a technical deep-dive? Our IT lead, Priya at our end, will want to poke at the integrations.",
+    "05:42 Sarah Watts: Of course. I'll send a scheduling link for next week — does Tuesday or Wednesday work better?",
+    "05:48 Tom Reyes: Wednesday afternoon is better for us.",
+    "05:52 Sarah Watts: Wednesday it is. I'll also include a demo recording you can share with the wider team.",
+    "05:59 Emily Chen: One last question — what happens to our data if we leave?",
+    "06:05 Sarah Watts: You own your data. Everything is exportable — transcripts, summaries, and recordings — and we offer zero data retention options if that's a compliance requirement.",
+    "06:17 Emily Chen: That's reassuring. Okay, I think we have what we need.",
+    "06:22 Tom Reyes: Thanks Sarah, this was genuinely one of the more useful vendor calls we've had.",
+    "06:27 Sarah Watts: Thank you both. I'll follow up tomorrow — talk Wednesday!"
+  ],
+  "summary": {
+    "template": "sales",
+    "overview": "Discovery call with Acme Corp (120-seat ops team, ~40 sales calls/week). Tom and Emily's core pain: reps lose ~3 hours daily to notes and CRM admin, and management lacks visibility into objections. Fireflies was positioned around the Notepad demo, HubSpot sync, and a recommended 25-seat Pro pilot. Budget cap is $30k this quarter; a security review and leadership sync on Thursday gate the proposal. Next steps: send pilot pricing + security docs by tomorrow, technical deep-dive Wednesday.",
+    "notes": [
+      "Acme runs ~40 discovery and demo calls weekly across Google Meet",
+      "Reps spend ~3 hours per day on notes and CRM admin; half the details never reach HubSpot",
+      "Transcription accuracy was challenged — a previous notetaker failed them; live demo offered as proof",
+      "CRM sync with HubSpot is a hard requirement — it must reduce admin time",
+      "Security posture: SOC 2 Type 2, GDPR, HIPAA, 256-bit encryption; docs promised to legal",
+      "Pilot recommended: 25 Pro seats for the sales team, 30-day evaluation",
+      "ROI benchmark shared: ~5 hours saved per rep weekly, 30% CRM completeness lift"
+    ],
+    "topics": [
+      { "text": "Current process & pain points", "at": "00:00", "end": "02:10" },
+      { "text": "Product walkthrough & CRM sync", "at": "02:10", "end": "03:12" },
+      { "text": "Pricing, pilot structure & budget", "at": "03:12", "end": "05:07" },
+      { "text": "Security, onboarding & next steps", "at": "05:07", "end": "06:29" }
+    ],
+    "metrics": [
+      { "text": "40 calls per week", "at": "00:21" },
+      { "text": "~3 hours daily on notes/admin", "at": "00:41" },
+      { "text": "95% transcription accuracy", "at": "01:53" },
+      { "text": "Growth plan $19/user/month; Pro $29/user/month", "at": "02:58" },
+      { "text": "120 seats → $2,280/mo Growth, $3,480/mo Pro", "at": "03:16" },
+      { "text": "Budget cap $30k this quarter", "at": "03:36" },
+      { "text": "25-seat pilot, 30-day evaluation", "at": "03:16" },
+      { "text": "~5 hours saved per rep/week; 30% CRM completeness lift", "at": "04:53" }
+    ],
+    "action_items": [
+      { "text": "Send the pilot proposal with 25-seat Pro pricing", "speaker": "Sarah Watts", "at": "05:26", "status": "done", "due": "2026-10-07" },
+      { "text": "Send security documentation and the standard questionnaire", "speaker": "Sarah Watts", "at": "03:54", "status": "open", "due": "2026-10-07" },
+      { "text": "Schedule the technical deep-dive with Acme's IT lead on Wednesday", "speaker": "Sarah Watts", "at": "05:42", "status": "in_progress", "due": "2026-10-14" },
+      { "text": "Propose the pilot to Acme leadership at the Thursday sync", "speaker": "Tom Reyes", "at": "05:16", "status": "open", "due": "2026-10-09" },
+      { "text": "Route the security questionnaire to the legal team", "speaker": "Emily Chen", "at": "04:08", "status": "open", "due": "2026-10-13" }
+    ]
+  },
+  "comments": [
+    { "by": "Sarah Watts", "at": "02:51", "body": "Emily's pricing question at 02:51 — this is the moment the deal got real. Follow up on this thread." },
+    { "by": "Sarah Watts", "at": "05:16", "body": "Thursday leadership sync is the internal deadline — proposal must land before it." }
+  ],
+  "bookmarks": [
+    { "at": "02:58", "label": "Pricing walk-through" },
+    { "at": "04:53", "label": "ROI benchmarks" }
+  ],
+  "soundbites": [
+    { "title": "The 3-hour admin problem", "at": "00:41", "end": "00:59" },
+    { "title": "Budget cap", "at": "03:36", "end": "03:47" }
+  ],
+  "chat": [
+    { "role": "user", "content": "When was pricing discussed?", "cites": ["02:58", "03:36"] },
+    { "role": "user", "content": "What were the key takeaways?" }
+  ]
+}

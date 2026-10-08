@@ -1,0 +1,21 @@
+{
+  "title": "Customer Check-in — Globex Corp (scheduled)",
+  "meeting_date": "2026-10-14T16:00:00Z",
+  "description": "Monthly check-in with Globex's ops leadership on pilot progress.",
+  "channel": "My Meetings",
+  "source": "schedule",
+  "language": "en",
+  "tags": ["sales"],
+  "status": "scheduled",
+  "participants": [
+    { "name": "Vishesh Gupta", "email": "vishesh@northstar.io", "host": true },
+    { "name": "Sarah Watts", "email": "sarah@northstar.io" },
+    { "name": "Tom Reyes", "email": "tom@globex.com" }
+  ],
+  "transcript": [],
+  "summary": null,
+  "comments": [],
+  "bookmarks": [],
+  "soundbites": [],
+  "chat": []
+}
