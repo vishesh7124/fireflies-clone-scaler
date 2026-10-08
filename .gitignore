@@ -1,0 +1,33 @@
+# dependencies
+node_modules/
+
+# next.js
+.next/
+out/
+
+# env — keep examples only
+.env
+.env.*
+!.env.example
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# backend runtime data (SQLite db + generated/uploaded media)
+backend/data/
+data/
+
+# misc
+.DS_Store
+*.log
+.vercel
+tsconfig.tsbuildinfo
+
+# local research materials (assignment PDF, real-app screenshots, demo transcript)
+# — kept locally for design reference, not part of the public submission
+/Scaler_SDE_Fullstack_Assignment_-_Fireflies_Clone.pdf
+/fireflies_ui_ss/
+/firefly.txt

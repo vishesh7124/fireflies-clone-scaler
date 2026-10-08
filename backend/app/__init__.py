@@ -1,0 +1,1 @@
+"""Fireflies clone — FastAPI backend."""
