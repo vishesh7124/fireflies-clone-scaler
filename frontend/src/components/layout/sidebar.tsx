@@ -20,7 +20,7 @@ import {
 import { toast } from "sonner";
 import { cn } from "cn";
 
-/** Nav items + layout replicated from the real app shell (docs/01 §4). */
+/** Nav items + layout replicate the real app shell (docs/01 §4). */
 const MAIN_NAV: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Home", href: "/", icon: HouseIcon },
   { label: "AskFred", href: "/askfred", icon: SparklesIcon },
@@ -37,29 +37,29 @@ const BOTTOM_NAV: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Settings", href: "/settings", icon: SettingsIcon },
 ];
 
-/** Workspace switcher avatar — 4-square mosaic, like the real workspace chip. */
+/**
+ * Workspace switcher avatar — mosaic block in the purple family
+ * (the real app's workspace chip, toned to match its monochrome look).
+ */
 function WorkspaceAvatar() {
   return (
-    <span
-      className="grid size-6 shrink-0 grid-cols-2 gap-[2px] rounded-md"
-      aria-hidden="true"
-    >
-      <span className="rounded-[2px] bg-[#ff6fb5]" />
+    <span className="grid size-6 shrink-0 grid-cols-2 gap-[2px] rounded-md" aria-hidden="true">
+      <span className="rounded-[2px] bg-[#9d8bff]" />
       <span className="rounded-[2px] bg-[#7c5cff]" />
-      <span className="rounded-[2px] bg-[#74c0fc]" />
-      <span className="rounded-[2px] bg-[#63e6be]" />
+      <span className="rounded-[2px] bg-[#5b3ee6]" />
+      <span className="rounded-[2px] bg-[#b197fc]" />
     </span>
   );
 }
 
-function navLinkClass(active: boolean) {
-  return cn(
-    "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium transition-colors",
+/** Active = plum pill + purple text; inactive = muted (like the real sidebar). */
+const navLinkClass = (active: boolean) =>
+  cn(
+    "flex items-center gap-3 rounded-lg whitespace-nowrap px-3 py-2.5 text-[15px] font-medium transition-colors",
     active
-      ? "bg-elevated text-primary"
-      : "text-muted-foreground hover:bg-elevated/50 hover:text-foreground",
+      ? "bg-accent text-primary"
+      : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
   );
-}
 
 function NavLink({ href, label, icon: Icon }: { href: string; label: string; icon: LucideIcon }) {
   const pathname = usePathname();
@@ -74,24 +74,24 @@ function NavLink({ href, label, icon: Icon }: { href: string; label: string; ico
 
 export function Sidebar() {
   return (
-    <aside className="flex h-full w-[220px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
+    <aside className="flex h-full w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
       {/* workspace switcher */}
       <button
         type="button"
         onClick={() => toast.info("Workspace switcher — coming soon")}
-        className="flex items-center gap-2.5 px-4 pb-2 pt-4 text-left"
+        className="flex items-center gap-2.5 px-5 pb-2 pt-5 text-left"
       >
         <WorkspaceAvatar />
-        <span className="text-sm font-semibold tracking-wide text-foreground">VISHESH</span>
-        <ChevronDownIcon className="size-3.5 text-subtle" />
+        <span className="text-[15px] font-semibold tracking-wide text-foreground">VISHESH</span>
+        <ChevronDownIcon className="size-3.5 text-muted-foreground" />
       </button>
 
-      <nav className="mt-3 flex-1 space-y-0.5 px-2.5">
+      <nav className="mt-3 flex-1 space-y-1 px-3">
         {MAIN_NAV.map((item) => (
           <NavLink key={item.label} {...item} />
         ))}
 
-        {/* Upgrade — green "40% OFF" badge, like the real nav */}
+        {/* Upgrade — green text badge only (no filled pill, like the original) */}
         <button
           type="button"
           onClick={() => toast.info("Upgrade — coming soon")}
@@ -99,13 +99,11 @@ export function Sidebar() {
         >
           <CrownIcon className="size-4" />
           Upgrade
-          <span className="ml-auto rounded-full bg-success/15 px-1.5 py-0.5 text-[10px] font-semibold text-success">
-            40% OFF
-          </span>
+          <span className="ml-auto text-[11px] font-semibold text-success">40% OFF</span>
         </button>
       </nav>
 
-      <div className="space-y-0.5 px-2.5 pb-4">
+      <div className="space-y-1 px-3 pb-5">
         {BOTTOM_NAV.map((item) => (
           <NavLink key={item.label} {...item} />
         ))}

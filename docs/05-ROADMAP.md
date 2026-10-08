@@ -32,6 +32,7 @@
 - [x] shadcn/ui init + primitives (Radix base, Nova preset — 20 components); restyled to Fireflies dark tokens
 - [x] `AppShell`: `Sidebar` (nav + active pill + bottom items), `Topbar` (search box, chips, Upgrade, bell, `CaptureMenu`) + placeholder pages for every nav route + placeholder Home (hero + Quick Start tiles)
 - **Checkpoint:** build green (12 routes); prerendered HTML verified against shell markers. Next.js 16.4 / React 19 / lucide-react 1.x (`*Icon` import convention).
+- **Review round 1 (Oct 9, `original.png` vs `clone.png`):** applied — warm plum palette (`#0E0A17` canvas / `#251C3D` accents / mint `#3DDC97`), sidebar 240px w/ 15px nav + plum active pill + green-text `40% OFF`, topbar (real search copy, `Ctrl`+`K` keycaps, red bell dot, camera-icon Capture), centered 880px content column, hero (plum fill + visible border + richer thumbnail), one-line Quick Start tiles, Recent/Upcoming/AI Feed tabs + recent row, Try More cards, trial banner, floating promo card, help bubble, ambient canvas glow.
 
 ## Phase 1 — Shared fixtures + mock layer (2h)
 

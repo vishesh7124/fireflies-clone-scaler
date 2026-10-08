@@ -34,20 +34,24 @@ The real app canvas is a near-black with a purple tint; panels are one step ligh
 
 ### Core tokens (dark theme — primary)
 
+> **Revision (Oct 9, after `original.png` vs `clone.png` comparison):** the app is a **warm plum-toned** dark UI, not a cold near-black. Values below supersede the first estimates; hero/promo surfaces sit in the same plum family (`#2A1F3D` fill, `#4A3A5A` border).
+
 | Token | Value | Usage |
 |---|---|---|
-| `--bg-base` | `#0B0B12` | App canvas |
-| `--bg-surface` | `#15151D` | Sidebar, panels, cards |
-| `--bg-elevated` | `#1C1C28` | Popovers, active rows, dropdowns, input fields |
-| `--border-subtle` | `rgba(255,255,255,0.08)` | Hairline borders, dividers |
+| `--bg-base` | `#0E0A17` | App canvas (deep warm purple-black + subtle radial glow) |
+| `--bg-surface` | `#161021` | Sidebar, panels, cards |
+| `--bg-elevated` | `#1D1630` | Popovers, active rows, dropdowns, input fields |
+| `--accent` (plum pill) | `#251C3D` | Active nav pill, hover fills, hero-family surfaces |
+| `--border-subtle` | `rgba(255,255,255,0.10)` | Hairline borders, dividers |
 | `--text-primary` | `#F5F5F7` | Headings, titles |
-| `--text-secondary` | `#A8A8B8` | Body text |
-| `--text-muted` | `#6E6E82` | Timestamps, helper copy, placeholders |
+| `--text-secondary` | `#BFB5CC` | Body text (warm lilac) |
+| `--text-muted` | `#8A8298` | Timestamps, helper copy, placeholders |
 | `--brand-purple` | `#7C5CFF` | Primary buttons, active nav/tab, links, focus rings, send buttons |
 | `--brand-purple-hover` | `#6B4CF0` | Hover state |
 | `--logo-pink` | `#FF3D8B` → `#C2185B` gradient | F logo, pink accents, gradient icon tiles |
-| `--success-green` | `#22C55E` | "NEW"/"Upgrade" pills, REC tag, check icons, compliance chips |
+| `--success-green` | `#3DDC97` | "NEW"/"Upgrade" text, REC tag, check icons, compliance chips |
 | `--warning-amber` | `#F59E0B` | Hero card tints, warm accents |
+| Accent tints | red `#E5484D` · teal `#2DD4BF` | Quick Start tile icon colors |
 
 ### Speaker palette (distinct chips — "revised speaker avatars so you can easily distinguish each speaker")
 

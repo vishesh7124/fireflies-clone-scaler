@@ -26,8 +26,10 @@ data/
 .vercel
 tsconfig.tsbuildinfo
 
-# local research materials (assignment PDF, real-app screenshots, demo transcript)
-# — kept locally for design reference, not part of the public submission
+# local research materials (assignment PDF, real-app screenshots, demo transcript,
+# original-vs-clone comparison shots) — kept locally, not part of the public submission
 /Scaler_SDE_Fullstack_Assignment_-_Fireflies_Clone.pdf
 /fireflies_ui_ss/
 /firefly.txt
+/original.png
+/clone.png

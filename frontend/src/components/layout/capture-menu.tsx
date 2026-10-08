@@ -4,7 +4,6 @@ import {
   CalendarPlusIcon,
   ChevronDownIcon,
   MicIcon,
-  PlusIcon,
   UploadIcon,
   VideoIcon,
 } from "lucide-react";
@@ -27,7 +26,7 @@ export function CaptureMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button size="sm">
-          <PlusIcon className="size-4" />
+          <VideoIcon />
           Capture
           <ChevronDownIcon className="size-3 opacity-70" />
         </Button>

@@ -5,13 +5,12 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Fireflies design tokens — extracted from real app screenshots + official docs.
- * See docs/01-UIUX-RESEARCH.md §2-3 (source of truth for every value below).
- *
- * The real app is dark-mode-first: `.dark` holds the product palette; `:root`
- * holds the light palette for the bonus light-mode toggle (Phase 7).
- * `surface` = panels/sidebar/cards · `elevated` = popovers/inputs/active rows ·
- * `subtle` = timestamps & meta text · `success` = NEW/Upgrade/REC green.
+ * Fireflies design tokens — extracted from real app screenshots + official docs
+ * (docs/01-UIUX-RESEARCH.md §2-3) and revised after the original-vs-clone
+ * screenshot comparison: the app is a WARM plum-toned dark UI, not cold black.
+ * `surface` = panels/sidebar/cards · `elevated` = popovers/inputs ·
+ * `accent` = plum active/hover pill · `subtle` = timestamps & meta text ·
+ * `success` = the app's mint green.
  */
 
 @theme inline {
@@ -67,28 +66,28 @@
 
 /* Light theme (bonus toggle — dark is the product default) */
 :root {
-  --background: #f7f7fa;
-  --foreground: #17171f;
+  --background: #f7f5fb;
+  --foreground: #1c1626;
   --surface: #ffffff;
   --elevated: #ffffff;
-  --subtle: #8e8e9c;
+  --subtle: #8b8598;
   --card: #ffffff;
-  --card-foreground: #17171f;
+  --card-foreground: #1c1626;
   --popover: #ffffff;
-  --popover-foreground: #17171f;
+  --popover-foreground: #1c1626;
   --primary: #6b4cf0;
   --primary-foreground: #ffffff;
-  --secondary: #ececf2;
-  --secondary-foreground: #17171f;
-  --muted: #ececf2;
-  --muted-foreground: #52525f;
-  --accent: #ececf2;
-  --accent-foreground: #17171f;
+  --secondary: #ece6f7;
+  --secondary-foreground: #1c1626;
+  --muted: #ece6f7;
+  --muted-foreground: #5b5470;
+  --accent: #ece6f7;
+  --accent-foreground: #1c1626;
   --destructive: #dc2626;
-  --success: #16a34a;
+  --success: #0f9d6e;
   --warning: #d97706;
-  --border: rgba(23, 23, 31, 0.1);
-  --input: rgba(23, 23, 31, 0.14);
+  --border: rgba(28, 22, 38, 0.12);
+  --input: rgba(28, 22, 38, 0.16);
   --ring: #6b4cf0;
   --chart-1: #6b4cf0;
   --chart-2: #ff3d8b;
@@ -97,39 +96,39 @@
   --chart-5: #3b82f6;
   --radius: 0.625rem;
   --sidebar: #ffffff;
-  --sidebar-foreground: #17171f;
+  --sidebar-foreground: #1c1626;
   --sidebar-primary: #6b4cf0;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #ececf2;
-  --sidebar-accent-foreground: #17171f;
-  --sidebar-border: rgba(23, 23, 31, 0.08);
+  --sidebar-accent: #ece6f7;
+  --sidebar-accent-foreground: #1c1626;
+  --sidebar-border: rgba(28, 22, 38, 0.1);
   --sidebar-ring: #6b4cf0;
 }
 
-/* Dark theme — the real Fireflies app palette */
+/* Dark theme — warm plum palette from the real app */
 .dark {
-  --background: #0b0b12;
+  --background: #0e0a17;
   --foreground: #f5f5f7;
-  --surface: #15151d;
-  --elevated: #1c1c28;
-  --subtle: #6e6e82;
-  --card: #15151d;
+  --surface: #161021;
+  --elevated: #1d1630;
+  --subtle: #8a8298;
+  --card: #161021;
   --card-foreground: #f5f5f7;
-  --popover: #1c1c28;
+  --popover: #1d1630;
   --popover-foreground: #f5f5f7;
   --primary: #7c5cff;
   --primary-foreground: #ffffff;
-  --secondary: #1c1c28;
+  --secondary: #1d1630;
   --secondary-foreground: #f5f5f7;
-  --muted: #1c1c28;
-  --muted-foreground: #a8a8b8;
-  --accent: #24242f;
+  --muted: #1d1630;
+  --muted-foreground: #bfb5cc;
+  --accent: #251c3d;
   --accent-foreground: #f5f5f7;
   --destructive: #ef4444;
-  --success: #22c55e;
+  --success: #3ddc97;
   --warning: #f59e0b;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.1);
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.12);
   --ring: #7c5cff;
   --chart-1: #7c5cff;
   --chart-2: #ff6fb5;
@@ -137,13 +136,13 @@
   --chart-4: #ffa94d;
   --chart-5: #74c0fc;
   --radius: 0.625rem;
-  --sidebar: #15151d;
+  --sidebar: #161021;
   --sidebar-foreground: #f5f5f7;
   --sidebar-primary: #7c5cff;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1c1c28;
+  --sidebar-accent: #1d1630;
   --sidebar-accent-foreground: #f5f5f7;
-  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
   --sidebar-ring: #7c5cff;
 }
 
@@ -160,6 +159,20 @@
   ::selection {
     @apply bg-primary/40 text-foreground;
   }
+}
+
+/*
+ * Ambient canvas glow — the real app has a subtle warm radial tint behind the
+ * content area (visible in original screenshots).
+ */
+.app-canvas {
+  background:
+    radial-gradient(
+      1100px 480px at 60% -140px,
+      color-mix(in srgb, var(--primary) 13%, transparent),
+      transparent 65%
+    ),
+    var(--background);
 }
 
 /* Thin, subtle scrollbars (dark-first) */

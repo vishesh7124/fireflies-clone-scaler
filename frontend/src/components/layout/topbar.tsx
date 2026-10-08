@@ -31,32 +31,32 @@ export function Topbar() {
       <button
         type="button"
         onClick={() => toast.info("Global search lands in Phase 7")}
-        className="mx-auto flex h-9 w-full max-w-md items-center gap-2 rounded-lg border border-border bg-elevated/50 px-3 text-sm text-subtle transition-colors hover:border-ring/40"
+        className="mx-auto flex h-9 w-full max-w-md items-center gap-2 rounded-lg border border-border bg-elevated/60 px-3 text-sm text-subtle transition-colors hover:border-ring/40"
       >
         <SearchIcon className="size-4" />
-        <span>Search meetings, transcripts, tasks…</span>
-        <kbd className="ml-auto rounded border border-border bg-surface px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
-          Ctrl K
-        </kbd>
+        <span className="truncate">Search by title or keyword</span>
+        <span className="ml-auto flex shrink-0 items-center gap-1 font-mono text-[10px] text-muted-foreground">
+          <kbd className="rounded border border-border bg-surface px-1.5 py-0.5">Ctrl</kbd>+
+          <kbd className="rounded border border-border bg-surface px-1.5 py-0.5">K</kbd>
+        </span>
       </button>
 
       <div className="flex items-center gap-2">
-        {/* free-plan chip — mirrors the real "3 Free meetings" counter */}
+        {/* free-plan chip — green count badge + label (like the real top bar) */}
         <span className="hidden items-center gap-1.5 text-xs text-subtle md:flex">
-          Free meetings
-          <span className="rounded-full bg-success/15 px-1.5 py-0.5 font-semibold text-success">
+          <span className="rounded-full bg-success px-1.5 py-0.5 text-[10px] font-bold text-background">
             3
           </span>
+          Free meetings
         </span>
 
-        <Button
-          variant="outline"
-          size="sm"
-          className="border-success/40 text-success hover:bg-success/10 hover:text-success"
+        <button
+          type="button"
           onClick={() => toast.info("Upgrade — coming soon")}
+          className="rounded-md px-2.5 py-1.5 text-sm font-medium text-success transition-colors hover:bg-success/10"
         >
           Upgrade
-        </Button>
+        </button>
 
         <Button
           variant="ghost"
@@ -66,7 +66,7 @@ export function Topbar() {
           onClick={() => toast.info("No new notifications")}
         >
           <BellIcon className="size-4" />
-          <span className="absolute right-2 top-2 size-1.5 rounded-full bg-primary" />
+          <span className="absolute right-2 top-2 size-1.5 rounded-full bg-destructive" />
         </Button>
 
         <CaptureMenu />
