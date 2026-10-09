@@ -2,18 +2,22 @@
  * Fixture imports — the sample data authored once in `shared/fixtures/`
  * (see that folder's README for the format). The same files feed the backend
  * seeder in Phase 5.
+ *
+ * Turbopack cannot import from outside the frontend root, so these point at
+ * a *generated copy* in `./fixtures/`, kept in sync by `scripts/sync-fixtures.mjs`
+ * (runs automatically before dev/build/start/smoke — never edit the copy).
  */
 
-import m01 from "../../../shared/fixtures/meeting-01.json";
-import m02 from "../../../shared/fixtures/meeting-02.json";
-import m03 from "../../../shared/fixtures/meeting-03.json";
-import m04 from "../../../shared/fixtures/meeting-04.json";
-import m05 from "../../../shared/fixtures/meeting-05.json";
-import m06 from "../../../shared/fixtures/meeting-06.json";
-import m07 from "../../../shared/fixtures/meeting-07.json";
-import m08 from "../../../shared/fixtures/meeting-08.json";
-import m09 from "../../../shared/fixtures/meeting-09.json";
-import m10 from "../../../shared/fixtures/meeting-10.json";
+import m01 from "./fixtures/meeting-01.json";
+import m02 from "./fixtures/meeting-02.json";
+import m03 from "./fixtures/meeting-03.json";
+import m04 from "./fixtures/meeting-04.json";
+import m05 from "./fixtures/meeting-05.json";
+import m06 from "./fixtures/meeting-06.json";
+import m07 from "./fixtures/meeting-07.json";
+import m08 from "./fixtures/meeting-08.json";
+import m09 from "./fixtures/meeting-09.json";
+import m10 from "./fixtures/meeting-10.json";
 import type { ActionItemStatus, MeetingSource, MeetingStatus, SummaryTemplate } from "@/lib/types";
 
 // ---------- fixture shape (see shared/fixtures/README.md) ----------

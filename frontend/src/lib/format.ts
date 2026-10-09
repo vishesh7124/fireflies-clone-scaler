@@ -3,6 +3,18 @@
  * Python seeder mirrors them (keep both in sync).
  */
 
+import { format, parseISO } from "date-fns";
+
+/** ISO date → "Thu, Aug 8 2024, 3:52 PM" (the real app's row style). */
+export function formatRowDate(iso: string): string {
+  return format(parseISO(iso), "EEE, MMM d yyyy, h:mm a");
+}
+
+/** ISO date → "Oct 5" / "Mar 15 · 11:30 AM" compact styles. */
+export function formatDate(iso: string, pattern = "MMM d yyyy · h:mm a"): string {
+  return format(parseISO(iso), pattern);
+}
+
 /** "14:32" (or "1:02:03" when over an hour) — the Notepad timestamp style. */
 export function msToClock(ms: number): string {
   const total = Math.max(0, Math.floor(ms / 1000));

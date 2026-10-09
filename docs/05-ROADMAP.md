@@ -44,14 +44,16 @@
 - [x] React Query provider mounted in `(app)/layout.tsx`; `npm run smoke` — end-to-end data-layer test, all green
 - **Checkpoint:** `npm run smoke` prints the full roundtrip (list/filters, transcript/stats, summary, AskFred w/ citations, create→process→ready, action-item toggle, 5 exports, engagement CRUD).
 
-## Phase 2 — Login, Home, Meetings library (3.5h)
+## Phase 2 — Login, Home, Meetings library (3.5h) — ✅ done (Oct 9)
 
-- [ ] React Query + toast + theme providers; `mockApi` wired
-- [ ] `/login` replica (mock auth → localStorage flag → redirect)
-- [ ] `/` Home: welcome hero, Quick Start tiles → real modals, Recent/Upcoming/AI Feed tabs, dashboard stats, meeting rows
-- [ ] `/meetings`: ChannelsRail, toolbar (tabs, FiltersDropdown, sort), MeetingRow (thumb, title, date, participant stack, duration, tags, 3-dot), pagination, empty state, skeletons
-- [ ] Create flows: Upload modal (file/drag-drop + paste + optional media), Schedule modal → `scheduled` meeting (shows under Upcoming); delete w/ confirm + toast; rename via 3-dot
-- **Checkpoint:** full library UX works end-to-end on mocks; **this is where the "Fireflies look" verdict happens.**
+- [x] React Query + toast providers; `mockApi` wired (`lib/api.ts` adapter)
+- [x] `/login` replica — headline, Google/Microsoft buttons (any signs in), SSO link, compliance chips, product mockup ("Marketing Sync") + Vercel testimonial; mock auth → localStorage → redirect; `AuthGate` guards all (app) routes; profile dropdown + Sign out in topbar
+- [x] `/` Home — personalized hero, Quick Start tiles → real create dialogs, stats strip (count-up), Recent/Upcoming/AI Feed tabs with live rows, Try More cards
+- [x] `/meetings` — three-pane: ChannelsRail (My/All/Voice/Uploads+NEW, channel search, +Channel), toolbar (search, Hosted/Shared tabs, Filters popover, sort select), MeetingRow (thumb, title, date · duration · tags, participant stack, 3-dot: rename/export×5/delete-confirm), pagination, per-channel empty states, skeletons, AskFred rail (presentational)
+- [x] Create flows — Upload dialog (file .txt/.vtt/.json via client converter + paste tab, participants; `processing → ready` w/ auto-refetch), Schedule dialog → upcoming; toast on every mutation
+- [x] Turbopack fix: fixtures live in `shared/fixtures/` (single source of truth), synced into `src/mock/fixtures/` by `scripts/sync-fixtures.mjs` before dev/build/start/smoke
+- [x] `/meetings/[id]` placeholder page (Notepad lands in Phase 3)
+- **Checkpoint:** ✅ build green (14 routes incl. `/login` + `/meetings/[id]`), smoke green, login HTML verified against the real screen.
 
 ## Phase 3 — Notepad UI ★ (5h)
 

@@ -15,13 +15,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useUiStore } from "@/store/ui-store";
 
 /**
  * "Capture" primary dropdown — items replicate the real app's menu.
- * Schedule / Upload open real modals in Phase 2; the rest stay "Coming Soon"
- * placeholders (assignment: mocked sections).
+ * Schedule / Upload open the real create dialogs; the bot-dependent items
+ * stay "Coming Soon" placeholders (assignment: mocked sections).
  */
 export function CaptureMenu() {
+  const openSchedule = useUiStore((s) => s.openSchedule);
+  const openUpload = useUiStore((s) => s.openUpload);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -35,10 +39,10 @@ export function CaptureMenu() {
         <DropdownMenuItem onClick={() => toast.info("Add to live meeting — coming soon")}>
           <VideoIcon /> Add to live meeting
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => toast.info("Schedule meeting — lands in Phase 2")}>
+        <DropdownMenuItem onClick={openSchedule}>
           <CalendarPlusIcon /> Schedule new meeting
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => toast.info("Upload — lands in Phase 2")}>
+        <DropdownMenuItem onClick={openUpload}>
           <UploadIcon /> Upload audio or video
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => toast.info("Start recording — coming soon")}>

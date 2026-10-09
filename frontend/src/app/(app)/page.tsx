@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import {
   CalendarPlusIcon,
   ChevronRightIcon,
@@ -9,47 +12,67 @@ import {
   PlusIcon,
   SettingsIcon,
   SmartphoneIcon,
+  SparklesIcon,
   UploadIcon,
   type LucideIcon,
 } from "lucide-react";
 import { toast } from "sonner";
-import { cn } from "cn";
+import { api } from "@/lib/api";
+import { qk } from "@/lib/query-keys";
+import { formatDate } from "@/lib/format";
+import { useUiStore } from "@/store/ui-store";
 import { Button } from "@/components/ui/button";
-import { Logo } from "@/components/layout/logo";
+import { Skeleton } from "@/components/ui/skeleton";
+import { DashboardStats } from "@/components/home/dashboard-stats";
+import { MeetingRow } from "@/components/meetings/meeting-row";
+import { SegmentedTabs } from "@/components/shared/segmented-tabs";
 
 /**
- * Home — replicates the real app's layout (docs/01 §5.2): warm copper hero,
- * solid-tinted Quick Start tiles, Recent/Upcoming/AI Feed tabs, Try More cards.
- * Lists are static placeholders until the mock data layer lands (Phase 1-2).
+ * Home — the real app's dashboard (docs/01 §5.2): welcome hero, Quick Start
+ * tiles (→ real create dialogs), stats strip, Recent/Upcoming/AI Feed tabs
+ * with live data, and the Try More cards.
  */
 
-// Solid tinted tiles (colors sampled from the original screenshot)
-const TILES: { label: string; icon: LucideIcon; bg: string; iconColor: string }[] = [
-  { label: "Schedule Meeting", icon: CalendarPlusIcon, bg: "bg-[#3a1423]", iconColor: "text-[#f2a4b4]" },
-  { label: "Upload File", icon: UploadIcon, bg: "bg-[#0c2622]", iconColor: "text-[#8ee6d3]" },
-  { label: "Capture Meeting", icon: PlusIcon, bg: "bg-[#17152e]", iconColor: "text-[#a5a0ff]" },
+const TILES: { label: string; icon: LucideIcon; bg: string; iconColor: string; action: "schedule" | "upload" | "soon" }[] = [
+  { label: "Schedule Meeting", icon: CalendarPlusIcon, bg: "bg-[#3a1423]", iconColor: "text-[#f2a4b4]", action: "schedule" },
+  { label: "Upload File", icon: UploadIcon, bg: "bg-[#0c2622]", iconColor: "text-[#8ee6d3]", action: "upload" },
+  { label: "Capture Meeting", icon: PlusIcon, bg: "bg-[#17152e]", iconColor: "text-[#a5a0ff]", action: "soon" },
 ];
 
 const TABS = ["Recent", "Upcoming", "AI Feed"];
 
 export default function HomePage() {
-  const soon = (what: string) => () => toast.info(`${what} — coming soon`);
+  const [tab, setTab] = useState("Recent");
+  const openSchedule = useUiStore((s) => s.openSchedule);
+  const openUpload = useUiStore((s) => s.openUpload);
+
+  const { data: me } = useQuery({ queryKey: qk.me, queryFn: () => api.getMe() });
+  const { data: dashboard, isPending } = useQuery({
+    queryKey: qk.dashboard,
+    queryFn: () => api.getDashboard(),
+  });
+
+  const firstName = (me?.name ?? "Vishesh Gupta").split(/\s+/)[0].toUpperCase();
+
+  const openTile = (action: "schedule" | "upload" | "soon", label: string) => () => {
+    if (action === "schedule") openSchedule();
+    else if (action === "upload") openUpload();
+    else toast.info(`${label} — coming soon`);
+  };
 
   return (
     <div className="mx-auto w-full max-w-[880px] space-y-8 p-8">
-      {/* welcome hero — warm brown/copper gradient card, like the original */}
+      {/* welcome hero — warm copper card (original.png) */}
       <section className="flex items-center gap-8 rounded-xl border border-[#241812] bg-gradient-to-b from-[#3a1f0f] to-[#5a2d12] p-6">
         <div className="min-w-0 space-y-2">
           <h1 className="font-display text-2xl font-semibold text-[#f5ede4]">
-            Welcome aboard, VISHESH!
+            Welcome aboard, {firstName}!
           </h1>
           <p className="text-sm leading-relaxed text-[#d8ccbd]">
-            Fireflies is now ready to automate your meetings and streamline your
-            workflows.
+            Fireflies is now ready to automate your meetings and streamline your workflows.
           </p>
         </div>
-
-        {/* stylized laptop mockup with copper border (like the original) */}
+        {/* stylized laptop mockup with copper border */}
         <div className="hidden w-52 shrink-0 sm:block">
           <div className="rounded-lg border border-[#e8955c]/40 bg-gradient-to-b from-[#7a4520] to-[#4a2610] p-2">
             <div className="relative aspect-video rounded-md bg-gradient-to-br from-[#e8955c]/25 via-[#c97b3d]/10 to-transparent">
@@ -62,25 +85,21 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* quick start — solid tinted tiles, one-line labels, 52px rows */}
+      {/* quick start tiles — open the real create dialogs */}
       <section className="space-y-3">
         <h2 className="font-display text-lg font-semibold text-foreground">Quick Start</h2>
         <p className="text-sm text-muted-foreground">
-          Capture your first meeting or upload a recording to see Fireflies in
-          action.
+          Capture your first meeting or upload a recording to see Fireflies in action.
         </p>
         <div className="grid gap-3 sm:grid-cols-3">
-          {TILES.map(({ label, icon: Icon, bg, iconColor }) => (
+          {TILES.map(({ label, icon: Icon, bg, iconColor, action }) => (
             <button
               key={label}
               type="button"
-              onClick={soon(label)}
-              className={cn(
-                "flex h-[52px] items-center gap-3 rounded-xl px-4 text-left transition-opacity hover:opacity-90",
-                bg,
-              )}
+              onClick={openTile(action, label)}
+              className={`flex h-[52px] items-center gap-3 rounded-xl px-4 text-left transition-opacity hover:opacity-90 ${bg}`}
             >
-              <Icon className={cn("size-4 shrink-0", iconColor)} />
+              <Icon className={`size-4 shrink-0 ${iconColor}`} />
               <span className="truncate text-sm font-medium text-foreground">{label}</span>
               <ChevronRightIcon className="ml-auto size-4 shrink-0 text-foreground/60" />
             </button>
@@ -88,29 +107,24 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* recent / upcoming / ai feed — TODO(phase-2): live lists */}
+      {/* stats strip */}
+      {isPending || !dashboard ? (
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-[72px] rounded-xl" />
+          ))}
+        </div>
+      ) : (
+        <DashboardStats data={dashboard} />
+      )}
+
+      {/* recent / upcoming / ai feed */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1 rounded-lg bg-[#2c2d31] p-1">
-            {TABS.map((tab, i) => (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => toast.info("Lists land in Phase 2")}
-                className={cn(
-                  "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-                  i === 0
-                    ? "bg-[#3a3a3d] text-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
+          <SegmentedTabs options={TABS} value={tab} onChange={setTab} />
           <button
             type="button"
-            onClick={soon("Meeting list settings")}
+            onClick={() => toast.info("Meeting list settings — coming soon")}
             className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <SettingsIcon className="size-3.5" />
@@ -118,23 +132,59 @@ export default function HomePage() {
           </button>
         </div>
 
-        {/* recent meeting row (placeholder — the mock list replaces this in Phase 2) */}
-        <button
-          type="button"
-          onClick={soon("Open meeting")}
-          className="flex w-full items-center gap-3 rounded-lg p-3 text-left transition-colors hover:bg-surface"
-        >
-          <Logo variant="mark" className="size-10 shrink-0 rounded-[10px]" />
-          <span className="min-w-0">
-            <span className="block truncate text-sm font-medium text-foreground">
-              Fireflies AI Platform Quick Overview
-            </span>
-            <span className="block text-xs text-subtle">Thu, Aug 8 2024, 3:52 PM</span>
-          </span>
-        </button>
+        {isPending || !dashboard ? (
+          <div className="space-y-2">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-16 rounded-lg" />
+            ))}
+          </div>
+        ) : tab === "Recent" ? (
+          <div className="space-y-1">
+            {dashboard.recent.map((meeting) => (
+              <MeetingRow key={meeting.id} meeting={meeting} />
+            ))}
+            {dashboard.recent.length > 0 && (
+              <Link
+                href="/meetings"
+                className="flex items-center gap-1 pt-1 text-sm text-primary-soft hover:underline"
+              >
+                View all meetings <ChevronRightIcon className="size-3.5" />
+              </Link>
+            )}
+          </div>
+        ) : tab === "Upcoming" ? (
+          dashboard.upcoming_list.length > 0 ? (
+            <div className="space-y-1">
+              {dashboard.upcoming_list.map((meeting) => (
+                <MeetingRow key={meeting.id} meeting={meeting} showTags={false} />
+              ))}
+            </div>
+          ) : (
+            <EmptyTab text="No upcoming meetings — schedule one to see it here." />
+          )
+        ) : (
+          <div className="space-y-2">
+            {dashboard.ai_feed.map((entry) => (
+              <Link
+                key={entry.meeting_id}
+                href={`/meetings/${entry.meeting_id}`}
+                className="block space-y-1.5 rounded-lg border border-transparent p-3 transition-colors hover:border-border hover:bg-surface"
+              >
+                <p className="truncate text-sm font-medium text-foreground">{entry.title}</p>
+                <p className="text-xs text-subtle">{formatDate(entry.meeting_date)}</p>
+                <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                  {entry.headline}
+                </p>
+              </Link>
+            ))}
+            {dashboard.ai_feed.length === 0 && (
+              <EmptyTab text="AI Feed fills in as your meetings get processed." />
+            )}
+          </div>
+        )}
       </section>
 
-      {/* try more — desktop & mobile app cards */}
+      {/* try more */}
       <section className="space-y-3">
         <h2 className="font-display text-lg font-semibold text-foreground">Try More</h2>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -148,7 +198,7 @@ export default function HomePage() {
             <p className="text-xs leading-relaxed text-muted-foreground">
               Capture conversations without any bot present in your meeting.
             </p>
-            <Button size="sm" onClick={soon("Desktop app")}>
+            <Button size="sm" onClick={() => toast.info("Desktop app — coming soon")}>
               <DownloadIcon className="size-3.5" />
               Download
             </Button>
@@ -166,7 +216,7 @@ export default function HomePage() {
             </p>
             <div className="flex gap-2">
               {["App Store", "Google Play"].map((store) => (
-                <Button key={store} variant="outline" size="sm" onClick={soon(store)}>
+                <Button key={store} variant="outline" size="sm" onClick={() => toast.info(`${store} — coming soon`)}>
                   {store}
                 </Button>
               ))}
@@ -174,6 +224,15 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+    </div>
+  );
+}
+
+function EmptyTab({ text }: { text: string }) {
+  return (
+    <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-border py-10 text-center">
+      <SparklesIcon className="size-5 text-subtle" />
+      <p className="text-sm text-muted-foreground">{text}</p>
     </div>
   );
 }
