@@ -129,6 +129,9 @@ def seed_all(db: Session) -> None:
 
     db.commit()
 
+    # generate placeholder WAV audio for meetings with transcripts
+    _generate_audio(db)
+
 
 def _seed_meeting(db: Session, fx: dict, user: User, channel: Channel) -> None:
     has_transcript = bool(fx.get("transcript"))
@@ -294,6 +297,34 @@ def _recompute_stats(db: Session, meeting_id: int, participants: list[Participan
         own = [s for s in segments if s.speaker_id == p.id]
         p.talk_time_ms = sum(s.end_ms - s.start_ms for s in own)
         p.word_count = sum(len(s.text.split()) for s in own)
+
+
+def _generate_audio(db: Session) -> None:
+    """Generate placeholder WAV audio for meetings with transcripts (docs/03 §5.6)."""
+    try:
+        from app.services.media_synth import synthesize_wav
+        from app.config import settings
+        from pathlib import Path
+        media_dir = Path(settings.media_dir)
+        meetings = db.scalars(select(Meeting).where(Meeting.status == "ready")).all()
+        for m in meetings:
+            if m.media_path:
+                continue  # already generated
+            segments = db.scalars(
+                select(TranscriptSegment).where(TranscriptSegment.meeting_id == m.id).order_by(TranscriptSegment.start_ms)
+            ).all()
+            if not segments:
+                continue
+            participants = db.scalars(select(Participant).where(Participant.meeting_id == m.id)).all()
+            speaker_ids = {p.id: i for i, p in enumerate(participants)}
+            seg_dicts = [{"start_ms": s.start_ms, "end_ms": s.end_ms, "speaker_id": s.speaker_id} for s in segments]
+            out_path = media_dir / f"meeting_{m.id}.wav"
+            media_path = synthesize_wav(seg_dicts, speaker_ids, out_path)
+            if media_path:
+                m.media_path = media_path
+        db.commit()
+    except Exception as exc:
+        print(f"[media_synth] skipped: {exc}")
 
 
 if __name__ == "__main__":

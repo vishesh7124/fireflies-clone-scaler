@@ -13,7 +13,6 @@ import { api } from "@/lib/api";
 import { qk } from "@/lib/query-keys";
 import { signOut } from "@/lib/auth";
 import type { Settings, SummaryTemplate } from "@/lib/types";
-import { resetDb } from "@/mock/store";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -67,11 +66,21 @@ export default function SettingsContent() {
     onError: (e) => toast.error(e.message),
   });
 
-  const handleReseed = () => {
-    resetDb();
-    queryClient.invalidateQueries();
-    toast.success("Demo data reseeded");
-    router.push("/");
+  const handleReseed = async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "") ?? "http://localhost:8000"}/api/v1/admin/reseed`, {
+        method: "POST",
+      });
+      if (res.ok) {
+        queryClient.invalidateQueries();
+        toast.success("Demo data reseeded");
+        router.push("/");
+      } else {
+        toast.error("Reseed failed — is the backend running?");
+      }
+    } catch {
+      toast.error("Reseed failed — is the backend running?");
+    }
   };
 
   if (isPending || !settings) {

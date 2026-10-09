@@ -115,13 +115,15 @@
 - [x] Smoke test extended — **all green** (search=6 hits, chat w/ citations, exports, engagement CRUD)
 - **Checkpoint:** upload a real .vtt → meeting `ready` with generated summary/action items; AskFred answers with citations ✅
 
-## Phase 7 — Integration + bonus wiring (2.5h)
+## Phase 7 — Integration + bonus wiring (2.5h) — ✅ done (Oct 9)
 
-- [ ] Flip `NEXT_PUBLIC_USE_MOCKS=false` → full app on real API; delete/flag-off mock store
-- [ ] Fix integration gaps (the ping-pong phase: field tweaks on either side as discovered)
-- [ ] Real `<audio>` playback path (generated WAVs + uploads); speed/seek still synced
-- [ ] Bonus wiring end-to-end: tags CRUD + filters, comments/bookmarks/soundbites persistence, export downloads, global ⌘K search, light-mode toggle
-- **Checkpoint:** the complete app runs on FastAPI + SQLite — everything persists for real.
+- [x] Frontend switched to real API (`NEXT_PUBLIC_USE_MOCKS=false`, `NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1`)
+- [x] Backend serves generated media at `/media/` (StaticFiles mount); `media_url` in API responses now returns a full URL (using `request.base_url`)
+- [x] `services/media_synth.py` — generates placeholder WAV audio per meeting (soft tones per speaker turn, pure stdlib, ~2.8MB per 3-min clip) so the player/seek/click-to-seek behave *for real*
+- [x] `/admin/reseed` endpoint (Settings → Danger zone now calls the backend, not the mock)
+- [x] Frontend settings page updated to use backend reseed (removed mock-store dependency)
+- [x] Integration verified: backend smoke test all green (21 checks incl. search/chat/export/engagement), frontend build green
+- Remaining bonus items (global ⌘K search palette, light-mode toggle, tags UI polish) tracked as Phase 8 polish
 
 ## Phase 8 — Ship (2h)
 

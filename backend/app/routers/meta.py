@@ -120,3 +120,12 @@ def get_dashboard(db: Session = Depends(get_db)):
 def health(db: Session = Depends(get_db)):
     meetings = db.scalar(select(func.count(Meeting.id))) or 0
     return {"ok": True, "db": "sqlite", "meetings": meetings, "seed": "loaded" if meetings else "empty", "llm_enabled": False}
+
+
+@router.post("/admin/reseed")
+def reseed(db: Session = Depends(get_db)):
+    """Wipe and reload demo data from shared/fixtures/ (Settings → Danger zone)."""
+    from app.seed.seed import seed_all
+    seed_all(db)
+    meetings = db.scalar(select(func.count(Meeting.id))) or 0
+    return {"ok": True, "meetings": meetings}

@@ -3,9 +3,11 @@
 
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
+
+from app.config import settings
 
 from app.database import get_db
 from app.models import (
@@ -165,14 +167,19 @@ def create_meeting(data: CreateMeetingInput, db: Session = Depends(get_db)):
 
 
 @router.get("/meetings/{meeting_id}")
-def get_meeting(meeting_id: int, db: Session = Depends(get_db)):
+def get_meeting(meeting_id: int, request: Request, db: Session = Depends(get_db)):
+    return _meeting_detail(meeting_id, db, str(request.base_url))
+
+
+def _meeting_detail(meeting_id: int, db: Session, base_url: str) -> dict:
     m = db.get(Meeting, meeting_id)
     if not m or m.is_deleted:
         raise HTTPException(status_code=404, detail="Meeting not found")
     item = _item(m, db)
+    media_url = base_url + m.media_path if m.media_path else None
     return {
         **item,
-        "description": m.description, "host_id": m.host_id, "media_url": m.media_path,
+        "description": m.description, "host_id": m.host_id, "media_url": media_url,
         "counts": {
             "comments": db.scalar(select(func.count(Comment.id)).where(Comment.meeting_id == m.id)) or 0,
             "bookmarks": db.scalar(select(func.count(Bookmark.id)).where(Bookmark.meeting_id == m.id)) or 0,
@@ -183,7 +190,7 @@ def get_meeting(meeting_id: int, db: Session = Depends(get_db)):
 
 
 @router.patch("/meetings/{meeting_id}")
-def update_meeting(meeting_id: int, patch: UpdateMeetingInput, db: Session = Depends(get_db)):
+def update_meeting(meeting_id: int, patch: UpdateMeetingInput, request: Request, db: Session = Depends(get_db)):
     m = db.get(Meeting, meeting_id)
     if not m or m.is_deleted:
         raise HTTPException(status_code=404, detail="Meeting not found")
@@ -199,7 +206,7 @@ def update_meeting(meeting_id: int, patch: UpdateMeetingInput, db: Session = Dep
         m.language = patch.language
     db.commit()
     db.refresh(m)
-    return get_meeting(meeting_id, db)
+    return _meeting_detail(meeting_id, db, str(request.base_url))
 
 
 @router.delete("/meetings/{meeting_id}", status_code=204)
