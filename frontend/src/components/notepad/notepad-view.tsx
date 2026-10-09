@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { CalendarIcon, Loader2Icon } from "lucide-react";
 import { api } from "@/lib/api";
@@ -116,6 +117,17 @@ export function NotepadView({ meetingId }: { meetingId: number }) {
     queryFn: () => api.getTranscript(meetingId),
     enabled: meetingStatus === "ready",
   });
+
+  // seek to a timestamp passed via ?t=<seconds> (e.g. from a task provenance link)
+  const searchParams = useSearchParams();
+  const tParam = searchParams.get("t");
+  const seekTo = usePlayerStore((s) => s.seekTo);
+  useEffect(() => {
+    if (transcript && tParam != null) {
+      const ms = Number(tParam) * 1000;
+      if (Number.isFinite(ms)) seekTo(ms);
+    }
+  }, [transcript, tParam, seekTo]);
 
   // reset playback state when entering/leaving the Notepad
   const reset = usePlayerStore((s) => s.reset);

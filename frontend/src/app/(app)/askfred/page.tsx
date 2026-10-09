@@ -1,13 +1,12 @@
-import type { Metadata } from "next";
-import { Placeholder } from "@/components/layout/placeholder";
+import AskFredContent from "./askfred-content";
 
-export const metadata: Metadata = { title: "AskFred" };
+/**
+ * AskFred (global) — full-page chat with citation chips (docs/01 §5.6).
+ * Fully client-driven, so we opt out of Next.js 16's PPR instant-navigation
+ * validation.
+ */
+export const instant = false;
 
 export default function AskFredPage() {
-  return (
-    <Placeholder
-      title="Hi VISHESH, how can I help today?"
-      note="AskFred chat with citations across your meetings — Phase 4."
-    />
-  );
+  return <AskFredContent />;
 }

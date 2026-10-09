@@ -78,13 +78,15 @@
 - **Virtual-clock seek bug (Oct 9, "seek stops working when playing"):** the rAF loop in `player-engine.tsx` advanced from a **stale closure variable** (`lastMs`), so any user seek (which updates the store's `currentTimeMs`) was overwritten on the very next frame. Seeks worked when paused (loop not running) but failed when playing — exactly the reported symptom. Fixed by advancing from `usePlayerStore.getState().currentTimeMs` each tick so seeks take effect immediately.
 - **Notepad fidelity round 2 (Oct 9, notepad screenshots):** hamburger now opens a **slide-in sidebar overlay** (fixed left panel + backdrop, CSS slide transition) instead of navigating back; video area is compact & centered (`max-w-2xl`) with a **3×3 participant grid** and a **video controls overlay** (play/pause, timecode, volume, CC, fullscreen, kebab) at the bottom; transcript uses **single-letter** avatars + brighter body text (`text-foreground`); "Did you like the summary?" card is centered with **purple filled stars**; "Continue from this meeting" chips use a **colored `+` icon prefix** (purple/yellow/blue).
 
-## Phase 4 — Remaining app pages (2h)
+## Phase 4 — Remaining app pages (2h) — ✅ done (Oct 9)
 
-- [ ] `/tasks`: segmented My/All, grouped rows, provenance link (opens Notepad + seeks), New dialog, integration banner
-- [ ] `/askfred`: chat rail, composer, suggestions, citation chips (mock rule-based answers per doc 03 §5.4)
-- [ ] Notepad `AskFredPanel` (meeting-scoped) + `SoundbitesPanel`/`CommentsPanel`/`BookmarksPanel` (mock-backed)
-- [ ] `/settings` (localStorage-persisted) + `/integrations` (Coming Soon grid + toasts)
-- [ ] Toast audit: every mutation notifies; delete confirms
+- [x] `/tasks` — My/All segmented toggle (My = assignee = current user), tasks grouped by meeting, **provenance links** (`/meetings/{id}?t=<s>` opens the Notepad and seeks to the source moment), New task dialog (meeting select + description + due date), "Automatically send all your tasks to your work apps." integration banner with Connect link, empty state + "+ New" CTA
+- [x] `/askfred` (global) — left chat-history rail (recent meetings), main thread with citation chips (link to meeting + seek), prompt composer with suggestions + "Consumes AI credits" footer; sends via `api.sendChat(null, q)` (rule-based engine, LLM when key present)
+- [x] Notepad `AskFredPanel` — was already live in Phase 3 (meeting-scoped tab in the right column)
+- [x] `/settings` — persisted (Profile, AI summary template + auto-join + send-recaps-to, playback speed, Integrations & team link, Danger zone: Reseed demo data + Sign out)
+- [x] `/integrations` — 16-card grid (Zoom, Google Meet, Teams, Slack, HubSpot, Salesforce, Notion, Asana, Trello, Jira, Google Drive, Dropbox, Zapier, Google Calendar, Salesloft, Webhooks) with category + description + Connect → Coming Soon toasts
+- [x] Notepad `?t=<seconds>` seek-on-load (task provenance links jump to the exact moment)
+- [x] Toast audit — every mutation notifies (create/edit/delete/complete/export/settings/chat/engagement), delete confirms via dialog
 - **★ Visual review checkpoint:** walk the app with the user against the original screenshots; collect change requests before a line of backend is written.
 
 ## Phase 5 — Backend foundation (3h)

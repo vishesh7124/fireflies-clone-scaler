@@ -1,13 +1,12 @@
-import type { Metadata } from "next";
-import { Placeholder } from "@/components/layout/placeholder";
+import IntegrationsContent from "./integrations-content";
 
-export const metadata: Metadata = { title: "Integrations" };
+/**
+ * Integrations — the real app's integration grid (docs/01 §5.7). All
+ * Connect buttons show "Coming Soon" per the assignment's mocked scope.
+ * Fully client-driven, so we opt out of Next.js 16's PPR validation.
+ */
+export const instant = false;
 
 export default function IntegrationsPage() {
-  return (
-    <Placeholder
-      title="Integrations"
-      note="Zoom, Google Meet, Slack, CRM… all coming soon (mocked section)."
-    />
-  );
+  return <IntegrationsContent />;
 }

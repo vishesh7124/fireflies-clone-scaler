@@ -1,13 +1,12 @@
-import type { Metadata } from "next";
-import { Placeholder } from "@/components/layout/placeholder";
+import TasksContent from "./tasks-content";
 
-export const metadata: Metadata = { title: "Tasks" };
+/**
+ * Tasks — "All your meeting tasks in one place" (docs/01 §5.5). Fully
+ * client-driven (queries + state), so we opt out of Next.js 16's Partial
+ * Prerendering "instant navigation" validation.
+ */
+export const instant = false;
 
 export default function TasksPage() {
-  return (
-    <Placeholder
-      title="All your meeting tasks in one place"
-      note="Manage, assign and update all your meeting tasks here — Phase 4."
-    />
-  );
+  return <TasksContent />;
 }
