@@ -48,15 +48,21 @@ TAG_COLORS = {
     "investors": "#e599f7",
 }
 
-LINE_RE = re.compile(r"^(\d{1,2}:\d{2}(?::\d{2})?)\s+([^:]{1,40}):\s*(.+)$")
+LINE_RE = re.compile(r"^(\d{1,2}:\d{2}(?::\d{2})?(?:[.,]\d{1,3})?)\s+([^:]{1,40}):\s*(.+)$")
 
 
 def parse_timecode(tc: str) -> int:
-    """"14:32" or "1:02:03" → milliseconds."""
+    """"14:32", "1:02:03", or "1:02:03.000" → milliseconds."""
+    tc = tc.replace(",", ".")
+    if "." in tc:
+        tc, frac = tc.split(".", 1)
+        ms = int(float("0." + frac) * 1000)
+    else:
+        ms = 0
     parts = [int(p) for p in tc.split(":")]
     if len(parts) == 3:
-        return ((parts[0] * 60 + parts[1]) * 60 + parts[2]) * 1000
-    return (parts[0] * 60 + parts[1]) * 1000
+        return ((parts[0] * 60 + parts[1]) * 60 + parts[2]) * 1000 + ms
+    return (parts[0] * 60 + parts[1]) * 1000 + ms
 
 
 def parse_iso(s: str | None) -> datetime | None:

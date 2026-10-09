@@ -31,7 +31,8 @@ function vttToLines(text: string): string[] {
     const rows = block.split(/\r?\n/).filter((r) => r.trim());
     const cue = rows.find((r) => /^\s*\d{1,2}:\d{2}(:\d{2})?[.,]\d{3}\s*-->/.test(r));
     if (!cue) continue;
-    const tc = cue.trim().split("-->")[0].replace(/[.,]\d{3}$/, "");
+    // extract "00:00:04" from "00:00:04.000 --> 00:00:18.000" (strip .ms + whitespace)
+    const tc = cue.trim().split("-->")[0].trim().replace(/[.,]\d{3}$/, "");
     const texts = rows.filter((r) => r !== cue && !/^\d+$/.test(r.trim()));
     const joined = texts.join(" ").replace(/<[^>]+>/g, "").trim();
     // speaker patterns: "Name: text", "<v Name>text", "Name - text"
