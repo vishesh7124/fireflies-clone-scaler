@@ -1,0 +1,22 @@
+00:04 Sarah Watts: Hi Tom, hi Emily — thanks for making time today. I'd love to understand how your team handles customer onboarding right now.
+00:18 Tom Reyes: Thanks Sarah. So our onboarding flow is mostly manual. We spend about 3 hours per day on data entry across the team, which is a huge time sink.
+00:34 Emily Chen: And the accuracy is a real problem. Last month we had 40% of our records with missing information, which makes reporting basically impossible.
+00:50 Sarah Watts: That's a significant pain point. What tools are you using today to manage this?
+01:02 Tom Reyes: We're on spreadsheets mostly. I know, it's embarrassing. We tried a CRM last year but the migration failed and we never went back.
+01:18 Emily Chen: The budget for new tools is capped at $30k this quarter, so we need to be careful about what we commit to.
+01:30 Sarah Watts: Got it — a $30k budget cap. Our platform starts at $19 per user per month, and for a team your size that would be well within budget.
+01:45 Tom Reyes: What about implementation? We can't afford another 3-month rollout.
+01:52 Sarah Watts: Most teams are fully onboarded in under a week. We handle the data migration for you at no extra cost.
+02:05 Emily Chen: That's reassuring. One thing we'd need is SSO integration — we can't roll anything out without single sign-on.
+02:16 Sarah Watts: SSO is included in the Pro plan. I'll send you the full feature comparison after this call.
+02:28 Tom Reyes: Great. Can we set up a demo for the wider team next week?
+02:34 Sarah Watts: Absolutely — I'll schedule a 30-minute demo for Tuesday or Thursday. I'll send a calendar invite today.
+02:45 Emily Chen: Perfect. And could you also send the security documentation? Our legal team will need to review it.
+02:52 Sarah Watts: Of course — SOC 2 Type 2, GDPR compliance docs, all of it goes over today.
+03:02 Tom Reyes: One more question — what does support look like after we sign? We've been burned before by vendors who disappear after onboarding.
+03:12 Sarah Watts: You get a dedicated customer success manager plus 24/7 chat support. Our median response time is under 2 hours.
+03:25 Emily Chen: That's impressive. I think we have enough to move forward.
+03:30 Tom Reyes: Agreed. Sarah, can you also prepare a pricing proposal for 25 seats?
+03:36 Sarah Watts: Yes — I'll send the proposal with 25-seat pricing by tomorrow. And I'll follow up with the calendar invite and security docs today.
+03:48 Emily Chen: Wonderful. Thanks for the quick call, Sarah.
+03:52 Sarah Watts: Thank you both! Talk soon.
