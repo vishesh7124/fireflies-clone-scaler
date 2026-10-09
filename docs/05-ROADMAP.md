@@ -56,18 +56,19 @@
 - **Checkpoint:** ✅ build green (14 routes incl. `/login` + `/meetings/[id]`), smoke green, login HTML verified against the real screen.
 - **Fidelity round (Oct 9, original-vs-clone screenshots for home/upload/meetings):** stripped invented elements and matched the real screens — Home = time-of-day greeting ("Good Morning, VISHESH 🌤️") + Feedback link, "Personal Assistant" row, Daily Brief / Meeting Prep / Tasks cards, compact rows + "All caught up!" badge, docked AskFred rail (Quick Start tiles, stats strip, hero card, topbar avatar all removed); Meetings = icon-strip sidebar + channels rail with "# My Meetings" purple pill, plain-text tabs + Filters pill + magnifier toggle-search (sort folded into Filters), rows = muted video thumb + title + up-arrow + one meta line (date · duration · host) + "..." + "Details >" (no tag pills / participant stacks); Uploads = real page (not a modal): "Uploads are moving" banner, big drop zone (MP3/M4A/WAV/MP4/WEBM + limits + Browse Files), right "Uploading N Files" panel (language, queued rows, Upload), "You have no recent uploads!" empty state, paste-transcript dialog; help bubble hidden on Meetings (rail owns that corner).
 
-## Phase 3 — Notepad UI ★ (5h)
+## Phase 3 — Notepad UI ★ (5h) — ✅ done (Oct 9)
 
-- [ ] `NotepadHeader` (back, inline rename, participants, 3-dot menu, ExportMenu)
-- [ ] `MediaPlayer`: custom seek bar, play/pause, ±5s, speed 0.5–2×, volume, time display — **virtual clock engine** (`useAudioPlayer` rAF fallback; `<audio>` path ready for Phase 7)
-- [ ] `TranscriptView` + memoized `TranscriptLine` + active-line highlight + auto-scroll (doc 03 §5.1)
-- [ ] `FindInTranscript`: `<mark>` highlights, count, prev/next, filter-to-matches
-- [ ] Edit mode: contenteditable + debounced autosave (mock store) + optimistic state
-- [ ] `SummaryPanel`: Overview/Action items/Notes/Topics/Metrics; template dropdown; Copy/Reprocess/Edit toolbar; topics & metrics anchor → seek
-- [ ] `ActionItemsSection`: checkbox (optimistic), assignee, due badge, inline add/edit/delete
-- [ ] IconRail + `SmartSearchPanel` (rule-based client-side classification per doc 03 §5.2 — counts + jump + highlight; speaker talk-time bars + WPM) + `IndexPanel`
-- [ ] Resizable `SplitLayout` + expand/full-screen; collapsible rail (persisted)
-- **Checkpoint:** the assignment's core feature demonstrable — click line → seek; play → highlight & scroll — even before the backend exists.
+- [x] `NotepadHeader` (back-to-Notebook beside title, double-click inline rename, participants + date meta, 3-dot menu: rename / regenerate notes / meeting info / download×5 / copy link / delete-confirm)
+- [x] `MediaPlayer` + headless `PlayerEngine`: custom draggable seek bar, play/pause, ±5s, speed 0.5–2×, time display — **virtual clock engine** (rAF × speed; `<audio>` path fully wired, exercised from Phase 7); volume deferred to Phase 7 (no audio to control in mock)
+- [x] `TranscriptView` + memoized `TranscriptLine` + binary-search active-line highlight + auto-scroll (`scrollIntoView nearest`, docs/03 §5.1); narrow store selectors so only the active line + player UI re-render at playback rate
+- [x] `FindInTranscript`: `<mark>` highlights, live count, prev/next → seek + scroll (filter-to-matches cut per the fidelity principle — smart search already filters)
+- [x] Edit mode: contenteditable + debounced (700ms) autosave via PATCH + optimistic transcript-cache patch; edited-line marker
+- [x] `SummaryPanel`: Overview → Action items → Notes → Topics → Metrics; template dropdown (General/Sales/1:1/BANT → regenerate); Copy / Reprocess / Edit toolbar; topics + metrics rows carry timestamps → click seeks the player
+- [x] `ActionItemsSection`: live from the action-items endpoint — optimistic checkboxes, assignee dot, due badge, provenance → seek to source moment, inline add, delete
+- [x] `IconRail` (Smart Search / Index / Soundbites / Comments / Bookmarks / AskFred) + panels: `SmartSearchPanel` (Questions/Tasks/Dates/Metrics/Pricing/Sentiment/Fillers counts → click filters + seeks to first match; speaker talk-time bars + WPM), `IndexPanel` (jump list), `SoundbitesPanel` (clip cards, playClip seeks + auto-stops), `CommentsPanel` (anchored comments + composer), `BookmarksPanel`, `AskFredPanel` (suggestions, thread, citations → seek)
+- [x] Resizable `SplitLayout` (pointer-drag divider, keyboard arrows, collapse/expand either side, persisted) + transcript-line hover actions (comment / soundbite / bookmark a moment)
+- [x] Processing state (polling → flips ready) + scheduled state + skeletons
+- **Checkpoint:** ✅ build green; the assignment's core feature works end-to-end — click line → seek, play → active line highlights & auto-scrolls, speed changes playback rate.
 
 ## Phase 4 — Remaining app pages (2h)
 
