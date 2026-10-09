@@ -28,6 +28,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SeekBar } from "./seek-bar";
 
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
@@ -66,7 +67,7 @@ export function TransportBar({ meeting }: { meeting: Meeting }) {
 
   return (
     <div className="flex h-14 shrink-0 items-center gap-2 border-t border-border px-4">
-      {/* timecode + speed + "now playing" indicator */}
+      {/* timecode + seek bar + "now playing" indicator */}
       <span className="flex shrink-0 items-center gap-1.5 font-mono text-[11px] tabular-nums text-subtle">
         {isPlaying && (
           <span
@@ -80,6 +81,9 @@ export function TransportBar({ meeting }: { meeting: Meeting }) {
         )}
         {msToClock(currentTimeMs)} / {msToClock(durationMs)}
       </span>
+      <div className="w-28 shrink-0 sm:w-48 lg:w-72">
+        <SeekBar currentTimeMs={currentTimeMs} durationMs={durationMs} />
+      </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button

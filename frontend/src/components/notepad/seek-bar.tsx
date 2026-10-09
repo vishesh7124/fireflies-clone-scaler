@@ -6,24 +6,27 @@ import { usePlayerStore } from "@/store/player-store";
 /**
  * Interactive seek bar — click or drag anywhere to scrub. Clicking starts
  * playback if the player is currently paused (the standard "jump and play"
- * UX). Keyboard ←/→ skip ±5 s. Wired into the video surface, matching
- * the real product's progress bar under the video.
+ * UX). Keyboard ←/→ skip ±5 s.
  *
- * Robustness: uses BOTH `onPointerDown` (instant, drag-aware with
- * `setPointerCapture`) and `onClick` (fallback for any config where
- * pointerdown doesn't fire) so seeking always works.
+ * Robustness: the previous version captured the pointer on `pointerdown` but
+ * never released it on `pointerup`, which made the bar unresponsive after the
+ * first click. Now we explicitly release the capture and track the drag via a
+ * ref, so every click works.
  */
 export function SeekBar({
   currentTimeMs,
   durationMs,
+  className,
 }: {
   currentTimeMs: number;
   durationMs: number;
+  className?: string;
 }) {
   const seekTo = usePlayerStore((s) => s.seekTo);
   const play = usePlayerStore((s) => s.play);
   const skip = usePlayerStore((s) => s.skip);
   const barRef = useRef<HTMLDivElement>(null);
+  const draggingRef = useRef(false);
 
   const pct = durationMs > 0 ? (currentTimeMs / durationMs) * 100 : 0;
   const seconds = Math.round(currentTimeMs / 1000);
@@ -49,8 +52,9 @@ export function SeekBar({
       aria-valuemax={totalSeconds}
       aria-valuenow={seconds}
       tabIndex={0}
-      className="group/sb relative z-10 flex h-4 cursor-pointer select-none items-center"
+      className={`group/sb relative z-10 flex h-4 cursor-pointer select-none items-center ${className ?? ""}`}
       onPointerDown={(e) => {
+        draggingRef.current = true;
         try {
           e.currentTarget.setPointerCapture(e.pointerId);
         } catch {
@@ -60,7 +64,18 @@ export function SeekBar({
         startPlaybackIfPaused();
       }}
       onPointerMove={(e) => {
-        if (e.currentTarget.hasPointerCapture(e.pointerId)) seekFromClientX(e.clientX);
+        if (draggingRef.current) seekFromClientX(e.clientX);
+      }}
+      onPointerUp={(e) => {
+        draggingRef.current = false;
+        try {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        } catch {
+          /* already released */
+        }
+      }}
+      onPointerCancel={() => {
+        draggingRef.current = false;
       }}
       onClick={(e) => {
         seekFromClientX(e.clientX);
@@ -73,7 +88,7 @@ export function SeekBar({
     >
       <div className="h-1 w-full overflow-hidden rounded-full bg-white/15">
         <div
-          className="h-full rounded-full bg-primary transition-[width] duration-100"
+          className="h-full rounded-full bg-primary transition-[width] duration-75"
           style={{ width: `${pct}%` }}
         />
       </div>
