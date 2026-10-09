@@ -88,26 +88,45 @@ function TaskRow({ task }: { task: ActionItem }) {
         aria-label={`Mark "${task.description}" as ${task.status === "done" ? "open" : "done"}`}
       />
       <div className="min-w-0 flex-1">
-        <button
-          type="button"
-          className={cn(
-            "block w-full text-left text-sm leading-snug",
-            task.status === "done" ? "text-subtle line-through" : "text-foreground",
+        <div className="flex items-start justify-between gap-3">
+          <button
+            type="button"
+            className={cn(
+              "min-w-0 flex-1 text-left text-sm leading-snug",
+              task.status === "done" ? "text-subtle line-through" : "text-foreground",
+            )}
+            onClick={() => {
+              if (task.source_start_ms != null) {
+                window.location.href = `/meetings/${task.meeting_id}?t=${Math.round(task.source_start_ms / 1000)}`;
+              }
+            }}
+            title={task.source_start_ms != null ? "Jump to the moment this came from" : undefined}
+          >
+            {task.description}
+          </button>
+          {/* assignee chip (or Assign button) — visible on the task row */}
+          {task.assignee_name ? (
+            <span className="flex shrink-0 items-center gap-1.5 rounded-md border border-border bg-elevated/60 px-2 py-1 text-[11px]">
+              <span
+                className="flex size-4 items-center justify-center rounded-full text-[8px] font-bold text-background"
+                style={{ backgroundColor: "#7c5cff" }}
+              >
+                {task.assignee_name[0]?.toUpperCase()}
+              </span>
+              <span className="font-medium text-foreground">{task.assignee_name}</span>
+            </span>
+          ) : (
+            <button
+              type="button"
+              onClick={() => toast.info("Assign — coming soon")}
+              className="flex shrink-0 items-center gap-1 rounded-md border border-border bg-elevated/60 px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <PlusIcon className="size-3" />
+              Assign
+            </button>
           )}
-          onClick={() => {
-            if (task.source_start_ms != null) {
-              // open the Notepad and seek to the moment this task came from
-              window.location.href = `/meetings/${task.meeting_id}?t=${Math.round(task.source_start_ms / 1000)}`;
-            }
-          }}
-          title={task.source_start_ms != null ? "Jump to the moment this came from" : undefined}
-        >
-          {task.description}
-        </button>
+        </div>
         <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px]">
-          {task.assignee_name && (
-            <span className="text-muted-foreground">{task.assignee_name}</span>
-          )}
           {task.due_date && (
             <span
               className={cn(
