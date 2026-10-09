@@ -10,7 +10,8 @@ import { formatDate, msToClock } from "@/lib/format";
 import { useDebounced } from "@/hooks/use-debounced";
 import { useUiStore } from "@/store/ui-store";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { Command as CommandPrimitive } from "cmdk";
+import { SearchSnippet } from "./search-snippet";
 
 /**
  * Global search (⌘K / Ctrl+K) — searches meeting titles AND transcript text
@@ -34,59 +35,61 @@ export function SearchDialog() {
     return () => window.removeEventListener("keydown", handler);
   }, [openSearch]);
 
-  const { data, isFetching } = useQuery({
-    queryKey: qk.search(debounced),
-    queryFn: () => api.search(debounced),
+  const { data, isFetching, isError, refetch } = useQuery({
+    queryKey: qk.search(debounced.trim()),
+    queryFn: () => api.search(debounced.trim()),
     enabled: searchOpen && debounced.trim().length > 0,
   });
 
   const hasResults = data && (data.meetings.length > 0 || data.transcript_matches.length > 0);
+  const ready = query.trim() === debounced.trim() && query.trim().length > 0;
 
   return (
     <Dialog open={searchOpen} onOpenChange={(open) => !open && closeSearch()}>
       <DialogContent className="top-24 max-w-xl translate-y-0 gap-0 overflow-hidden p-0">
         <DialogTitle className="sr-only">Search meetings and transcripts</DialogTitle>
-
+        <CommandPrimitive shouldFilter={false} label="Search results">
         {/* search input */}
         <div className="flex items-center gap-2 border-b border-border px-4">
           <SearchIcon className="size-4 shrink-0 text-subtle" />
-          <Input
+          <CommandPrimitive.Input
             autoFocus
             placeholder="Search by title or keyword"
             className="h-12 flex-1 border-0 bg-transparent text-sm outline-none focus-visible:ring-0"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onValueChange={setQuery}
           />
           {isFetching && <span className="text-xs text-subtle">Searching…</span>}
         </div>
 
         {/* results */}
-        <div className="max-h-[60vh] overflow-y-auto p-2">
+        <CommandPrimitive.List className="max-h-[60vh] overflow-y-auto p-2">
           {query.trim().length === 0 && (
             <p className="px-3 py-8 text-center text-sm text-subtle">
               Search across all your meetings and transcripts.
             </p>
           )}
-          {query.trim().length > 0 && !hasResults && !isFetching && (
+          {isError && ready && <button type="button" onClick={() => refetch()} className="w-full px-3 py-8 text-sm text-destructive">Search failed. Click to retry.</button>}
+          {ready && !hasResults && !isFetching && !isError && (
             <p className="px-3 py-8 text-center text-sm text-subtle">
               No results for “{query}”.
             </p>
           )}
 
-          {data && data.meetings.length > 0 && (
+          {ready && data && data.meetings.length > 0 && (
             <>
               <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-subtle">
                 Meetings
               </p>
               {data.meetings.map((m) => (
-                <button
+                <CommandPrimitive.Item
                   key={m.id}
-                  type="button"
-                  onClick={() => {
+                  value={`meeting-${m.id}`}
+                  onSelect={() => {
                     closeSearch();
                     router.push(`/meetings/${m.id}`);
                   }}
-                  className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-accent"
+                  className="flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-accent data-[selected=true]:bg-accent"
                 >
                   <VideoIcon className="size-4 shrink-0 text-subtle" />
                   <span className="min-w-0 flex-1 truncate text-sm text-foreground">{m.title}</span>
@@ -94,41 +97,39 @@ export function SearchDialog() {
                     {formatDate(m.meeting_date, "MMM d")}
                   </span>
                   <ArrowRightIcon className="size-3.5 shrink-0 text-subtle" />
-                </button>
+                </CommandPrimitive.Item>
               ))}
             </>
           )}
 
-          {data && data.transcript_matches.length > 0 && (
+          {ready && data && data.transcript_matches.length > 0 && (
             <>
               <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-subtle">
                 Transcript matches
               </p>
               {data.transcript_matches.map((t) => (
-                <button
+                <CommandPrimitive.Item
                   key={t.segment_id}
-                  type="button"
-                  onClick={() => {
+                  value={`segment-${t.segment_id}`}
+                  onSelect={() => {
                     closeSearch();
-                    router.push(`/meetings/${t.meeting_id}?t=${Math.round(t.start_ms / 1000)}`);
+                    router.push(`/meetings/${t.meeting_id}?t=${t.start_ms / 1000}`);
                   }}
-                  className="flex w-full items-start gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-accent"
+                  className="flex w-full cursor-pointer items-start gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-accent data-[selected=true]:bg-accent"
                 >
                   <FileTextIcon className="mt-0.5 size-4 shrink-0 text-subtle" />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-xs text-subtle">
                       {t.meeting_title} · {msToClock(t.start_ms)} · {t.speaker}
                     </span>
-                    <span
-                      className="block text-sm text-foreground"
-                      dangerouslySetInnerHTML={{ __html: t.text }}
-                    />
+                    <span className="block text-sm text-foreground"><SearchSnippet text={t.text} /></span>
                   </span>
-                </button>
+                </CommandPrimitive.Item>
               ))}
             </>
           )}
-        </div>
+        </CommandPrimitive.List>
+        </CommandPrimitive>
 
         <div className="flex items-center gap-3 border-t border-border px-4 py-2 text-[11px] text-subtle">
           <span>

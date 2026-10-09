@@ -314,6 +314,7 @@ export interface CreateMeetingInput {
 }
 
 export interface UpdateMeetingInput {
+  participants?: { id?: number; name: string; email?: string | null }[];
   title?: string;
   description?: string;
   meeting_date?: string;

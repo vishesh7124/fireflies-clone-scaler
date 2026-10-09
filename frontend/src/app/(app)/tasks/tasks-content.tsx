@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowRightIcon, InboxIcon, ListChecksIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { ArrowRightIcon, InboxIcon, ListChecksIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { qk } from "@/lib/query-keys";
 import { formatDate } from "@/lib/format";
-import type { ActionItem, Meeting } from "@/lib/types";
+import type { ActionItem, MeetingListItem } from "@/lib/types";
 import { usePlayerStore } from "@/store/player-store";
 import { cn } from "cn";
 import { Button } from "@/components/ui/button";
@@ -31,11 +32,15 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SegmentedTabs } from "@/components/shared/segmented-tabs";
+import { EditTaskDialog } from "@/components/shared/edit-task-dialog";
+import { DataError } from "@/components/shared/data-error";
 
 const TABS = ["My Tasks", "All Tasks"];
 
 /** One task row — checkbox, description, assignee, due date, provenance link. */
 function TaskRow({ task }: { task: ActionItem }) {
+  const router = useRouter();
+  const [editOpen, setEditOpen] = useState(false);
   const queryClient = useQueryClient();
   const seekTo = usePlayerStore((s) => s.seekTo);
 
@@ -97,7 +102,7 @@ function TaskRow({ task }: { task: ActionItem }) {
             )}
             onClick={() => {
               if (task.source_start_ms != null) {
-                window.location.href = `/meetings/${task.meeting_id}?t=${Math.round(task.source_start_ms / 1000)}`;
+                router.push(`/meetings/${task.meeting_id}?t=${Math.round(task.source_start_ms / 1000)}`);
               }
             }}
             title={task.source_start_ms != null ? "Jump to the moment this came from" : undefined}
@@ -118,7 +123,7 @@ function TaskRow({ task }: { task: ActionItem }) {
           ) : (
             <button
               type="button"
-              onClick={() => toast.info("Assign — coming soon")}
+              onClick={() => setEditOpen(true)}
               className="flex shrink-0 items-center gap-1 rounded-md border border-border bg-elevated/60 px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
             >
               <PlusIcon className="size-3" />
@@ -150,6 +155,10 @@ function TaskRow({ task }: { task: ActionItem }) {
           )}
         </div>
       </div>
+      {editOpen && <EditTaskDialog task={task} onClose={() => setEditOpen(false)} />}
+      <Button variant="ghost" size="icon-sm" aria-label="Edit task" onClick={() => setEditOpen(true)}>
+        <PencilIcon className="size-3.5" />
+      </Button>
       <button
         type="button"
         aria-label="Delete task"
@@ -170,23 +179,31 @@ function NewTaskDialog({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  meetings: Meeting[];
+  meetings: MeetingListItem[];
 }) {
   const queryClient = useQueryClient();
   const [meetingId, setMeetingId] = useState<number | null>(null);
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [assignee, setAssignee] = useState("none");
+  const { data: selectedMeeting } = useQuery({
+    queryKey: qk.meeting(meetingId ?? 0),
+    queryFn: () => api.getMeeting(meetingId!),
+    enabled: meetingId != null,
+  });
 
   const createMutation = useMutation({
     mutationFn: () =>
       api.createActionItem(meetingId!, {
         description: description.trim(),
+        assignee_id: assignee === "none" ? null : Number(assignee),
         due_date: dueDate || null,
       }),
     onSuccess: () => {
       setMeetingId(null);
       setDescription("");
       setDueDate("");
+      setAssignee("none");
       onOpenChange(false);
       queryClient.invalidateQueries();
       toast.success("Task added");
@@ -205,7 +222,7 @@ function NewTaskDialog({
             <Label htmlFor="task-meeting">Meeting</Label>
             <Select
               value={meetingId ? String(meetingId) : undefined}
-              onValueChange={(v) => setMeetingId(Number(v))}
+              onValueChange={(v) => { setMeetingId(Number(v)); setAssignee("none"); }}
             >
               <SelectTrigger id="task-meeting" className="text-xs">
                 <SelectValue placeholder="Pick a meeting" />
@@ -237,6 +254,16 @@ function NewTaskDialog({
               onChange={(e) => setDueDate(e.target.value)}
             />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="task-assignee">Assignee</Label>
+            <Select value={assignee} onValueChange={setAssignee} disabled={!selectedMeeting || createMutation.isPending}>
+              <SelectTrigger id="task-assignee"><SelectValue placeholder="Unassigned" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Unassigned</SelectItem>
+                {selectedMeeting?.participants.map((p) => <SelectItem key={p.id} value={String(p.id)}>{p.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
@@ -265,7 +292,7 @@ export default function TasksContent() {
   const [newOpen, setNewOpen] = useState(false);
 
   const { data: me } = useQuery({ queryKey: qk.me, queryFn: () => api.getMe() });
-  const { data: tasks, isPending } = useQuery({
+  const { data: tasks, isPending, isError, refetch } = useQuery({
     queryKey: qk.actionItems({}),
     queryFn: () => api.listActionItems({}),
   });
@@ -274,7 +301,7 @@ export default function TasksContent() {
     queryFn: () => api.listMeetings({ sort: "recent", page_size: 50 }),
   });
 
-  const meetings: Meeting[] = (meetingsData?.items ?? []) as unknown as Meeting[];
+  const meetings = meetingsData?.items ?? [];
   const allTasks = tasks ?? [];
   const filtered = tab === "My Tasks" ? allTasks.filter((t) => t.assignee_name === me?.name) : allTasks;
 
@@ -325,7 +352,7 @@ export default function TasksContent() {
             <Skeleton key={i} className="h-16 rounded-lg" />
           ))}
         </div>
-      ) : Object.keys(groups).length === 0 ? (
+      ) : isError ? <DataError title="Could not load tasks" onRetry={() => { void refetch(); }} /> : Object.keys(groups).length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-16 text-center">
           <InboxIcon className="size-10 text-subtle" />
           <h3 className="font-display text-lg font-semibold text-foreground">
@@ -344,8 +371,8 @@ export default function TasksContent() {
           {Object.entries(groups).map(([mid, group]) => {
             const meeting = meetings.find((m) => m.id === Number(mid));
             return (
-              <section key={mid} className="space-y-1">
-                <h3 className="flex items-center gap-1.5 px-3 text-xs font-semibold uppercase tracking-wide text-subtle">
+              <section key={mid} className="overflow-hidden rounded-lg border border-border bg-surface/40 [&>div+div]:border-t [&>div+div]:border-border/60">
+                <h3 className="flex items-center gap-1.5 border-b border-border bg-surface px-4 py-4 text-sm font-medium text-muted-foreground">
                   <ListChecksIcon className="size-3" />
                   {meeting?.title ?? `Meeting #${mid}`}
                   {meeting && (

@@ -24,7 +24,6 @@ export function PlayerEngine({ durationMs, mediaUrl }: { durationMs: number; med
   const speed = usePlayerStore((s) => s.speed);
   const seekVersion = usePlayerStore((s) => s.seekVersion);
   const currentTimeMs = usePlayerStore((s) => s.currentTimeMs);
-  const playUntilMs = usePlayerStore((s) => s.playUntilMs);
 
   // ---- virtual clock (no media) ----
   useEffect(() => {
@@ -86,7 +85,6 @@ export function PlayerEngine({ durationMs, mediaUrl }: { durationMs: number; med
     if (isPlaying) void audio.play().catch(() => undefined);
     else audio.pause();
     audio.playbackRate = speed;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, speed, mediaUrl]);
 
   // seek requests drive the element
@@ -98,7 +96,6 @@ export function PlayerEngine({ durationMs, mediaUrl }: { durationMs: number; med
   }, [seekVersion, mediaUrl]);
 
   return mediaUrl ? (
-    // eslint-disable-next-line jsx-a11y/media-has-caption -- placeholder audio, captions ARE the transcript panel
     <audio ref={audioRef} src={mediaUrl} preload="metadata" className="hidden" />
   ) : null;
 }

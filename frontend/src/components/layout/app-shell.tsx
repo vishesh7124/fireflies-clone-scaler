@@ -28,11 +28,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-background text-foreground">
-      <TrialBanner />
+      {pathname === "/uploads" && <TrialBanner />}
       <div className="flex min-h-0 flex-1">
         <Sidebar variant={railMode ? "rail" : "full"} />
         <div className="flex min-w-0 flex-1 flex-col">
-          <Topbar />
+          {pathname !== "/meetings" && <Topbar />}
           <main className="flex-1 overflow-y-auto">{children}</main>
         </div>
       </div>

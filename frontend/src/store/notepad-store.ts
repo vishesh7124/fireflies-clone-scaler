@@ -12,6 +12,8 @@ interface NotepadState {
   activePanel: NotepadPanel | null;
   smartFilter: string | null; // "questions" | "tasks" | "dates" | "metrics" | "sentiment-positive" | "sentiment-negative"
   findQuery: string; // shared by the Smart Search input + Find or Replace bar
+  followAudio: boolean;
+  setFollowAudio: (follow: boolean) => void;
   videoVisible: boolean;
   transcriptHidden: boolean;
   sidebarOpen: boolean;
@@ -31,12 +33,16 @@ export const useNotepadStore = create<NotepadState>()(
       activePanel: "smart-search",
       smartFilter: null,
       findQuery: "",
+      followAudio: true,
+      setFollowAudio: (followAudio) => set({ followAudio }),
       videoVisible: true,
       transcriptHidden: false,
       sidebarOpen: false,
       commentAnchorSegmentId: null,
       setActivePanel: (activePanel) => set({ activePanel }),
-      setSmartFilter: (smartFilter) => set({ smartFilter }),
+      setSmartFilter: (smartFilter) => set(smartFilter
+        ? { smartFilter, findQuery: "", followAudio: true }
+        : { smartFilter }),
       setFindQuery: (findQuery) => set({ findQuery }),
       setVideoVisible: (videoVisible) => set({ videoVisible }),
       setTranscriptHidden: (transcriptHidden) => set({ transcriptHidden }),

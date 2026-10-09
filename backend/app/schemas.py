@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, field_serializer
+from pydantic import BaseModel, field_serializer, field_validator
 
 
 # ---------- primitives ----------
@@ -97,6 +97,7 @@ class MeetingListItem(BaseModel):
 
 
 class MeetingOut(MeetingListItem):
+    participants: list[ParticipantOut]
     description: str | None
     host_id: int
     media_url: str | None
@@ -114,12 +115,33 @@ class CreateMeetingInput(BaseModel):
     transcript_text: str | None = None
 
 
+class ParticipantInput(BaseModel):
+    id: int | None = None
+    name: str
+    email: str | None = None
+
+    @field_validator("name")
+    @classmethod
+    def nonblank_name(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("Participant name cannot be blank")
+        return value.strip()
+
+
 class UpdateMeetingInput(BaseModel):
     title: str | None = None
     description: str | None = None
     meeting_date: str | None = None
     channel: str | None = None
     language: str | None = None
+    participants: list[ParticipantInput] | None = None
+
+    @field_validator("title")
+    @classmethod
+    def nonblank_title(cls, value: str | None) -> str | None:
+        if value is not None and not value.strip():
+            raise ValueError("Title cannot be blank")
+        return value.strip() if value is not None else None
 
 
 # ---------- transcript ----------
@@ -203,6 +225,20 @@ class ActionItemUpdate(BaseModel):
     status: str | None = None
     due_date: str | None = None
 
+    @field_validator("description")
+    @classmethod
+    def nonblank_description(cls, value: str | None) -> str | None:
+        if value is not None and not value.strip():
+            raise ValueError("Task cannot be blank")
+        return value.strip() if value is not None else None
+
+    @field_validator("status")
+    @classmethod
+    def valid_status(cls, value: str | None) -> str | None:
+        if value is not None and value not in {"open", "in_progress", "done"}:
+            raise ValueError("Invalid task status")
+        return value
+
 
 # ---------- engagement ----------
 
@@ -270,6 +306,13 @@ class ChatMessageOut(BaseModel):
 
 class ChatRequest(BaseModel):
     question: str
+
+    @field_validator("question")
+    @classmethod
+    def nonblank_question(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("Question cannot be blank")
+        return value.strip()
 
 
 class ChatResponseOut(BaseModel):

@@ -123,11 +123,11 @@ export default function UploadsPage() {
   return (
     <div className="flex h-full min-h-0">
       {/* main column */}
-      <div className="flex-1 space-y-6 overflow-y-auto p-6">
+      <div className="mx-auto w-full max-w-[1332px] flex-1 space-y-8 overflow-y-auto px-10 py-10">
         {/* "Uploads are moving" banner (dismissible, like the original) */}
         {bannerVisible && (
-          <div className="flex items-center gap-2 rounded-lg border border-warning/25 bg-warning/10 px-3 py-2 text-xs text-[#f0d9a8]">
-            <span className="flex-1">
+          <div className="mx-auto mb-14 flex max-w-[1140px] items-center gap-2 rounded-lg bg-warning/15 px-5 py-4 text-base text-foreground">
+            <span className="flex-1 text-center">
               Uploads are moving — you&rsquo;ll find them on the Meetings page soon.
             </span>
             <button
@@ -148,14 +148,14 @@ export default function UploadsPage() {
             e.preventDefault();
             onFiles(e.dataTransfer.files);
           }}
-          className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-elevated/30 px-6 py-14 text-center"
+          className="flex min-h-[328px] flex-col items-center justify-center gap-6 rounded-lg border border-dashed border-primary-soft bg-background px-6 py-12 text-center"
         >
-          <UploadIcon className="size-8 text-muted-foreground" />
+          <UploadIcon className="size-7 text-primary-soft" />
           <div className="space-y-1">
-            <h1 className="font-display text-lg font-semibold text-foreground">
+            <h1 className="font-display text-xl font-semibold text-foreground">
               Upload a file to generate a transcript
             </h1>
-            <p className="mx-auto max-w-md text-xs leading-relaxed text-subtle">
+            <p className="mx-auto max-w-4xl text-sm leading-relaxed text-subtle">
               Browse or drag and drop MP3, M4A, WAV, MP4 or WEBM files. (Max video size:
               100 MB, Max audio size: 500 MB)
             </p>
@@ -163,8 +163,7 @@ export default function UploadsPage() {
               Transcript files (.txt, .vtt, .json) are processed instantly.
             </p>
           </div>
-          <Button onClick={() => inputRef.current?.click()}>
-            <FileTextIcon className="size-3.5" />
+          <Button className="h-12 px-6 text-base" onClick={() => inputRef.current?.click()}>
             Browse Files
           </Button>
           <input
@@ -209,7 +208,7 @@ export default function UploadsPage() {
 
       {/* right — "Uploading N Files" panel (like the original) */}
       {queue.length > 0 && (
-        <aside className="flex w-80 shrink-0 flex-col border-l border-border">
+        <aside className="fixed bottom-3 right-5 z-20 flex max-h-[65vh] w-[min(475px,calc(100vw-40px))] flex-col rounded-lg border border-border bg-background shadow-lg">
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <span className="text-sm font-medium text-foreground">
               Uploading {queue.length} {queue.length === 1 ? "File" : "Files"}

@@ -4,7 +4,8 @@ FTS5 is the production optimization; LIKE fallback works fine for our data
 size and avoids SQLite FTS5 setup complexity.
 """
 
-from sqlalchemy import or_, select
+from html import escape
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models import Meeting, Participant, TranscriptSegment
@@ -14,7 +15,7 @@ def _snippet(text: str, q: str, radius: int = 60) -> str:
     """Extract a snippet around the first match, with <mark> highlights."""
     idx = text.lower().find(q.lower())
     if idx < 0:
-        return text[:radius * 2] + ("…" if len(text) > radius * 2 else "")
+        return escape(text[:radius * 2]) + ("…" if len(text) > radius * 2 else "")
     start = max(0, idx - radius)
     end = min(len(text), idx + len(q) + radius)
     before = text[start:idx]
@@ -22,7 +23,7 @@ def _snippet(text: str, q: str, radius: int = 60) -> str:
     after = text[idx + len(q):end]
     prefix = "…" if start > 0 else ""
     suffix = "…" if end < len(text) else ""
-    return f"{prefix}{before}<mark>{match}</mark>{after}{suffix}"
+    return f"{prefix}{escape(before)}<mark>{escape(match)}</mark>{escape(after)}{suffix}"
 
 
 def search(q: str, db: Session, limit: int = 12) -> dict:
@@ -40,7 +41,7 @@ def search(q: str, db: Session, limit: int = 12) -> dict:
 
     # transcript matches
     segments = db.scalars(
-        select(TranscriptSegment).where(TranscriptSegment.text.ilike(like))
+        select(TranscriptSegment).join(Meeting).where(Meeting.is_deleted == False, TranscriptSegment.text.ilike(like))
         .order_by(TranscriptSegment.meeting_id, TranscriptSegment.start_ms)
         .limit(limit)
     ).all()

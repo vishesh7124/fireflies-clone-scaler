@@ -22,8 +22,8 @@ function Section({
   defaultOpen?: boolean;
 }) {
   return (
-    <details open={defaultOpen} className="group/sec">
-      <summary className="flex cursor-pointer list-none items-center justify-between px-1 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-subtle [&::-webkit-details-marker]:hidden">
+    <details open={defaultOpen} className="group/sec border-t border-border px-5 py-4">
+      <summary className="mb-4 flex cursor-pointer list-none items-center justify-between py-2 text-xs font-normal uppercase text-subtle [&::-webkit-details-marker]:hidden">
         {title}
         <ChevronDownIcon className="size-3 transition-transform group-open/sec:rotate-180" />
       </summary>
@@ -106,13 +106,13 @@ export function SmartSearchPanel({ meeting, transcript }: { meeting: Meeting; tr
   }, [segments]);
 
   return (
-    <div className="flex h-full w-72 shrink-0 flex-col overflow-y-auto border-r border-border">
-      <div className="space-y-3 p-3">
+    <div className="flex h-full w-72 shrink-0 flex-col overflow-y-auto border-r border-border xl:w-[348px]">
+      <div>
         {/* section heading (no input — filters below do the work) */}
-        <h2 className="px-1 text-sm font-semibold text-foreground">Smart Search</h2>
+        <h2 className="flex h-[52px] items-center px-4 text-sm font-semibold text-foreground">Smart Search</h2>
 
         <Section title="AI Filters">
-          <div className="grid grid-cols-2 gap-1.5">
+          <div className="grid grid-cols-2 gap-2">
             {filters.map((f) => {
               const active = smartFilter === f.id;
               return (
@@ -121,7 +121,7 @@ export function SmartSearchPanel({ meeting, transcript }: { meeting: Meeting; tr
                   type="button"
                   onClick={() => setSmartFilter(active ? null : f.id)}
                   className={cn(
-                    "flex items-center gap-1.5 rounded-md border px-2 py-1.5 text-[11px] font-medium transition-colors",
+                     "flex h-12 items-center gap-3 rounded border px-4 text-xs font-medium transition-colors",
                     active
                       ? "border-primary/40 bg-primary/15 text-primary-soft"
                       : "border-border bg-surface text-muted-foreground hover:text-foreground",
@@ -137,7 +137,7 @@ export function SmartSearchPanel({ meeting, transcript }: { meeting: Meeting; tr
         </Section>
 
         <Section title="Sentiments">
-          <div className="space-y-1">
+          <div className="space-y-2">
             {sentiments.map((s) => (
               <button
                 key={s.label}
@@ -145,7 +145,7 @@ export function SmartSearchPanel({ meeting, transcript }: { meeting: Meeting; tr
                 disabled={s.id == null}
                 onClick={() => setSmartFilter(smartFilter === s.id ? null : s.id!)}
                 className={cn(
-                  "flex w-full items-center gap-2 rounded-md px-1.5 py-1.5 text-[11px] font-medium transition-colors",
+                   "flex h-12 w-full items-center gap-3 rounded border border-border bg-surface px-4 text-xs font-medium transition-colors",
                   s.id && smartFilter === s.id
                     ? "bg-primary/15 text-primary-soft"
                     : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
@@ -154,13 +154,7 @@ export function SmartSearchPanel({ meeting, transcript }: { meeting: Meeting; tr
               >
                 <span className="size-1.5 rounded-full" style={{ backgroundColor: s.dot }} />
                 {s.label}
-                <span className="ml-auto h-1 w-16 overflow-hidden rounded-full bg-elevated">
-                  <span
-                    className="block h-full rounded-full"
-                    style={{ width: `${s.pct}%`, backgroundColor: s.dot }}
-                  />
-                </span>
-                <span className="w-8 text-right tabular-nums text-subtle">{s.pct}%</span>
+                <span className="ml-auto w-8 text-right tabular-nums text-subtle">{s.pct}%</span>
               </button>
             ))}
           </div>
@@ -172,7 +166,7 @@ export function SmartSearchPanel({ meeting, transcript }: { meeting: Meeting; tr
             <span>WPM</span>
             <span>Talktime</span>
           </div>
-          <div className="space-y-0.5">
+          <div className="space-y-2">
             {(stats?.speakers ?? []).map((sp) => {
               const firstTurn = segments.find((s) => s.speaker_name === sp.name);
               return (
@@ -182,7 +176,7 @@ export function SmartSearchPanel({ meeting, transcript }: { meeting: Meeting; tr
                   disabled={!firstTurn}
                   onClick={() => firstTurn && usePlayerStore.getState().seekTo(firstTurn.start_ms)}
                   title={firstTurn ? "Jump to this speaker's first turn" : undefined}
-                  className="flex w-full items-center gap-2 rounded-md px-1.5 py-1.5 text-[11px] transition-colors hover:bg-accent/60 disabled:cursor-default disabled:hover:bg-transparent"
+                   className="flex h-12 w-full items-center gap-3 rounded border border-border bg-surface px-3 text-xs transition-colors hover:bg-accent/60 disabled:cursor-default disabled:hover:bg-transparent"
                 >
                   <span
                     className="flex size-5 shrink-0 items-center justify-center rounded text-[9px] font-bold text-background"
@@ -198,7 +192,7 @@ export function SmartSearchPanel({ meeting, transcript }: { meeting: Meeting; tr
                   <span className="truncate text-muted-foreground">{sp.name}</span>
                   <span className="ml-auto flex shrink-0 items-center gap-2 text-subtle">
                     <span className="tabular-nums">{sp.wpm}</span>
-                    <TalkRing pct={sp.talk_time_pct} color={sp.avatar_color} />
+                    <TalkRing pct={sp.talk_time_pct} color="var(--primary)" />
                     <span className="w-8 text-right tabular-nums">{sp.talk_time_pct}%</span>
                   </span>
                 </button>
@@ -207,8 +201,8 @@ export function SmartSearchPanel({ meeting, transcript }: { meeting: Meeting; tr
           </div>
         </Section>
 
-        <Section title="Topic Trackers" defaultOpen={false}>
-          <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-border py-6 text-center">
+        <Section title="Topic Trackers">
+          <div className="flex flex-col items-center gap-3 py-6 text-center">
             <HashIcon className="size-4 text-subtle" />
             <p className="text-xs font-medium text-foreground">No topic tracker</p>
             <p className="max-w-[220px] text-[11px] leading-relaxed text-subtle">

@@ -54,10 +54,24 @@ def create_action_item(meeting_id: int, data: ActionItemCreate, db: Session = De
     m = db.get(Meeting, meeting_id)
     if not m:
         raise HTTPException(status_code=404, detail="Meeting not found")
+    if not data.description.strip():
+        raise HTTPException(status_code=422, detail="Task cannot be blank")
+    if data.assignee_id is not None:
+        participant = db.get(Participant, data.assignee_id)
+        if not participant or participant.meeting_id != meeting_id:
+            raise HTTPException(status_code=422, detail="Assignee must belong to this meeting")
+    if data.source_segment_id is not None:
+        segment = db.get(TranscriptSegment, data.source_segment_id)
+        if not segment or segment.meeting_id != meeting_id:
+            raise HTTPException(status_code=422, detail="Source must belong to this meeting")
+    try:
+        due_date = datetime.fromisoformat(data.due_date) if data.due_date else None
+    except ValueError:
+        raise HTTPException(status_code=422, detail="Invalid due date")
     a = ActionItem(
         meeting_id=meeting_id, description=data.description.strip(),
         assignee_id=data.assignee_id, status="open",
-        due_date=datetime.fromisoformat(data.due_date) if data.due_date else None,
+        due_date=due_date,
         source_segment_id=data.source_segment_id,
     )
     db.add(a)
@@ -73,10 +87,17 @@ def update_action_item(item_id: int, patch: ActionItemUpdate, db: Session = Depe
         raise HTTPException(status_code=404, detail="Action item not found")
     if patch.description is not None:
         a.description = patch.description.strip()
-    if patch.assignee_id is not None:
+    if "assignee_id" in patch.model_fields_set:
+        if patch.assignee_id is not None:
+            participant = db.get(Participant, patch.assignee_id)
+            if not participant or participant.meeting_id != a.meeting_id:
+                raise HTTPException(status_code=422, detail="Assignee must belong to this meeting")
         a.assignee_id = patch.assignee_id
-    if patch.due_date is not None:
-        a.due_date = datetime.fromisoformat(patch.due_date) if patch.due_date else None
+    if "due_date" in patch.model_fields_set:
+        try:
+            a.due_date = datetime.fromisoformat(patch.due_date) if patch.due_date else None
+        except ValueError:
+            raise HTTPException(status_code=422, detail="Invalid due date")
     if patch.status is not None and patch.status != a.status:
         a.status = patch.status
         a.completed_at = datetime.utcnow() if patch.status == "done" else None

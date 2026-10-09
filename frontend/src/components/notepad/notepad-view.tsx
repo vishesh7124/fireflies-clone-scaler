@@ -22,6 +22,10 @@ import { SoundbitesPanel } from "./panels/soundbites-panel";
 import { CommentsPanel } from "./panels/comments-panel";
 import { BookmarksPanel } from "./panels/bookmarks-panel";
 import { Sidebar } from "@/components/layout/sidebar";
+import { DataError } from "@/components/shared/data-error";
+import { ApiError } from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 /** Loading skeleton shaped like the Notepad. */
 function NotepadSkeleton() {
@@ -103,7 +107,7 @@ export function NotepadView({ meetingId }: { meetingId: number }) {
   const sidebarOpen = useNotepadStore((s) => s.sidebarOpen);
   const setSidebarOpen = useNotepadStore((s) => s.setSidebarOpen);
 
-  const { data: meeting, isPending } = useQuery({
+  const { data: meeting, isPending, error: meetingError, refetch: refetchMeeting } = useQuery({
     queryKey: qk.meeting(meetingId),
     queryFn: () => api.getMeeting(meetingId),
     refetchInterval: (query) =>
@@ -112,7 +116,7 @@ export function NotepadView({ meetingId }: { meetingId: number }) {
 
   const meetingStatus = meeting?.status;
 
-  const { data: transcript } = useQuery({
+  const { data: transcript, isError: transcriptError, refetch: refetchTranscript } = useQuery({
     queryKey: qk.transcript(meetingId),
     queryFn: () => api.getTranscript(meetingId),
     enabled: meetingStatus === "ready",
@@ -122,24 +126,36 @@ export function NotepadView({ meetingId }: { meetingId: number }) {
   const searchParams = useSearchParams();
   const tParam = searchParams.get("t");
   const seekTo = usePlayerStore((s) => s.seekTo);
-  useEffect(() => {
-    if (transcript && tParam != null) {
-      const ms = Number(tParam) * 1000;
-      if (Number.isFinite(ms)) seekTo(ms);
-    }
-  }, [transcript, tParam, seekTo]);
-
   // reset playback state when entering/leaving the Notepad
   const reset = usePlayerStore((s) => s.reset);
   useEffect(() => {
     reset();
+    useNotepadStore.setState({ findQuery: "", smartFilter: null, followAudio: true });
     return () => reset();
   }, [reset, meetingId]);
 
+  useEffect(() => {
+    if (!transcript) return;
+    usePlayerStore.getState().setDuration(transcript.duration_ms);
+    if (tParam != null) {
+      const ms = Number(tParam) * 1000;
+      if (Number.isFinite(ms)) seekTo(ms);
+    }
+  }, [transcript, tParam, seekTo, meetingId]);
+
   if (isPending) return <NotepadSkeleton />;
+  if (meetingError instanceof ApiError && meetingError.status === 404) return (
+    <div className="flex flex-1 flex-col items-center justify-center gap-3">
+      <p className="text-sm text-foreground">Meeting not found</p>
+      <Button asChild variant="outline"><Link href="/meetings">Back to meetings</Link></Button>
+    </div>
+  );
+  if (meetingError) return <DataError title="Could not load meeting" onRetry={() => { void refetchMeeting(); }} />;
   if (!meeting) return <NotepadSkeleton />;
   if (meeting.status === "processing") return <ProcessingView />;
   if (meeting.status === "scheduled") return <ScheduledView meetingId={meetingId} />;
+  if (meeting.status === "failed") return <DataError title="This meeting could not be processed" onRetry={() => { void refetchMeeting(); }} />;
+  if (transcriptError) return <DataError title="Could not load transcript" onRetry={() => { void refetchTranscript(); }} />;
   if (!transcript) return <NotepadSkeleton />;
 
   return (

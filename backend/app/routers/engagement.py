@@ -1,6 +1,6 @@
 """Engagement endpoints: comments, bookmarks, soundbites (docs/03-LLD §2.3)."""
 
-from datetime import datetime, timezone
+import json
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
@@ -119,14 +119,14 @@ def delete_soundbite(soundbite_id: int, db: Session = Depends(get_db)):
 def get_chat(meeting_id: int, db: Session = Depends(get_db)):
     msgs = db.scalars(select(ChatMessage).where(ChatMessage.meeting_id == meeting_id).order_by(ChatMessage.created_at)).all()
     return [{"id": m.id, "meeting_id": m.meeting_id, "role": m.role, "content": m.content,
-             "citations": None, "created_at": m.created_at.isoformat()} for m in msgs]
+             "citations": json.loads(m.citations) if m.citations else None, "created_at": m.created_at.isoformat()} for m in msgs]
 
 
 @router.get("/chat")
 def get_global_chat(db: Session = Depends(get_db)):
     msgs = db.scalars(select(ChatMessage).where(ChatMessage.meeting_id == None).order_by(ChatMessage.created_at)).all()  # noqa: E711
     return [{"id": m.id, "meeting_id": m.meeting_id, "role": m.role, "content": m.content,
-             "citations": None, "created_at": m.created_at.isoformat()} for m in msgs]
+             "citations": json.loads(m.citations) if m.citations else None, "created_at": m.created_at.isoformat()} for m in msgs]
 
 
 @router.delete("/chat", status_code=204)

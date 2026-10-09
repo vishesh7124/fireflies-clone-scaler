@@ -6,7 +6,7 @@ intents + keyword retrieval; LLM branch activates when LLM_API_KEY is set.
 
 import re
 
-from app.services.summary_engine import classify, _tokenize
+from app.services.summary_engine import _tokenize
 
 
 def _quote(text: str) -> str:
@@ -17,7 +17,7 @@ def _quote(text: str) -> str:
 def _citation(seg: dict, meeting_title: str) -> dict:
     return {
         "meeting_id": seg["meeting_id"],
-        "meeting_title": meeting_title,
+        "meeting_title": meeting_title or seg.get("meeting_title", "Meeting"),
         "segment_id": seg["id"],
         "start_ms": seg["start_ms"],
         "speaker": seg.get("speaker_name", "Unknown"),
@@ -59,7 +59,8 @@ def answer_question(question: str, segments: list[dict], meeting_title: str | No
             assignee = a.get("assignee_name") or "Unassigned"
             suffix = " (done)" if a.get("status") == "done" else ""
             lines.append(f"{mark} {a['description']} — {assignee}{suffix}")
-        cites = [_citation(s, meeting_title) for s in segments if s["id"] in {a.get("source_segment_id") for a in items} and a.get("source_segment_id")][:3]
+        source_ids = {a["source_segment_id"] for a in items if a.get("source_segment_id") is not None}
+        cites = [_citation(s, meeting_title) for s in segments if s["id"] in source_ids][:3]
         label = "next steps" if "next step" in ql else "action items"
         return {"answer": f"Here are the {label} I found:\n" + "\n".join(lines), "citations": cites}
 
@@ -106,7 +107,11 @@ def answer_question(question: str, segments: list[dict], meeting_title: str | No
 
     # intent: duration / talk time
     if re.search(r"how long|duration|talk.?time", ql):
-        total = segments[-1]["end_ms"] - segments[0]["start_ms"]
+        ranges = {}
+        for s in segments:
+            start, end = ranges.get(s["meeting_id"], (s["start_ms"], s["end_ms"]))
+            ranges[s["meeting_id"]] = (min(start, s["start_ms"]), max(end, s["end_ms"]))
+        total = sum(end - start for start, end in ranges.values())
         return {"answer": f"\"{meeting_title or 'That meeting'}\" ran {round(total/60000)} minutes.", "citations": [_citation(segments[0], meeting_title)]}
 
     # general retrieval — keyword-scored segments

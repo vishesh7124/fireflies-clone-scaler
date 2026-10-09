@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   BellIcon,
-  CheckIcon,
   EllipsisIcon,
   EyeIcon,
   FileDownIcon,
@@ -26,6 +25,7 @@ import { qk } from "@/lib/query-keys";
 import type { ExportFormat, Meeting } from "@/lib/types";
 import { useNotepadStore } from "@/store/notepad-store";
 import { Button } from "@/components/ui/button";
+import { EditMeetingDialog } from "@/components/meetings/edit-meeting-dialog";
 import {
   Dialog,
   DialogContent,
@@ -65,6 +65,7 @@ export function NotepadHeader({ meeting }: { meeting: Meeting }) {
   const sidebarOpen = useNotepadStore((s) => s.sidebarOpen);
   const setSidebarOpen = useNotepadStore((s) => s.setSidebarOpen);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const regenerateMutation = useMutation({
@@ -101,7 +102,7 @@ export function NotepadHeader({ meeting }: { meeting: Meeting }) {
   };
 
   return (
-    <header className="flex h-12 shrink-0 items-center gap-2 border-b border-border px-3">
+    <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border bg-surface px-3">
       {/* hamburger + breadcrumb */}
       <button
         type="button"
@@ -139,6 +140,7 @@ export function NotepadHeader({ meeting }: { meeting: Meeting }) {
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-52">
+          <DropdownMenuItem onClick={() => setEditOpen(true)}><PencilIcon /> Edit meeting</DropdownMenuItem>
           <DropdownMenuItem onClick={() => setInfoOpen(true)}>
             <InfoIcon /> Meeting info
           </DropdownMenuItem>
@@ -244,6 +246,7 @@ export function NotepadHeader({ meeting }: { meeting: Meeting }) {
       </span>
 
       {/* meeting info dialog */}
+      {editOpen && <EditMeetingDialog meetingId={meeting.id} onClose={() => setEditOpen(false)} />}
       <Dialog open={infoOpen} onOpenChange={setInfoOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

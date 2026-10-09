@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/select";
 
 export type FiltersState = {
+  dateFrom: string;
+  dateTo: string;
   participant: string;
   tag: string;
   status: "" | MeetingStatus;
@@ -25,6 +27,8 @@ export type FiltersState = {
 };
 
 export const EMPTY_FILTERS: FiltersState = {
+  dateFrom: "",
+  dateTo: "",
   participant: "",
   tag: "",
   status: "",
@@ -57,6 +61,8 @@ export function MeetingsFilters({
   const { data: tags } = useQuery({ queryKey: qk.tags, queryFn: () => api.listTags() });
 
   const activeCount = [
+    filters.dateFrom,
+    filters.dateTo,
     filters.participant,
     filters.tag,
     filters.status,
@@ -80,6 +86,18 @@ export function MeetingsFilters({
       </PopoverTrigger>
       <PopoverContent align="start" className="w-64">
         <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="filter-from" className="text-xs">From</Label>
+              <Input id="filter-from" type="date" className="h-8 text-xs" value={filters.dateFrom}
+                max={filters.dateTo || undefined} onChange={(e) => set({ dateFrom: e.target.value })} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="filter-to" className="text-xs">To</Label>
+              <Input id="filter-to" type="date" className="h-8 text-xs" value={filters.dateTo}
+                min={filters.dateFrom || undefined} onChange={(e) => set({ dateTo: e.target.value })} />
+            </div>
+          </div>
           <div className="space-y-1.5">
             <Label className="text-xs">Sort by</Label>
             <Select value={sort} onValueChange={(v) => onSortChange(v as typeof sort)}>

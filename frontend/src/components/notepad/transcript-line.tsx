@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AudioLinesIcon, BookmarkIcon, ChevronDownIcon, MessageSquareIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -41,10 +41,10 @@ function TranscriptTurnComponent({
   const setCommentAnchor = useNotepadStore((s) => s.setCommentAnchor);
   const queryClient = useQueryClient();
 
-  const [draft, setDraft] = useState(segment.text);
+  const [editedText, setEditedText] = useState<{ source: string; text: string } | null>(null);
+  const draft = editedText?.source === segment.text ? editedText.text : segment.text;
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => setDraft(segment.text), [segment.text]);
 
   const editMutation = useMutation({
     mutationFn: (text: string) => api.updateSegment(segment.id, text),
@@ -59,7 +59,7 @@ function TranscriptTurnComponent({
   });
 
   const onEditInput = (text: string) => {
-    setDraft(text);
+    setEditedText({ source: segment.text, text });
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
       if (text.trim() && text !== segment.text) editMutation.mutate(text.trim());
@@ -88,7 +88,7 @@ function TranscriptTurnComponent({
           className="flex min-w-0 items-center gap-2"
         >
           <span
-            className="flex size-6 shrink-0 items-center justify-center rounded text-[9px] font-bold text-background"
+             className="flex size-5 shrink-0 items-center justify-center rounded text-[9px] font-bold text-background"
             style={{ backgroundColor: segment.avatar_color }}
           >
             {initials}
@@ -98,7 +98,7 @@ function TranscriptTurnComponent({
             <ChevronDownIcon className="ml-0.5 inline size-2.5 text-subtle" />
           </span>
           <span className="shrink-0 text-[11px] text-subtle">·</span>
-          <span className="shrink-0 cursor-pointer font-mono text-[11px] tabular-nums text-primary-soft underline decoration-primary-soft/40 transition-colors hover:bg-primary/15 hover:decoration-primary-soft">
+          <span className="shrink-0 cursor-pointer text-sm tabular-nums text-primary-soft underline decoration-primary-soft/40 transition-colors hover:bg-primary/15 hover:decoration-primary-soft">
             {msToClock(segment.start_ms)}
           </span>
         </button>
@@ -182,7 +182,7 @@ function TranscriptTurnComponent({
           onClick={() => seekTo(segment.start_ms)}
           className="mt-1 block w-full text-left"
         >
-          <p className="text-sm leading-relaxed text-foreground">
+          <p className="text-sm leading-7 text-foreground">
             <HighlightedText text={segment.text} query={findQuery} />
           </p>
         </button>

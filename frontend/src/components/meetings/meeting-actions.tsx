@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { EllipsisIcon, FileDownIcon, Loader2Icon, PencilIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
-import { cn } from "cn";
 import { api } from "@/lib/api";
 import { downloadFile } from "@/lib/download";
 import type { ExportFormat, MeetingListItem } from "@/lib/types";
@@ -29,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { EditMeetingDialog } from "./edit-meeting-dialog";
 
 const EXPORT_FORMATS: { format: ExportFormat; label: string }[] = [
   { format: "txt", label: "Transcript (.txt)" },
@@ -42,6 +42,7 @@ const EXPORT_FORMATS: { format: ExportFormat; label: string }[] = [
 export function MeetingActions({ meeting }: { meeting: MeetingListItem }) {
   const queryClient = useQueryClient();
   const [renameOpen, setRenameOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [title, setTitle] = useState(meeting.title);
 
@@ -79,7 +80,7 @@ export function MeetingActions({ meeting }: { meeting: MeetingListItem }) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon-sm"
             aria-label="Meeting actions"
             className="text-muted-foreground transition-colors hover:text-foreground"
@@ -88,6 +89,7 @@ export function MeetingActions({ meeting }: { meeting: MeetingListItem }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-52">
+          <DropdownMenuItem onClick={() => setEditOpen(true)}><PencilIcon /> Edit meeting</DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
               setTitle(meeting.title);
@@ -116,6 +118,7 @@ export function MeetingActions({ meeting }: { meeting: MeetingListItem }) {
       </DropdownMenu>
 
       {/* rename dialog */}
+      {editOpen && <EditMeetingDialog meetingId={meeting.id} onClose={() => setEditOpen(false)} />}
       <Dialog open={renameOpen} onOpenChange={setRenameOpen}>
         <DialogContent>
           <DialogHeader>

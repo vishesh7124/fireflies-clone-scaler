@@ -15,6 +15,8 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChannelsRail, type ChannelId } from "@/components/meetings/channels-rail";
 import { MeetingRow } from "@/components/meetings/meeting-row";
+import { DataError } from "@/components/shared/data-error";
+import { Topbar } from "@/components/layout/topbar";
 import { EMPTY_FILTERS, MeetingsFilters, type FiltersState } from "@/components/meetings/meetings-filters";
 import { EmptyState } from "@/components/shared/empty-state";
 import { AskFredRail } from "@/components/shared/askfred-rail";
@@ -96,6 +98,8 @@ export default function MeetingsPage() {
     ...(channel === "uploads" ? {} : CHANNEL_PARAMS[channel]),
     q: debouncedSearch || undefined,
     participant: filters.participant || undefined,
+    date_from: filters.dateFrom || undefined,
+    date_to: filters.dateTo || undefined,
     tag: filters.tag || undefined,
     status: filters.status || undefined,
     min_duration: filters.minDuration || undefined,
@@ -105,7 +109,7 @@ export default function MeetingsPage() {
     page_size: 20,
   };
 
-  const { data, isPending, isFetching } = useQuery({
+  const { data, isPending, isFetching, isError, refetch } = useQuery({
     queryKey: qk.meetings(params),
     queryFn: () => api.listMeetings(params),
   });
@@ -114,6 +118,7 @@ export default function MeetingsPage() {
   const hasActiveFilters =
     Boolean(debouncedSearch) ||
     Boolean(filters.participant) ||
+    Boolean(filters.dateFrom) || Boolean(filters.dateTo) ||
     Boolean(filters.tag) ||
     Boolean(filters.status) ||
     Boolean(filters.minDuration);
@@ -130,11 +135,13 @@ export default function MeetingsPage() {
   return (
     <div className="flex h-full min-h-0">
       <ChannelsRail active={channel} onSelect={selectChannel} />
-
+      <div className="flex min-w-0 flex-1 flex-col">
+      <Topbar />
+      <div className="flex min-h-0 flex-1">
       {/* middle — the list */}
       <div className="flex min-w-0 flex-1 flex-col">
         {/* tab row: plain text tabs + Filters pill + toggled search (like the original) */}
-        <div className="flex flex-wrap items-center gap-3 border-b border-border px-4 py-2.5">
+        <div className="flex min-h-[72px] flex-wrap items-center gap-3 border-b border-border px-5 py-3">
           {TABS.map((t) => (
             <button
               key={t}
@@ -158,7 +165,7 @@ export default function MeetingsPage() {
               setPage(1);
             }}
             sort={sort}
-            onSortChange={setSort}
+            onSortChange={(value) => { setSort(value); setPage(1); }}
           />
 
           <div className="ml-auto flex items-center gap-2">
@@ -201,7 +208,7 @@ export default function MeetingsPage() {
                 <Skeleton key={i} className="h-16 rounded-lg" />
               ))}
             </div>
-          ) : !data || data.items.length === 0 ? (
+          ) : isError ? <DataError title="Could not load meetings" onRetry={() => { void refetch(); }} /> : !data || data.items.length === 0 ? (
             hasActiveFilters ? (
               <EmptyState
                 icon={ListChecksIcon}
@@ -249,9 +256,9 @@ export default function MeetingsPage() {
                   ))}
                 </section>
               ))}
-              <p className="py-6 text-center text-xs text-subtle">
+              {page === totalPages && <p className="py-6 text-center text-xs text-subtle">
                 You&apos;ve reached the end of your meetings.
-              </p>
+              </p>}
             </div>
           )}
         </div>
@@ -289,6 +296,8 @@ export default function MeetingsPage() {
 
       {/* right — docked AskFred rail (live chat lands in Phase 4) */}
       <AskFredRail />
+      </div>
+      </div>
     </div>
   );
 }

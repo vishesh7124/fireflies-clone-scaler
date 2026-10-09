@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { PlusIcon, Trash2Icon } from "lucide-react";
+import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { qk } from "@/lib/query-keys";
@@ -12,6 +12,7 @@ import { cn } from "cn";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { EditTaskDialog } from "@/components/shared/edit-task-dialog";
 
 function dueBadgeClass(due: string | null): string {
   if (!due) return "";
@@ -20,6 +21,7 @@ function dueBadgeClass(due: string | null): string {
 
 /** One action-item row — checkbox (optimistic), assignee, due, provenance, delete. */
 function ActionItemRow({ item, participants }: { item: ActionItem; participants: Participant[] }) {
+  const [editOpen, setEditOpen] = useState(false);
   const queryClient = useQueryClient();
   const seekTo = usePlayerStore((s) => s.seekTo);
 
@@ -108,6 +110,10 @@ function ActionItemRow({ item, participants }: { item: ActionItem; participants:
           )}
         </div>
       </div>
+      {editOpen && <EditTaskDialog task={item} onClose={() => setEditOpen(false)} />}
+      <Button variant="ghost" size="icon-sm" aria-label="Edit action item" onClick={() => setEditOpen(true)}>
+        <PencilIcon className="size-3.5" />
+      </Button>
       <button
         type="button"
         aria-label="Delete action item"
@@ -168,11 +174,11 @@ export function ActionItemsSection({ meeting }: { meeting: Meeting }) {
           className="h-7 border-transparent bg-transparent px-1 text-xs focus-visible:border-border"
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter" && draft.trim()) createMutation.mutate();
+            if (e.key === "Enter" && draft.trim() && !createMutation.isPending) createMutation.mutate();
           }}
         />
         {draft.trim() && (
-          <Button variant="ghost" size="xs" className="shrink-0 text-xs" onClick={() => createMutation.mutate()}>
+          <Button variant="ghost" size="xs" className="shrink-0 text-xs" disabled={createMutation.isPending} onClick={() => createMutation.mutate()}>
             Add
           </Button>
         )}

@@ -75,14 +75,16 @@ export function TranscriptView({
   const smartFilter = useNotepadStore((s) => s.smartFilter);
   const setSmartFilter = useNotepadStore((s) => s.setSmartFilter);
   const seekTo = usePlayerStore((s) => s.seekTo);
+  const followAudio = useNotepadStore((s) => s.followAudio);
+  const setFollowAudio = useNotepadStore((s) => s.setFollowAudio);
 
   // auto-scroll the active turn into view while playing / after seeks
   useEffect(() => {
-    if (activeSegmentId == null) return;
+    if (activeSegmentId == null || !followAudio) return;
     document
       .querySelector(`[data-segment-id="${activeSegmentId}"]`)
       ?.scrollIntoView({ block: "nearest", behavior: "smooth" });
-  }, [activeSegmentId]);
+  }, [activeSegmentId, followAudio]);
 
   // applying a smart filter jumps to the first match
   const prevFilter = useRef<string | null>(null);
@@ -94,16 +96,17 @@ export function TranscriptView({
     prevFilter.current = smartFilter;
   }, [smartFilter, segments, seekTo]);
 
-  const visible = smartFilter ? segments.filter((s) => matchesFilter(s, smartFilter)) : segments;
+  const effectiveFilter = findQuery?.trim() ? null : smartFilter;
+  const visible = effectiveFilter ? segments.filter((s) => matchesFilter(s, effectiveFilter)) : segments;
 
   return (
     <div className="relative flex-1 overflow-y-auto">
       <ActiveSegmentTracker segments={segments} />
 
-      {smartFilter && (
+      {effectiveFilter && (
         <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-primary/25 bg-primary/10 px-4 py-1.5 text-xs backdrop-blur">
           <span className="text-primary-soft">
-            {smartFilter.replace("-", " ")} · showing {visible.length} of {segments.length}
+            {effectiveFilter.replace("-", " ")} · showing {visible.length} of {segments.length}
           </span>
           <button
             type="button"
@@ -122,7 +125,7 @@ export function TranscriptView({
           meetingId={meetingId}
           editMode={editMode}
           findQuery={findQuery}
-          dimmed={Boolean(smartFilter)}
+           dimmed={false}
         />
       ))}
       {visible.length === 0 && (
@@ -135,6 +138,7 @@ export function TranscriptView({
       <button
         type="button"
         onClick={() => {
+          setFollowAudio(true);
           if (activeSegmentId == null) return;
           document
             .querySelector(`[data-segment-id="${activeSegmentId}"]`)

@@ -220,6 +220,9 @@ Real-format transcripts for testing upload: `shared/samples/`.
 ## Testing
 
 ```bash
+# Backend — isolated core/reliability regression tests (temporary SQLite DB)
+cd backend && python tests/test_core.py
+
 # Backend — 21-check end-to-end smoke test
 cd backend && python tests/smoke.py
 
@@ -229,6 +232,10 @@ cd backend && python tests/test_parse.py
 # Frontend — build + typecheck
 cd frontend && npm run build
 ```
+
+**Safety:** `tests/smoke.py` wipes and reseeds the configured database. Do not run
+it against data you want to keep. Use `tests/test_core.py` for non-destructive
+regression checks.
 
 The smoke test covers: seed → meetings list/filters → transcript/stats → summary → tasks → create-meeting (with auto-summary) → search → AskFred w/ citations → exports → comments/bookmarks/soundbites CRUD → chat history.
 

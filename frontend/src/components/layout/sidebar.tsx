@@ -43,7 +43,7 @@ const BOTTOM_NAV: { label: string; href: string; icon: LucideIcon }[] = [
  */
 const navLinkClass = (active: boolean) =>
   cn(
-    "flex items-center gap-3 rounded-md whitespace-nowrap px-3 py-2.5 text-[15px] font-medium transition-colors",
+    "flex h-9 items-center gap-3 rounded whitespace-nowrap px-3 text-sm font-medium transition-colors",
     active
       ? "bg-accent text-foreground"
       : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
@@ -83,7 +83,6 @@ function RailIcon({ href, label, icon: Icon }: { href: string; label: string; ic
 }
 
 export function Sidebar({ variant = "full" }: { variant?: "full" | "rail" }) {
-  const pathname = usePathname();
 
   if (variant === "rail") {
     return (
@@ -110,7 +109,7 @@ export function Sidebar({ variant = "full" }: { variant?: "full" | "rail" }) {
       <button
         type="button"
         onClick={() => toast.info("Workspace switcher — coming soon")}
-        className="flex items-center gap-2.5 px-5 pb-2 pt-5 text-left"
+        className="flex h-14 shrink-0 items-center gap-2.5 px-4 text-left"
       >
         <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-elevated text-[11px] font-bold text-foreground">
           V
@@ -119,7 +118,7 @@ export function Sidebar({ variant = "full" }: { variant?: "full" | "rail" }) {
         <ChevronDownIcon className="size-3.5 text-muted-foreground" />
       </button>
 
-      <nav className="mt-3 flex-1 space-y-0.5 px-3">
+      <nav className="mt-2 space-y-0.5 px-2">
         {MAIN_NAV.map((item) => (
           <NavLink key={item.label} {...item} />
         ))}
@@ -140,10 +139,12 @@ export function Sidebar({ variant = "full" }: { variant?: "full" | "rail" }) {
         {/* faint separator between nav groups (original has one) */}
         <div className="mx-3 my-2 h-px bg-border" />
 
+      </nav>
+      <nav className="mt-auto space-y-0.5 px-3 pb-3">
         {/* highlighted promo item — deep-purple pill in the original */}
         <Link
           href="/integrations"
-          className="flex items-center gap-3 rounded-md bg-primary/15 px-3 py-2.5 text-[15px] font-medium text-primary-soft transition-colors hover:bg-primary/25"
+          className="flex h-9 items-center gap-3 rounded bg-primary/15 px-3 text-sm font-medium text-primary-soft transition-colors hover:bg-primary/25"
         >
           <MailIcon className="size-4" />
           Try Email Assistant
@@ -155,18 +156,14 @@ export function Sidebar({ variant = "full" }: { variant?: "full" | "rail" }) {
       </nav>
 
       {/* invite card — bottom of sidebar, like the original's cycling promo */}
-      <div className="mx-3 mb-4 rounded-xl border border-border bg-elevated p-3.5">
+      <div className="mx-4 mb-4 rounded-lg border border-border bg-surface px-3 py-6">
         <p className="text-[13px] font-medium leading-snug text-foreground">
           Invite coworkers to your Fireflies team
         </p>
-        <div className="mt-2.5 flex items-center justify-between">
-          <Button size="sm" onClick={() => toast.info("Create team — coming soon")}>
+        <div className="mt-4">
+          <Button className="w-full" size="sm" onClick={() => toast.info("Create team — coming soon")}>
             Create Team
           </Button>
-          <span className="flex gap-1.5">
-            <span className="size-1.5 rounded-full bg-primary" />
-            <span className="size-1.5 rounded-full bg-muted" />
-          </span>
         </div>
       </div>
     </aside>

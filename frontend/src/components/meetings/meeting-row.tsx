@@ -47,7 +47,7 @@ export function MeetingRow({
   return (
     <div
       className={cn(
-        "group flex items-center gap-3 rounded-lg border border-transparent p-3 transition-colors bg-[#292929] hover:border-border hover:bg-surface",
+        "group flex items-center gap-4 rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-border hover:bg-surface",
         className,
       )}
     >
@@ -68,12 +68,12 @@ export function MeetingRow({
       </button>
 
       {showActions && (
-        <span className=" hidden group-hover:flex  shrink-0 items-center gap-1">
+        <span className=" hidden group-hover:flex shrink-0 items-center gap-2">
           <MeetingActions meeting={meeting} />
           <button
             type="button"
             onClick={() => router.push(`/meetings/${meeting.id}`)}
-            className="flex items-center gap-0.5 rounded-md px-2 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-elevated/60 hover:text-foreground"
+            className="flex items-center gap-2 rounded border border-border bg-surface px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-elevated hover:text-foreground"
           >
             Details
             <ChevronRightIcon className="size-3" />

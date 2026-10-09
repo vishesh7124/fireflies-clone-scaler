@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowUpIcon,
@@ -9,21 +9,18 @@ import {
   CheckIcon,
   CircleIcon,
   ExpandIcon,
-  LayoutGridIcon,
   Loader2Icon,
   MapPinIcon,
-  MessageSquareIcon,
   MicIcon,
   PlusIcon,
   SparklesIcon,
-  XIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { qk } from "@/lib/query-keys";
 import { msToClock } from "@/lib/format";
-import { usePlayerStore } from "@/store/player-store";
 import { cn } from "cn";
+import { ConnectContextBanner } from "./connect-context-banner";
 
 /** Full-width suggestion cards (like the original rail's stacked rows). */
 const CARDS: { label: string; icon: typeof CheckIcon; tint: string; prompt: string }[] = [
@@ -55,6 +52,7 @@ const CARDS: { label: string; icon: typeof CheckIcon; tint: string; prompt: stri
  */
 export function AskFredRail() {
   const router = useRouter();
+  const isHome = usePathname() === "/";
   const queryClient = useQueryClient();
   const [promoVisible, setPromoVisible] = useState(true);
   const [draft, setDraft] = useState("");
@@ -82,9 +80,9 @@ export function AskFredRail() {
   const isEmpty = thread.length === 0;
 
   return (
-    <aside className="hidden w-[30rem] shrink-0 flex-col border-l border-border lg:flex">
+    <aside className={cn("hidden w-80 shrink-0 flex-col border-l border-border lg:flex", isHome ? "xl:w-[416px]" : "xl:w-[480px] 2xl:w-[584px]")}>
       {/* header */}
-      <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+      <div className="flex h-[52px] shrink-0 items-center gap-2 border-b border-border px-6">
         <BotIcon className="size-4 text-primary-soft" />
         <span className="text-sm font-medium text-foreground">Ask Fred</span>
         <span className="ml-auto flex items-center gap-1">
@@ -117,47 +115,26 @@ export function AskFredRail() {
       <div className="flex-1 space-y-3 overflow-y-auto p-3">
         {/* connect promo (dismissible, like the original) */}
         {promoVisible && isEmpty && (
-          <div className="rounded-lg border border-primary/20 bg-primary/10 p-3">
-            <div className="flex items-start justify-between gap-2">
-              <p className="text-xs leading-relaxed text-foreground">
-                Connect Slack and Gmail — get answers with full context.
-              </p>
-              <button
-                type="button"
-                aria-label="Dismiss"
-                onClick={() => setPromoVisible(false)}
-                className="text-subtle transition-colors hover:text-foreground"
-              >
-                <XIcon className="size-3.5" />
-              </button>
-            </div>
-            <button
-              type="button"
-              onClick={() => toast.info("Slack & Gmail — coming soon")}
-              className="mt-1 text-xs font-medium text-primary-soft hover:underline"
-            >
-              Connect
-            </button>
-          </div>
+          <ConnectContextBanner onDismiss={() => setPromoVisible(false)} />
         )}
 
         {/* empty state: greeting + suggestion cards */}
         {isEmpty && (
           <>
-            <div className="flex flex-col items-center gap-1 py-6 text-center">
-              <SparklesIcon className="size-5 text-primary-soft" />
+            <div className="flex flex-col items-start gap-1 px-2 pb-8 pt-24 text-left">
+              <SparklesIcon className="mb-6 size-7 text-success" />
               <p className="font-display text-lg font-semibold text-foreground">Hi VISHESH!</p>
-              <p className="text-sm text-muted-foreground">Get ready for your meeting</p>
+              <p className="text-lg font-semibold text-muted-foreground">Get ready for your meeting</p>
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col items-start gap-4 px-2 pt-2">
               {CARDS.map(({ label, icon: Icon, tint, prompt }) => (
                 <button
                   key={label}
                   type="button"
                   onClick={() => send(prompt)}
-                  className="flex w-full items-center gap-3 rounded-lg border border-border bg-surface p-3 text-left transition-colors hover:border-ring/40"
+                  className="flex items-center gap-3 rounded-md bg-surface px-3 py-3 text-left transition-colors hover:bg-elevated"
                 >
-                  <span className={`flex size-8 shrink-0 items-center justify-center rounded-lg ${tint}`}>
+                  <span className={`flex size-4 shrink-0 items-center justify-center ${tint}`}>
                     <Icon className="size-4" />
                   </span>
                   <span className="text-sm font-medium text-foreground">{label}</span>
@@ -175,7 +152,7 @@ export function AskFredRail() {
           >
             <p
               className={cn(
-                "inline-block max-w-full whitespace-pre-wrap rounded-xl px-3 py-2 text-left text-xs leading-relaxed",
+                "inline-block max-w-full whitespace-pre-wrap rounded-md px-3 py-2 text-left text-sm leading-relaxed",
                 message.role === "user"
                   ? "bg-primary text-primary-foreground"
                   : "border border-border bg-surface text-muted-foreground",
@@ -190,7 +167,7 @@ export function AskFredRail() {
                     key={`${message.id}-${c.segment_id}`}
                     type="button"
                     onClick={() => {
-                      window.location.href = `/meetings/${c.meeting_id}?t=${Math.round(c.start_ms / 1000)}`;
+                      router.push(`/meetings/${c.meeting_id}?t=${c.start_ms / 1000}`);
                     }}
                     title={c.quote}
                     className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary-soft transition-colors hover:bg-primary/20"
@@ -212,13 +189,13 @@ export function AskFredRail() {
       </div>
 
       {/* working prompt input (like the original) */}
-      <div className="space-y-1.5 border-t border-border p-3">
-        <p className="px-1 text-xs font-medium text-muted-foreground"># My Meetings</p>
-        <div className="flex items-end gap-2 rounded-lg border border-border bg-elevated/60 p-2">
+      <div className="m-4 space-y-4 rounded-md border border-border bg-surface p-3">
+        <p className="inline-block rounded bg-elevated/60 px-2 py-1 text-sm font-medium text-muted-foreground"># My Meetings</p>
+        <div className="flex min-h-20 items-end gap-2">
           <textarea
-            rows={1}
+            rows={3}
             placeholder="Ask anything. Type / to run AI skills."
-            className="max-h-20 flex-1 resize-none bg-transparent px-1 py-1 text-xs text-foreground outline-none placeholder:text-subtle"
+            className="max-h-28 flex-1 resize-none bg-transparent px-1 py-1 text-sm text-foreground outline-none placeholder:text-subtle"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
@@ -242,7 +219,7 @@ export function AskFredRail() {
               aria-label="Send"
               disabled={!draft.trim() || sendMutation.isPending}
               onClick={() => send(draft)}
-              className="flex size-6 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-40"
+              className="flex size-8 items-center justify-center rounded bg-primary text-primary-foreground transition-opacity disabled:opacity-40"
             >
               <ArrowUpIcon className="size-3" />
             </button>

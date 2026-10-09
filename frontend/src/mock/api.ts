@@ -35,7 +35,6 @@ import type {
   Soundbite,
   SearchResult,
   DashboardData,
-  ChatCitation,
 } from "@/lib/types";
 import { answerQuestion, computeStats, exportMeeting } from "./engine";
 import {
@@ -314,7 +313,10 @@ export const mockApi: ApiClient = {
     if (params.source) rows = rows.filter((m) => m.source === params.source);
     if (params.channel) rows = rows.filter((m) => m.channel === params.channel);
     if (params.date_from) rows = rows.filter((m) => m.meeting_date >= params.date_from!);
-    if (params.date_to) rows = rows.filter((m) => m.meeting_date <= params.date_to!);
+    if (params.date_to) {
+      const to = params.date_to.length === 10 ? `${params.date_to}T23:59:59.999Z` : params.date_to;
+      rows = rows.filter((m) => m.meeting_date <= to);
+    }
     if (params.min_duration) rows = rows.filter((m) => (m.duration_seconds ?? 0) >= params.min_duration!);
     if (params.q) {
       const q = params.q.toLowerCase();
@@ -378,6 +380,20 @@ export const mockApi: ApiClient = {
     if (patch.meeting_date != null) m.meeting_date = patch.meeting_date;
     if (patch.channel !== undefined) m.channel = patch.channel;
     if (patch.language != null) m.language = patch.language;
+    if (patch.participants !== undefined) {
+      const db = getDb();
+      const retained = patch.participants.map((input, i) => {
+        const existing = db.participants.find((p) => p.id === input.id && p.meeting_id === id);
+        return existing ? { ...existing, name: input.name.trim(), email: input.email ?? null, is_host: i === 0 } : {
+          id: nextId("participants"), meeting_id: id, name: input.name.trim(), email: input.email ?? null,
+          avatar_color: "#7c5cff", is_host: i === 0, talk_time_ms: 0, word_count: 0,
+        };
+      });
+      const ids = new Set(retained.map((p) => p.id));
+      db.segments.forEach((s) => { if (s.meeting_id === id && s.speaker_id != null && !ids.has(s.speaker_id)) s.speaker_id = null; });
+      db.action_items.forEach((a) => { if (a.meeting_id === id && a.assignee_id != null && !ids.has(a.assignee_id)) a.assignee_id = null; });
+      db.participants = [...db.participants.filter((p) => p.meeting_id !== id), ...retained];
+    }
     touch(id);
     persist();
     return toDetail(m);

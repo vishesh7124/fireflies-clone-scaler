@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   CameraOffIcon,
@@ -16,7 +16,6 @@ import {
   PencilIcon,
   PlayIcon,
   PlusIcon,
-  RefreshCwIcon,
   SmileIcon,
   SparklesIcon,
   StarIcon,
@@ -47,11 +46,13 @@ const TEMPLATES: { value: SummaryTemplate; label: string }[] = [
   { value: "bant", label: "BANT Summary" },
 ];
 
+const EMPTY_ITEMS: SummaryItem[] = [];
+
 /** Editable summary bullet with debounced autosave. */
 function EditableBullet({ item, editable }: { item: SummaryItem; editable: boolean }) {
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState(item.text);
-  const timer = useMemo(() => ({ current: null as ReturnType<typeof setTimeout> | null }), []);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const saveMutation = useMutation({
     mutationFn: (text: string) => api.updateSummaryItem(item.id, text),
@@ -148,8 +149,8 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
   });
 
   const section = (type: string) => summary?.sections.find((s) => s.section_type === type);
-  const notes = section("notes")?.items ?? [];
-  const topics = section("topics")?.items ?? [];
+  const notes = section("notes")?.items ?? EMPTY_ITEMS;
+  const topics = section("topics")?.items ?? EMPTY_ITEMS;
   const metrics = section("metrics")?.items ?? [];
   const overview = section("overview")?.items[0]?.text ?? "";
   const activeTemplate: SummaryTemplate = summary?.template ?? "general";
@@ -198,7 +199,7 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       {/* tabs row: Notes | AI Skills + fullscreen toggle */}
-      <div className="flex shrink-0 items-center justify-center gap-1 border-b border-border px-3 py-2">
+      <div className="relative flex h-[52px] shrink-0 items-center justify-center gap-1 px-3">
         <div className="flex items-center gap-1 rounded-lg bg-surface p-1">
           <span className="rounded-md bg-elevated px-3 py-1 text-sm font-medium text-foreground">
             Notes
@@ -224,10 +225,10 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-3xl space-y-4 p-5">
+        <div className="mx-auto w-full space-y-4 px-5 py-2 xl:px-10">
           {/* video surface (toggleable, like the original's Video area) */}
           {videoVisible && (
-            <div className="mx-auto w-full max-w-2xl">
+            <div className="mx-auto w-full">
               <div className="relative overflow-hidden rounded-lg border border-border bg-black">
                 <div className="relative aspect-video">
                   {/* mock participant grid (real video arrives with the backend) */}
@@ -256,7 +257,7 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
                       type="button"
                       aria-label="Play"
                       onClick={toggle}
-                      className="absolute inset-0 m-auto flex size-12 items-center justify-center rounded-full bg-primary/90 text-primary-foreground shadow-lg transition-transform hover:scale-105"
+                      className="absolute inset-0 m-auto flex h-12 w-20 items-center justify-center rounded-lg border border-white/30 bg-black/50 text-white transition-colors hover:bg-black/70"
                     >
                       <PlayIcon className="size-5 translate-x-[1px]" />
                     </button>
@@ -302,9 +303,10 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
             </div>
           )}
 
+          <div className="mx-auto max-w-[640px] space-y-5 pb-8 pt-10">
           {/* title */}
           <div className="flex items-start justify-between gap-3">
-            <h1 className="min-w-0 font-display text-xl font-bold leading-tight text-foreground">
+            <h1 className="min-w-0 font-display text-2xl font-medium leading-tight text-foreground">
               {meeting.title}
             </h1>
           </div>
@@ -331,7 +333,7 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
           </div>
 
           {/* summary toolbar */}
-          <div className="flex flex-wrap items-center gap-2 border-y border-border py-2">
+          <div className="flex flex-wrap items-center gap-2 pb-3 pt-8">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
@@ -499,6 +501,7 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
               Consumes AI credits
             </p>
           </section>
+          </div>
         </div>
       </div>
     </div>

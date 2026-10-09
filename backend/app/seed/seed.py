@@ -109,6 +109,12 @@ def resolve_note_anchor(note: str, segments: list[TranscriptSegment]) -> Transcr
     return best
 
 
+def seed_if_empty(db: Session) -> None:
+    """Populate a new workspace, never replace existing user data on boot."""
+    if db.scalar(select(User.id).limit(1)) is None:
+        seed_all(db)
+
+
 def seed_all(db: Session) -> None:
     """Idempotent seed — wipes and reloads from fixtures."""
     # wipe (order matters for FKs)
@@ -116,7 +122,7 @@ def seed_all(db: Session) -> None:
                   ActionItem, SummaryItem, SummarySection, Summary,
                   TranscriptSegment, Participant, Meeting, Channel, Settings, User]:
         db.query(model).delete()
-    db.commit()
+    db.flush()
 
     # default user + channel + settings
     user = User(name="Vishesh Gupta", email="vishesh@northstar.io", avatar_color="#8b7cff", is_default=True)
@@ -126,7 +132,7 @@ def seed_all(db: Session) -> None:
     db.add(channel)
     db.flush()
     db.add(Settings(id=1))
-    db.commit()
+    db.flush()
 
     fixture_files = sorted(FIXTURES_DIR.glob("meeting-*.json"))
     for fpath in fixture_files:

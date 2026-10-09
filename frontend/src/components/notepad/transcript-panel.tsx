@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { BotIcon, ChevronDownIcon, ChevronUpIcon, MaximizeIcon, PencilIcon, SearchIcon, XIcon } from "lucide-react";
 import type { Meeting, Transcript, TranscriptSegment } from "@/lib/types";
 import { useNotepadStore } from "@/store/notepad-store";
-import { useDebounced } from "@/hooks/use-debounced";
 import { cn } from "cn";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,43 +18,41 @@ function scrollToSegment(id: number) {
 /** Find-or-Replace bar with match count + prev/next + auto-scroll. */
 function FindBar({
   segments,
-  onQueryChange,
-  onClose,
 }: {
   segments: TranscriptSegment[];
-  onQueryChange: (q: string) => void;
-  onClose: () => void;
 }) {
-  const [query, setQuery] = useState("");
-  const [matchIndex, setMatchIndex] = useState(0);
-  const debounced = useDebounced(query, 200);
+  const query = useNotepadStore((s) => s.findQuery);
+  const setFindQuery = useNotepadStore((s) => s.setFindQuery);
+  const setSmartFilter = useNotepadStore((s) => s.setSmartFilter);
+  const setFollowAudio = useNotepadStore((s) => s.setFollowAudio);
+  const [selection, setSelection] = useState({ query: "", index: 0 });
 
   // matches (case-insensitive substring)
   const matches = useMemo(() => {
-    const q = debounced.trim().toLowerCase();
+    const q = query.trim().toLowerCase();
     if (!q) return [] as TranscriptSegment[];
     return segments.filter((s) => s.text.toLowerCase().includes(q));
-  }, [segments, debounced]);
-
-  // propagate to the store for highlighting
-  useEffect(() => {
-    onQueryChange(debounced);
-  }, [debounced, onQueryChange]);
+  }, [segments, query]);
+  const matchIndex = selection.query === query ? Math.min(selection.index, Math.max(0, matches.length - 1)) : 0;
+  const updateQuery = (value: string) => {
+    setFindQuery(value);
+    setSelection({ query: value, index: 0 });
+    if (value.trim()) { setSmartFilter(null); setFollowAudio(false); }
+    else setFollowAudio(true);
+  };
 
   // jump to first match whenever the query changes
   useEffect(() => {
     if (matches.length > 0) {
-      setMatchIndex(0);
-      scrollToSegment(matches[0].id);
+      scrollToSegment(matches[matchIndex].id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debounced]);
+  }, [matches, matchIndex]);
 
   const goTo = (index: number) => {
     if (matches.length === 0) return;
     const wrapped = ((index % matches.length) + matches.length) % matches.length;
-    setMatchIndex(wrapped);
-    scrollToSegment(matches[wrapped].id);
+    setFollowAudio(false);
+    setSelection({ query, index: wrapped });
   };
 
   return (
@@ -63,17 +60,16 @@ function FindBar({
       <div className="relative flex-1">
         <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-subtle" />
         <Input
-          autoFocus
           placeholder="Find or Replace"
           className="h-8 pl-8 pr-8 text-xs"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => updateQuery(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
               goTo(matchIndex + (e.shiftKey ? -1 : 1));
             }
-            if (e.key === "Escape") onClose();
+            if (e.key === "Escape") updateQuery("");
           }}
         />
         {query && (
@@ -81,8 +77,7 @@ function FindBar({
             type="button"
             aria-label="Clear"
             onClick={() => {
-              setQuery("");
-              onQueryChange("");
+              updateQuery("");
             }}
             className="absolute right-2 top-1/2 -translate-y-1/2 text-subtle hover:text-foreground"
           >
@@ -91,8 +86,8 @@ function FindBar({
         )}
       </div>
 
-      {debounced.trim() && (
-        <span className="shrink-0 font-mono text-[11px] tabular-nums text-subtle">
+      {query.trim() && (
+        <span title="Matching transcript turns" className="shrink-0 font-mono text-[11px] tabular-nums text-subtle">
           {matches.length > 0 ? `${matchIndex + 1} / ${matches.length}` : "0 / 0"}
         </span>
       )}
@@ -134,14 +129,13 @@ export function TranscriptPanel({
   const [tab, setTab] = useState<"transcript" | "askfred">("transcript");
   const [editMode, setEditMode] = useState(false);
   const findQuery = useNotepadStore((s) => s.findQuery);
-  const setFindQuery = useNotepadStore((s) => s.setFindQuery);
   const activePanel = useNotepadStore((s) => s.activePanel);
   const setActivePanel = useNotepadStore((s) => s.setActivePanel);
 
   return (
-    <div className="flex h-full min-h-0 w-80 shrink-0 flex-col border-l border-border xl:w-[400px]">
+    <div className="flex h-full min-h-0 w-80 shrink-0 flex-col border-l border-border xl:w-[480px]">
       {/* tabs */}
-      <div className="flex shrink-0 items-center gap-4 border-b border-border px-4 py-2">
+      <div className="flex h-[52px] shrink-0 items-center gap-4 border-b border-border px-6">
         <button
           type="button"
           onClick={() => setTab("askfred")}
@@ -196,10 +190,6 @@ export function TranscriptPanel({
         <>
           <FindBar
             segments={transcript.segments}
-            onQueryChange={setFindQuery}
-            onClose={() => {
-              setFindQuery("");
-            }}
           />
 
           {editMode && (

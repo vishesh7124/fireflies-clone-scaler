@@ -10,11 +10,11 @@ import { SearchDialog } from "@/components/shared/search-dialog";
  * search / ⌘K opens the global search dialog.
  */
 export function GlobalDialogs() {
-  const { scheduleOpen, searchOpen } = useUiStore();
+  const { scheduleOpen } = useUiStore();
   return (
     <>
       {scheduleOpen && <ScheduleDialog />}
-      {searchOpen && <SearchDialog />}
+      <SearchDialog />
     </>
   );
 }

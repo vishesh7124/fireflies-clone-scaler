@@ -59,7 +59,7 @@ export default function HomePage() {
   return (
     <div className="flex h-full min-h-0">
       <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-[780px] space-y-6 p-8">
+        <div className="mx-auto w-full max-w-[884px] space-y-8 px-8 py-10">
           {/* greeting + feedback (like the original) */}
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h1 className="font-display text-2xl font-semibold text-foreground">
@@ -77,11 +77,11 @@ export default function HomePage() {
 
           {/* personal assistant row (like the original) */}
           <div className="flex items-center justify-between">
-            <span className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+            <span className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
               Personal Assistant
               <InfoIcon className="size-3.5 text-subtle" />
             </span>
-            <Link href="/settings" className="text-sm text-primary-soft hover:underline">
+            <Link href="/settings" className="text-sm text-muted-foreground hover:underline">
               Manage
             </Link>
           </div>
@@ -91,9 +91,9 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => toast.info("Daily Brief — coming soon")}
-              className="flex items-start gap-3 rounded-xl border border-border bg-surface p-4 text-left transition-colors hover:border-ring/40"
+               className="flex min-h-[126px] flex-col items-start gap-4 rounded-lg border border-border bg-surface p-4 text-left transition-colors hover:border-ring/40"
             >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-elevated text-[#ffa94d]">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary/40 text-white">
                 <RssIcon className="size-4" />
               </span>
               <span>
@@ -107,12 +107,12 @@ export default function HomePage() {
               onClick={() =>
                 nextUpcoming ? router.push(`/meetings/${nextUpcoming.id}`) : toast.info("No upcoming meetings")
               }
-              className="flex items-start gap-3 rounded-xl border border-border bg-surface p-4 text-left transition-colors hover:border-ring/40"
+               className="flex min-h-[126px] flex-col items-start gap-4 rounded-lg border border-border bg-surface p-4 text-left transition-colors hover:border-ring/40"
             >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-elevated text-primary-soft">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-warning/40 text-white">
                 <CalendarIcon className="size-4" />
               </span>
-              <span className="min-w-0">
+              <span className="min-w-0 max-w-full">
                 <span className="block text-sm font-medium text-foreground">Meeting Prep</span>
                 <span className="block truncate text-xs text-subtle">
                   {nextUpcoming
@@ -125,9 +125,9 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => router.push("/tasks")}
-              className="flex items-start gap-3 rounded-xl border border-border bg-surface p-4 text-left transition-colors hover:border-ring/40"
+               className="flex min-h-[126px] flex-col items-start gap-4 rounded-lg border border-border bg-surface p-4 text-left transition-colors hover:border-ring/40"
             >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-elevated text-success">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-success/40 text-white">
                 <CheckIcon className="size-4" />
               </span>
               <span>
@@ -138,7 +138,7 @@ export default function HomePage() {
           </div>
 
           {/* recent / upcoming / ai feed */}
-          <section className="space-y-3">
+          <section className="space-y-5 pt-3">
             <div className="flex items-center justify-between">
               <SegmentedTabs options={TABS} value={tab} onChange={setTab} />
               <button
@@ -163,7 +163,7 @@ export default function HomePage() {
                   <MeetingRow key={meeting.id} meeting={meeting} meta="compact" showActions={false} />
                 ))}
                 <p className="flex justify-center pt-2">
-                  <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary-soft">
+                  <span className="rounded bg-primary/15 px-2 py-1 text-xs font-medium text-primary-soft">
                     All caught up!
                   </span>
                 </p>

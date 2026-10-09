@@ -1,7 +1,7 @@
 """Meetings router — list/create/get/update/delete + transcript + stats
 (docs/03-LLD §2.1-2.2)."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy import func, or_, select
@@ -66,6 +66,21 @@ def _item(m: Meeting, db: Session) -> MeetingListItem:
     }
 
 
+def _parse_date(value: str) -> datetime:
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        raise HTTPException(status_code=422, detail="Invalid date")
+
+
+def _refresh_speaker_stats(meeting_id: int, db: Session) -> None:
+    segments = db.scalars(select(TranscriptSegment).where(TranscriptSegment.meeting_id == meeting_id)).all()
+    for participant in db.scalars(select(Participant).where(Participant.meeting_id == meeting_id)).all():
+        own = [s for s in segments if s.speaker_id == participant.id]
+        participant.talk_time_ms = sum(s.end_ms - s.start_ms for s in own)
+        participant.word_count = sum(len(s.text.split()) for s in own)
+
+
 # ---------- meetings CRUD ----------
 
 @router.get("/meetings")
@@ -93,10 +108,17 @@ def list_meetings(
         stmt = stmt.where(Meeting.status == status)
     if source:
         stmt = stmt.where(Meeting.source == source)
-    if date_from:
-        stmt = stmt.where(Meeting.meeting_date >= datetime.fromisoformat(date_from))
-    if date_to:
-        stmt = stmt.where(Meeting.meeting_date <= datetime.fromisoformat(date_to))
+    start = _parse_date(date_from) if date_from else None
+    end = _parse_date(date_to) if date_to else None
+    if start and end and start.date() > end.date():
+        raise HTTPException(status_code=422, detail="From date must not be after To date")
+    if start:
+        stmt = stmt.where(Meeting.meeting_date >= start)
+    if end:
+        if len(date_to) == 10:
+            stmt = stmt.where(Meeting.meeting_date < end + timedelta(days=1))
+        else:
+            stmt = stmt.where(Meeting.meeting_date <= end)
     if min_duration:
         stmt = stmt.where(Meeting.duration_seconds >= min_duration)
 
@@ -130,10 +152,16 @@ def create_meeting(data: CreateMeetingInput, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=500, detail="Default user missing")
     has_transcript = bool(data.transcript_text and data.transcript_text.strip())
+    if not data.title.strip():
+        raise HTTPException(status_code=422, detail="Title cannot be blank")
+    from app.seed.seed import parse_transcript, SPEAKER_PALETTE
+    utterances = parse_transcript(data.transcript_text.splitlines()) if has_transcript else []
+    if has_transcript and not utterances:
+        raise HTTPException(status_code=422, detail="No transcript lines could be parsed")
     meeting = Meeting(
         title=data.title,
         description=data.description,
-        meeting_date=datetime.fromisoformat(data.meeting_date),
+        meeting_date=_parse_date(data.meeting_date),
         host_id=user.id,
         source="paste" if has_transcript else "schedule",
         status="processing" if has_transcript else "scheduled",
@@ -143,19 +171,25 @@ def create_meeting(data: CreateMeetingInput, db: Session = Depends(get_db)):
     db.flush()
 
     # participants (default to the current user)
-    names = data.participants or [{"name": user.name}]
+    names = list(data.participants)
+    for u in utterances:
+        if not any(p["name"].strip().casefold() == u["speaker"].casefold() for p in names):
+            names.append({"name": u["speaker"]})
+    names = names or [{"name": user.name}]
+    if any(not p["name"].strip() for p in names):
+        raise HTTPException(status_code=422, detail="Participant name cannot be blank")
     for i, p in enumerate(names):
-        db.add(Participant(meeting_id=meeting.id, name=p["name"], email=p.get("email"),
-                           avatar_color="#7c5cff", is_host=i == 0))
+        db.add(Participant(meeting_id=meeting.id, name=p["name"].strip(), email=p.get("email"),
+                            avatar_color=SPEAKER_PALETTE[i % len(SPEAKER_PALETTE)], is_host=i == 0))
     db.flush()
 
     if has_transcript:
         # parse transcript lines (same format as the frontend loader)
         from app.seed.seed import parse_transcript
-        utterances = parse_transcript(data.transcript_text.splitlines())
         seg_models = []
         for i, u in enumerate(utterances):
-            speaker = db.scalar(select(Participant).where(Participant.meeting_id == meeting.id, Participant.name == u["speaker"]))
+            speaker = next((p for p in db.scalars(select(Participant).where(Participant.meeting_id == meeting.id)).all()
+                            if p.name.strip().casefold() == u["speaker"].casefold()), None)
             seg = TranscriptSegment(meeting_id=meeting.id, speaker_id=speaker.id if speaker else None,
                                     start_ms=u["startMs"], end_ms=u["endMs"], text=u["text"], order_index=i)
             db.add(seg)
@@ -198,7 +232,7 @@ def create_meeting(data: CreateMeetingInput, db: Session = Depends(get_db)):
     return {"id": meeting.id, "status": meeting.status}
 
 
-@router.get("/meetings/{meeting_id}")
+@router.get("/meetings/{meeting_id}", response_model=MeetingOut)
 def get_meeting(meeting_id: int, request: Request, db: Session = Depends(get_db)):
     return _meeting_detail(meeting_id, db, str(request.base_url))
 
@@ -211,6 +245,10 @@ def _meeting_detail(meeting_id: int, db: Session, base_url: str) -> dict:
     media_url = base_url + m.media_path if m.media_path else None
     return {
         **item,
+        "participants": [{"id": p.id, "name": p.name, "email": p.email,
+                          "avatar_color": p.avatar_color, "is_host": p.is_host,
+                          "talk_time_ms": p.talk_time_ms, "word_count": p.word_count}
+                         for p in db.scalars(select(Participant).where(Participant.meeting_id == m.id)).all()],
         "description": m.description, "host_id": m.host_id, "media_url": media_url,
         "counts": {
             "comments": db.scalar(select(func.count(Comment.id)).where(Comment.meeting_id == m.id)) or 0,
@@ -221,7 +259,7 @@ def _meeting_detail(meeting_id: int, db: Session, base_url: str) -> dict:
     }
 
 
-@router.patch("/meetings/{meeting_id}")
+@router.patch("/meetings/{meeting_id}", response_model=MeetingOut)
 def update_meeting(meeting_id: int, patch: UpdateMeetingInput, request: Request, db: Session = Depends(get_db)):
     m = db.get(Meeting, meeting_id)
     if not m or m.is_deleted:
@@ -231,7 +269,24 @@ def update_meeting(meeting_id: int, patch: UpdateMeetingInput, request: Request,
     if patch.description is not None:
         m.description = patch.description
     if patch.meeting_date is not None:
-        m.meeting_date = datetime.fromisoformat(patch.meeting_date)
+        m.meeting_date = _parse_date(patch.meeting_date)
+    if patch.participants is not None:
+        existing = {p.id: p for p in m.participants}
+        ids = [p.id for p in patch.participants if p.id is not None]
+        names = [p.name.casefold() for p in patch.participants]
+        if len(ids) != len(set(ids)) or len(names) != len(set(names)):
+            raise HTTPException(status_code=422, detail="Duplicate participants")
+        if any(pid not in existing for pid in ids):
+            raise HTTPException(status_code=422, detail="Participant does not belong to this meeting")
+        from app.seed.seed import SPEAKER_PALETTE
+        retained = []
+        for i, participant in enumerate(patch.participants):
+            p = existing.get(participant.id) if participant.id is not None else None
+            if p is None:
+                p = Participant(meeting_id=m.id, avatar_color=SPEAKER_PALETTE[i % len(SPEAKER_PALETTE)])
+            p.name, p.email, p.is_host = participant.name, participant.email, i == 0
+            retained.append(p)
+        m.participants = retained
     if patch.channel is not None:
         pass  # channel update TODO
     if patch.language is not None:
@@ -279,6 +334,7 @@ def update_segment(segment_id: int, body: dict, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Segment not found")
     seg.text = body.get("text", seg.text).strip()
     seg.is_edited = True
+    _refresh_speaker_stats(seg.meeting_id, db)
     db.commit()
     db.refresh(seg)
     speaker = db.get(Participant, seg.speaker_id) if seg.speaker_id else None

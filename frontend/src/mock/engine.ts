@@ -20,7 +20,7 @@ import type {
   SummaryTemplate,
 } from "@/lib/types";
 import { capitalize, msToClock, msToSrt, msToVtt, slugify } from "@/lib/format";
-import type { DbActionItem, DbMeeting, DbParticipant, DbSegment, MockDb } from "./load";
+import type { DbMeeting, DbParticipant, DbSegment, MockDb } from "./load";
 
 // ---------- classification (LLD §5.2) ----------
 

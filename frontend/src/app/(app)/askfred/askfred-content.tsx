@@ -14,7 +14,6 @@ import {
   MicIcon,
   PlusIcon,
   SearchIcon,
-  SettingsIcon,
   SparklesIcon,
   XIcon,
 } from "lucide-react";
@@ -22,7 +21,6 @@ import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { qk } from "@/lib/query-keys";
 import { msToClock } from "@/lib/format";
-import type { Meeting } from "@/lib/types";
 import { cn } from "cn";
 
 const SUGGESTIONS: { label: string; icon: typeof CheckSquareIcon }[] = [
@@ -49,10 +47,6 @@ export default function AskFredContent() {
     queryFn: () => api.getChat(null),
   });
 
-  const { data: meetingsData } = useQuery({
-    queryKey: qk.meetings({ sort: "recent", page_size: 20 }),
-    queryFn: () => api.listMeetings({ sort: "recent", page_size: 20 }),
-  });
 
   const sendMutation = useMutation({
     mutationFn: (question: string) => api.sendChat(null, question),
@@ -68,7 +62,6 @@ export default function AskFredContent() {
     sendMutation.mutate(question.trim());
   };
 
-  const meetings: Meeting[] = (meetingsData?.items ?? []) as unknown as Meeting[];
 
   return (
     <div className="flex h-full min-h-0">

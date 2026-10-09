@@ -12,8 +12,10 @@ export function isAuthed(): boolean {
 
 export function signIn(): void {
   window.localStorage.setItem(AUTH_KEY, "1");
+  window.dispatchEvent(new Event("fireflies-auth-change"));
 }
 
 export function signOut(): void {
   window.localStorage.removeItem(AUTH_KEY);
+  window.dispatchEvent(new Event("fireflies-auth-change"));
 }

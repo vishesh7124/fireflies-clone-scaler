@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowUpIcon, BotIcon, Loader2Icon } from "lucide-react";
+import { ArrowUpIcon, Loader2Icon, SparklesIcon } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { qk } from "@/lib/query-keys";
@@ -10,6 +10,7 @@ import { msToClock } from "@/lib/format";
 import type { Meeting } from "@/lib/types";
 import { usePlayerStore } from "@/store/player-store";
 import { cn } from "cn";
+import { ConnectContextBanner } from "@/components/shared/connect-context-banner";
 
 const SUGGESTIONS = [
   "What were the key takeaways?",
@@ -27,6 +28,7 @@ export function AskFredPanel({ meeting }: { meeting: Meeting }) {
   const queryClient = useQueryClient();
   const seekTo = usePlayerStore((s) => s.seekTo);
   const [draft, setDraft] = useState("");
+  const [promoVisible, setPromoVisible] = useState(true);
 
   const { data: messages } = useQuery({
     queryKey: qk.chat(meeting.id),
@@ -49,25 +51,21 @@ export function AskFredPanel({ meeting }: { meeting: Meeting }) {
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col">
-      <div className="flex items-center gap-2 border-b border-border px-4 py-3">
-        <BotIcon className="size-4 text-primary-soft" />
-        <span className="text-sm font-medium text-foreground">AskFred</span>
-        <span className="ml-auto text-[11px] text-subtle">about this meeting</span>
-      </div>
-
       <div className="flex-1 space-y-4 overflow-y-auto p-3">
+        {promoVisible && <ConnectContextBanner onDismiss={() => setPromoVisible(false)} />}
         {(messages ?? []).length === 0 && (
-          <div className="flex flex-col items-center gap-3 py-6 text-center">
+          <div className="flex flex-col items-start gap-3 px-2 pb-6 pt-10 text-left">
+            <SparklesIcon className="mb-6 size-7 text-success" />
             <p className="font-display text-base font-semibold text-foreground">
               Hi VISHESH!
             </p>
-            <p className="text-sm text-muted-foreground">Ask anything about this meeting</p>
+            <p className="mb-8 text-lg font-semibold text-muted-foreground">Ask anything about this meeting</p>
             {SUGGESTIONS.map((s) => (
               <button
                 key={s}
                 type="button"
                 onClick={() => send(s)}
-                className="w-full rounded-full border border-border bg-surface px-3 py-2 text-center text-xs font-medium text-foreground transition-colors hover:border-ring/40"
+                className="rounded-md bg-surface px-3 py-3 text-left text-sm font-medium text-muted-foreground transition-colors hover:bg-elevated"
               >
                 {s}
               </button>
@@ -85,7 +83,7 @@ export function AskFredPanel({ meeting }: { meeting: Meeting }) {
           >
             <p
               className={cn(
-                "inline-block max-w-full whitespace-pre-wrap rounded-xl px-3 py-2 text-left text-xs leading-relaxed",
+                "inline-block max-w-full whitespace-pre-wrap rounded-md px-3 py-2 text-left text-sm leading-relaxed",
                 message.role === "user"
                   ? "bg-primary text-primary-foreground"
                   : "border border-border bg-surface text-muted-foreground",
@@ -119,12 +117,12 @@ export function AskFredPanel({ meeting }: { meeting: Meeting }) {
         )}
       </div>
 
-      <div className="border-t border-border p-3">
-        <div className="flex items-end gap-2 rounded-lg border border-border bg-elevated/60 p-2">
+      <div className="p-4">
+        <div className="flex min-h-[112px] items-end gap-2 rounded-md border border-border bg-surface p-3">
           <textarea
-            rows={1}
-            placeholder="Ask Fred about this meeting…"
-            className="max-h-24 flex-1 resize-none bg-transparent text-xs text-foreground outline-none placeholder:text-subtle"
+            rows={3}
+            placeholder="Ask anything. Type / to run AI skills."
+            className="max-h-28 flex-1 resize-none bg-transparent text-sm text-foreground outline-none placeholder:text-subtle"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
@@ -139,7 +137,7 @@ export function AskFredPanel({ meeting }: { meeting: Meeting }) {
             aria-label="Send"
             disabled={!draft.trim() || sendMutation.isPending}
             onClick={() => send(draft)}
-            className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-40"
+            className="flex size-8 shrink-0 items-center justify-center rounded bg-primary text-primary-foreground transition-opacity disabled:opacity-40"
           >
             <ArrowUpIcon className="size-3.5" />
           </button>

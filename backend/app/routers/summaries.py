@@ -81,10 +81,8 @@ def regenerate_summary(meeting_id: int, body: dict | None = None, db: Session = 
                                order_index=i))
         order += 1
 
-    for i, ai in enumerate(generated["action_items"]):
-        db.add(ActionItem(meeting_id=meeting_id, description=ai["description"],
-                          assignee_id=ai.get("assignee_id"), status="open",
-                          source_segment_id=ai.get("source_segment_id"), order_index=i))
+    # Tasks are generated at import and managed independently afterward.
+    # Reprocessing notes must not duplicate tasks or overwrite user edits/status.
 
     db.commit()
     return _summary_out(meeting_id, db)

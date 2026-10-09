@@ -24,12 +24,26 @@ def search_endpoint(q: str, db: Session = Depends(get_db)):
 # ---------- AskFred chat ----------
 
 def _segments_for(db: Session, meeting_id: int | None) -> list[dict]:
-    stmt = select(TranscriptSegment, Participant.name).outerjoin(Participant, TranscriptSegment.speaker_id == Participant.id)
+    stmt = (select(TranscriptSegment, Participant.name, Meeting.title)
+            .join(Meeting, TranscriptSegment.meeting_id == Meeting.id)
+            .outerjoin(Participant, TranscriptSegment.speaker_id == Participant.id)
+            .where(Meeting.is_deleted == False)
+            .order_by(TranscriptSegment.meeting_id, TranscriptSegment.start_ms))
     if meeting_id:
         stmt = stmt.where(TranscriptSegment.meeting_id == meeting_id)
     rows = db.execute(stmt).all()
     return [{"id": s.id, "meeting_id": s.meeting_id, "speaker_name": name or "Unknown",
-             "start_ms": s.start_ms, "text": s.text} for s, name in rows]
+             "meeting_title": title, "start_ms": s.start_ms, "end_ms": s.end_ms,
+             "text": s.text} for s, name, title in rows]
+
+
+def _actions_for(db: Session, meeting_id: int | None) -> list[dict]:
+    stmt = select(ActionItem, Participant.name).select_from(ActionItem).join(Meeting, ActionItem.meeting_id == Meeting.id).outerjoin(
+        Participant, ActionItem.assignee_id == Participant.id).where(Meeting.is_deleted == False)
+    if meeting_id is not None:
+        stmt = stmt.where(ActionItem.meeting_id == meeting_id)
+    return [{"description": a.description, "assignee_name": name, "status": a.status,
+             "source_segment_id": a.source_segment_id} for a, name in db.execute(stmt).all()]
 
 
 @router.post("/meetings/{meeting_id}/chat", response_model=ChatResponseOut)
@@ -38,9 +52,7 @@ def chat_meeting(meeting_id: int, req: ChatRequest, db: Session = Depends(get_db
     if not m:
         raise HTTPException(status_code=404, detail="Meeting not found")
     segments = _segments_for(db, meeting_id)
-    actions = db.scalars(select(ActionItem).where(ActionItem.meeting_id == meeting_id)).all()
-    action_dicts = [{"description": a.description, "assignee_name": db.get(Participant, a.assignee_id).name if a.assignee_id else None,
-                     "status": a.status, "source_segment_id": a.source_segment_id} for a in actions]
+    action_dicts = _actions_for(db, meeting_id)
     result = answer_question(req.question, segments, m.title, action_dicts)
     # persist
     db.add(ChatMessage(meeting_id=meeting_id, role="user", content=req.question))
@@ -54,7 +66,7 @@ def chat_meeting(meeting_id: int, req: ChatRequest, db: Session = Depends(get_db
 @router.post("/chat", response_model=ChatResponseOut)
 def chat_global(req: ChatRequest, db: Session = Depends(get_db)):
     segments = _segments_for(db, None)
-    result = answer_question(req.question, segments, None)
+    result = answer_question(req.question, segments, None, _actions_for(db, None))
     db.add(ChatMessage(meeting_id=None, role="user", content=req.question))
     import json
     db.add(ChatMessage(meeting_id=None, role="assistant", content=result["answer"],
