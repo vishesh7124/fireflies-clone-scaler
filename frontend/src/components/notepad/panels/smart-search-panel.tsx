@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronDownIcon, HashIcon, SearchIcon } from "lucide-react";
+import { ChevronDownIcon, HashIcon } from "lucide-react";
 import { api } from "@/lib/api";
 import { qk } from "@/lib/query-keys";
 import type { Meeting, Transcript } from "@/lib/types";
@@ -10,7 +10,6 @@ import { useNotepadStore } from "@/store/notepad-store";
 import { usePlayerStore } from "@/store/player-store";
 import { classifySegment } from "@/mock/engine";
 import { cn } from "cn";
-import { Input } from "@/components/ui/input";
 
 /** Collapsible section header (like the original's AI FILTERS / SENTIMENTS…). */
 function Section({
@@ -62,8 +61,6 @@ function TalkRing({ pct, color }: { pct: number; color: string }) {
  * TOPIC TRACKERS empty state.
  */
 export function SmartSearchPanel({ meeting, transcript }: { meeting: Meeting; transcript: Transcript }) {
-  const findQuery = useNotepadStore((s) => s.findQuery);
-  const setFindQuery = useNotepadStore((s) => s.setFindQuery);
   const smartFilter = useNotepadStore((s) => s.smartFilter);
   const setSmartFilter = useNotepadStore((s) => s.setSmartFilter);
 
@@ -111,16 +108,8 @@ export function SmartSearchPanel({ meeting, transcript }: { meeting: Meeting; tr
   return (
     <div className="flex h-full w-72 shrink-0 flex-col overflow-y-auto border-r border-border">
       <div className="space-y-3 p-3">
-        {/* smart search input */}
-        <div className="relative">
-          <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-subtle" />
-          <Input
-            placeholder="Smart Search"
-            className="h-8 pl-8 text-xs"
-            value={findQuery}
-            onChange={(e) => setFindQuery(e.target.value)}
-          />
-        </div>
+        {/* section heading (no input — filters below do the work) */}
+        <h2 className="px-1 text-sm font-semibold text-foreground">Smart Search</h2>
 
         <Section title="AI Filters">
           <div className="grid grid-cols-2 gap-1.5">

@@ -2,12 +2,19 @@
 
 import { useUiStore } from "@/store/ui-store";
 import { ScheduleDialog } from "@/components/meetings/schedule-dialog";
+import { SearchDialog } from "@/components/shared/search-dialog";
 
 /**
- * Globally-mounted create dialogs — opened from the Capture menu (topbar)
- * via the ui store. Uploads live on their own page (/uploads).
+ * Globally-mounted dialogs — opened from the Capture menu (topbar), Quick
+ * Start tiles (home) and empty states via the ui store, and the topbar
+ * search / ⌘K opens the global search dialog.
  */
 export function GlobalDialogs() {
-  const { scheduleOpen } = useUiStore();
-  return <>{scheduleOpen && <ScheduleDialog />}</>;
+  const { scheduleOpen, searchOpen } = useUiStore();
+  return (
+    <>
+      {scheduleOpen && <ScheduleDialog />}
+      {searchOpen && <SearchDialog />}
+    </>
+  );
 }
