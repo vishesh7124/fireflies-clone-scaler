@@ -89,5 +89,51 @@ ok &= check("create meeting", r.status_code == 201 and "id" in r.json(), f"statu
 r = client.get("/api/v1/settings")
 ok &= check("settings", r.status_code == 200 and "theme" in r.json())
 
+# --- Phase 6 endpoints ---
+
+# search
+r = client.get("/api/v1/search?q=pricing")
+sr = r.json()
+ok &= check("search", r.status_code == 200 and sr["total"] > 0, f"total={sr['total']}")
+
+# AskFred chat (meeting-scoped)
+r = client.post(f"/api/v1/meetings/{mid}/chat", json={"question": "When was pricing discussed?"})
+cr = r.json()
+ok &= check("chat meeting", r.status_code == 200 and "answer" in cr and len(cr["citations"]) > 0,
+            f"answer={cr['answer'][:60]}..., citations={len(cr['citations'])}")
+
+# AskFred chat (global)
+r = client.post("/api/v1/chat", json={"question": "What action items do I have?"})
+gr = r.json()
+ok &= check("chat global", r.status_code == 200 and "answer" in gr)
+
+# export (txt + json)
+r = client.get(f"/api/v1/meetings/{mid}/export?format=txt")
+ok &= check("export txt", r.status_code == 200 and "Transcript" in r.json()["content"])
+r = client.get(f"/api/v1/meetings/{mid}/export?format=json")
+ok &= check("export json", r.status_code == 200 and "transcript" in r.json()["content"])
+
+# comments
+r = client.post(f"/api/v1/meetings/{mid}/comments", json={"body": "Phase 6 smoke test comment"})
+ok &= check("add comment", r.status_code == 200 and "id" in r.json())
+r = client.get(f"/api/v1/meetings/{mid}/comments")
+ok &= check("list comments", r.status_code == 200 and len(r.json()) > 0)
+
+# bookmarks
+r = client.post(f"/api/v1/meetings/{mid}/bookmarks", json={"segment_id": 1, "label": "test"})
+ok &= check("add bookmark", r.status_code == 200 and "id" in r.json())
+r = client.get(f"/api/v1/meetings/{mid}/bookmarks")
+ok &= check("list bookmarks", r.status_code == 200)
+
+# soundbites
+r = client.post(f"/api/v1/meetings/{mid}/soundbites", json={"title": "test clip", "start_ms": 0, "end_ms": 5000})
+ok &= check("add soundbite", r.status_code == 200 and "id" in r.json())
+r = client.get(f"/api/v1/meetings/{mid}/soundbites")
+ok &= check("list soundbites", r.status_code == 200)
+
+# chat history
+r = client.get(f"/api/v1/meetings/{mid}/chat")
+ok &= check("chat history", r.status_code == 200 and len(r.json()) > 0)
+
 print(f"\n{'All green' if ok else 'FAILURES'}")
 sys.exit(0 if ok else 1)

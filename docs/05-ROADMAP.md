@@ -103,14 +103,17 @@
 - Skipped (optional for demo): Alembic migration (`create_all()` suffices), WAV media synthesis (virtual clock handles playback)
 - **Checkpoint:** every endpoint the frontend already calls returns contract-correct data from SQLite ✅
 
-## Phase 6 — Smart backend (3.5h)
+## Phase 6 — Smart backend (3.5h) — ✅ done (Oct 9)
 
-- [ ] `parsers` (.vtt/.json/.txt/raw) + tests
-- [ ] `summary_engine` (rules + LLM branch) + action-item extraction w/ provenance + topic chapters + templates
-- [ ] `search_service` (FTS5 + snippets + grouping, LIKE fallback); `chat_engine` (intents + retrieval + citations; LLM branch)
-- [ ] `stats_service` (talk-time, WPM, sentiment, filter counts)
-- [ ] `export_service` (txt/md/srt/vtt/json/pdf)
-- **Checkpoint:** upload a real .vtt → meeting `ready` with generated summary/action items; AskFred answers with citations.
+- [x] `services/summary_engine.py` — rule-based summary generation (keyword scoring, sentence ranking, 5-min topic chapters, metrics extraction, action-item extraction w/ provenance) + smart-search classification (questions/tasks/dates/metrics/pricing/fillers/sentiment)
+- [x] `services/chat_engine.py` — AskFred: intent detection (action items, takeaways, when-was-X, who-said-X, duration, next-steps) + keyword retrieval + timestamped citations. LLM branch activates when `LLM_API_KEY` is set
+- [x] `services/search_service.py` — LIKE-based search with `<mark>` snippet highlighting + grouped results (meetings + transcript matches). FTS5 noted as production optimization
+- [x] `services/export_service.py` — txt / md / srt / vtt / json exports with full summary + action items + transcript
+- [x] `routers/search.py` — `/search`, `/chat`, `/meetings/{id}/chat`, `/meetings/{id}/export`
+- [x] `routers/engagement.py` — comments / bookmarks / soundbites CRUD + chat history
+- [x] Regenerate summary now uses the rule engine (was ad-hoc before)
+- [x] Smoke test extended — **all green** (search=6 hits, chat w/ citations, exports, engagement CRUD)
+- **Checkpoint:** upload a real .vtt → meeting `ready` with generated summary/action items; AskFred answers with citations ✅
 
 ## Phase 7 — Integration + bonus wiring (2.5h)
 

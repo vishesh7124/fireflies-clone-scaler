@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import init_db
-from app.routers import action_items, meetings, meta, summaries
+from app.routers import action_items, engagement, meetings, meta, search, summaries
 
 
 @asynccontextmanager
@@ -45,3 +45,5 @@ app.include_router(meta.router, prefix="/api/v1")
 app.include_router(meetings.router, prefix="/api/v1")
 app.include_router(summaries.router, prefix="/api/v1")
 app.include_router(action_items.router, prefix="/api/v1")
+app.include_router(search.router, prefix="/api/v1")
+app.include_router(engagement.router, prefix="/api/v1")

@@ -40,6 +40,8 @@ def get_summary(meeting_id: int, db: Session = Depends(get_db)):
 @router.post("/meetings/{meeting_id}/regenerate", response_model=SummaryOut)
 def regenerate_summary(meeting_id: int, body: dict | None = None, db: Session = Depends(get_db)):
     """Regenerate the summary using the rule-based engine (LLM in Phase 6)."""
+    from app.services.summary_engine import generate_summary
+
     m = db.get(Meeting, meeting_id)
     if not m:
         raise HTTPException(status_code=404, detail="Meeting not found")
@@ -51,45 +53,38 @@ def regenerate_summary(meeting_id: int, body: dict | None = None, db: Session = 
         db.delete(old)
         db.flush()
 
-    # generate new (simple rule-based: overview + notes from top segments)
+    # generate new using the rule engine
     segments = db.scalars(
         select(TranscriptSegment).where(TranscriptSegment.meeting_id == meeting_id).order_by(TranscriptSegment.start_ms)
     ).all()
-    participants = db.scalars(select(Participant).where(Participant.meeting_id == meeting_id)).all()
     if not segments:
         raise HTTPException(status_code=400, detail="No transcript to summarize")
 
-    summary = Summary(meeting_id=meeting_id, template=template, generated_by="rules")
+    seg_dicts = [{"id": s.id, "speaker_id": s.speaker_id, "start_ms": s.start_ms,
+                  "end_ms": s.end_ms, "text": s.text} for s in segments]
+    generated = generate_summary(seg_dicts, template)
+
+    summary = Summary(meeting_id=meeting_id, template=generated["template"], generated_by="rules")
     db.add(summary)
     db.flush()
 
-    # overview
-    sec = SummarySection(summary_id=summary.id, section_type="overview", heading="Overview", order_index=0)
-    db.add(sec)
-    db.flush()
-    kw = {}
-    STOP = set("a an the and or but of to for with on in at by from is are was were be been this that these those we you they it our your their will would can could should shall do does did have has had not no yes so if then about into over under more most some such only own same too very just".split())
-    for s in segments:
-        for w in s.text.lower().replace(".", " ").replace(",", " ").split():
-            if len(w) > 3 and w not in STOP:
-                kw[w] = kw.get(w, 0) + 1
-    top_kw = sorted(kw, key=kw.get, reverse=True)[:4]
-    duration_min = round((segments[-1].end_ms or 0) / 60000) or 1
-    overview = f"The {duration_min}-minute meeting covered {', '.join(top_kw)}. " + segments[0].text[:150]
-    db.add(SummaryItem(section_id=sec.id, text=overview, timestamp_ms=segments[0].start_ms, source_segment_id=segments[0].id, order_index=0))
+    order = 0
+    for sec in generated["sections"]:
+        section = SummarySection(summary_id=summary.id, section_type=sec["section_type"],
+                                 heading=sec["heading"], order_index=order)
+        db.add(section)
+        db.flush()
+        for i, item in enumerate(sec["items"]):
+            db.add(SummaryItem(section_id=section.id, text=item["text"],
+                               timestamp_ms=item.get("timestamp_ms"),
+                               source_segment_id=item.get("source_segment_id"),
+                               order_index=i))
+        order += 1
 
-    # notes (top segments by keyword density)
-    sec = SummarySection(summary_id=summary.id, section_type="notes", heading="Notes", order_index=1)
-    db.add(sec)
-    db.flush()
-    scored = []
-    for s in segments:
-        words = s.text.lower().split()
-        score = sum(kw.get(w.strip(".,!?"), 0) for w in words)
-        scored.append((score, s))
-    scored.sort(key=lambda x: -x[0])
-    for i, (_, s) in enumerate(scored[:6]):
-        db.add(SummaryItem(section_id=sec.id, text=s.text, timestamp_ms=s.start_ms, source_segment_id=s.id, order_index=i))
+    for i, ai in enumerate(generated["action_items"]):
+        db.add(ActionItem(meeting_id=meeting_id, description=ai["description"],
+                          assignee_id=ai.get("assignee_id"), status="open",
+                          source_segment_id=ai.get("source_segment_id"), order_index=i))
 
     db.commit()
     return _summary_out(meeting_id, db)
