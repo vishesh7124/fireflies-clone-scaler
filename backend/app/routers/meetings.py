@@ -153,13 +153,45 @@ def create_meeting(data: CreateMeetingInput, db: Session = Depends(get_db)):
         # parse transcript lines (same format as the frontend loader)
         from app.seed.seed import parse_transcript
         utterances = parse_transcript(data.transcript_text.splitlines())
+        seg_models = []
         for i, u in enumerate(utterances):
             speaker = db.scalar(select(Participant).where(Participant.meeting_id == meeting.id, Participant.name == u["speaker"]))
-            db.add(TranscriptSegment(meeting_id=meeting.id, speaker_id=speaker.id if speaker else None,
-                                     start_ms=u["startMs"], end_ms=u["endMs"], text=u["text"], order_index=i))
+            seg = TranscriptSegment(meeting_id=meeting.id, speaker_id=speaker.id if speaker else None,
+                                    start_ms=u["startMs"], end_ms=u["endMs"], text=u["text"], order_index=i)
+            db.add(seg)
+            seg_models.append(seg)
         db.flush()
         meeting.duration_seconds = round(((db.scalar(select(TranscriptSegment.end_ms).where(TranscriptSegment.meeting_id == meeting.id).order_by(TranscriptSegment.end_ms.desc())) or 0) + 2000) / 1000)
-        # TODO: BackgroundTask to generate summary + flip to ready (Phase 6)
+
+        # recompute speaker stats
+        for p in db.scalars(select(Participant).where(Participant.meeting_id == meeting.id)).all():
+            own = [s for s in seg_models if s.speaker_id == p.id]
+            p.talk_time_ms = sum(s.end_ms - s.start_ms for s in own)
+            p.word_count = sum(len(s.text.split()) for s in own)
+
+        # generate summary + action items (the "AI processing" step)
+        from app.services.summary_engine import generate_summary
+        seg_dicts = [{"id": s.id, "speaker_id": s.speaker_id, "start_ms": s.start_ms,
+                      "end_ms": s.end_ms, "text": s.text} for s in seg_models]
+        generated = generate_summary(seg_dicts, "general")
+        summary = Summary(meeting_id=meeting.id, template="general", generated_by="rules")
+        db.add(summary)
+        db.flush()
+        for order, sec in enumerate(generated["sections"]):
+            section = SummarySection(summary_id=summary.id, section_type=sec["section_type"],
+                                     heading=sec["heading"], order_index=order)
+            db.add(section)
+            db.flush()
+            for j, item in enumerate(sec["items"]):
+                db.add(SummaryItem(section_id=section.id, text=item["text"],
+                                   timestamp_ms=item.get("timestamp_ms"),
+                                   source_segment_id=item.get("source_segment_id"),
+                                   order_index=j))
+        for j, ai in enumerate(generated["action_items"]):
+            db.add(ActionItem(meeting_id=meeting.id, description=ai["description"],
+                              assignee_id=ai.get("assignee_id"), status="open",
+                              source_segment_id=ai.get("source_segment_id"), order_index=j))
+
         meeting.status = "ready"
 
     db.commit()

@@ -76,7 +76,7 @@ r = client.get("/api/v1/tasks")
 tasks = r.json()
 ok &= check("tasks", r.status_code == 200 and len(tasks) > 0, f"count={len(tasks)}")
 
-# create meeting
+# create meeting (verify summary is auto-generated)
 r = client.post("/api/v1/meetings", json={
     "title": "Smoke Test Meeting",
     "meeting_date": "2026-10-09T12:00:00Z",
@@ -84,6 +84,10 @@ r = client.post("/api/v1/meetings", json={
     "transcript_text": "00:02 Ada Lovelace: Hello, let's test the API.\n00:15 Ada Lovelace: I'll send the report by Friday.",
 })
 ok &= check("create meeting", r.status_code == 201 and "id" in r.json(), f"status={r.json().get('status')}")
+new_mid = r.json()["id"]
+r = client.get(f"/api/v1/meetings/{new_mid}/summary")
+ok &= check("created meeting has summary", r.status_code == 200 and len(r.json().get("sections", [])) > 0,
+            f"sections={len(r.json().get('sections', []))}")
 
 # settings
 r = client.get("/api/v1/settings")
