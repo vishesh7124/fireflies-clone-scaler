@@ -5,16 +5,21 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   CameraOffIcon,
   CameraIcon,
+  CaptionsIcon,
   CheckIcon,
   ChevronDownIcon,
   CopyIcon,
   Loader2Icon,
   MaximizeIcon,
+  MoreVerticalIcon,
+  PauseIcon,
   PencilIcon,
   PlayIcon,
+  PlusIcon,
   RefreshCwIcon,
   SparklesIcon,
   StarIcon,
+  VolumeIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
@@ -221,43 +226,77 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
         <div className="mx-auto w-full max-w-3xl space-y-4 p-5">
           {/* video surface (toggleable, like the original's Video area) */}
           {videoVisible && (
-            <div className="relative overflow-hidden rounded-lg border border-border bg-black/70">
-              <div className="relative aspect-video">
-                {/* mock participant grid (real video arrives with the backend) */}
-                <div className="absolute inset-0 grid grid-cols-3 gap-px p-px opacity-80">
-                  {meeting.participants.slice(0, 9).map((p) => (
-                    <div
-                      key={p.id}
-                      className="flex items-center justify-center bg-gradient-to-br from-[#1e1e28] to-[#14141c] text-[11px] font-bold"
-                      style={{ color: p.avatar_color }}
+            <div className="mx-auto w-full max-w-2xl">
+              <div className="relative overflow-hidden rounded-lg border border-border bg-black">
+                <div className="relative aspect-video">
+                  {/* mock participant grid (real video arrives with the backend) */}
+                  <div className="absolute inset-0 grid grid-cols-3 gap-px p-px">
+                    {meeting.participants.slice(0, 9).map((p) => (
+                      <div
+                        key={p.id}
+                        className="flex items-center justify-center bg-gradient-to-br from-[#1e1e28] to-[#14141c] text-[11px] font-bold"
+                        style={{ color: p.avatar_color }}
+                      >
+                        {p.name
+                          .split(/\s+/)
+                          .map((w) => w[0])
+                          .slice(0, 2)
+                          .join("")
+                          .toUpperCase()}
+                      </div>
+                    ))}
+                    {Array.from({ length: Math.max(0, 9 - meeting.participants.length) }).map((_, i) => (
+                      <div key={`pad-${i}`} className="bg-gradient-to-br from-[#1e1e28] to-[#14141c]" />
+                    ))}
+                  </div>
+                  {/* center play overlay — only when paused */}
+                  {!isPlaying && (
+                    <button
+                      type="button"
+                      aria-label="Play"
+                      onClick={toggle}
+                      className="absolute inset-0 m-auto flex size-12 items-center justify-center rounded-full bg-primary/90 text-primary-foreground shadow-lg transition-transform hover:scale-105"
                     >
-                      {p.name
-                        .split(/\s+/)
-                        .map((w) => w[0])
-                        .slice(0, 2)
-                        .join("")
-                        .toUpperCase()}
+                      <PlayIcon className="size-5 translate-x-[1px]" />
+                    </button>
+                  )}
+
+                  {/* video controls overlay (bottom of video) */}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-3 pb-2 pt-8">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        aria-label={isPlaying ? "Pause" : "Play"}
+                        onClick={toggle}
+                        className="flex size-6 shrink-0 items-center justify-center rounded-full bg-white/20 text-white transition-colors hover:bg-white/30"
+                      >
+                        {isPlaying ? (
+                          <PauseIcon className="size-3" />
+                        ) : (
+                          <PlayIcon className="size-3 translate-x-[1px]" />
+                        )}
+                      </button>
+                      <span className="font-mono text-[11px] tabular-nums text-white">
+                        {msToClock(currentTimeMs)} / {msToClock(durationMs)}
+                      </span>
+                      <div className="flex-1" />
+                      <button type="button" aria-label="Volume" className="text-white/80 hover:text-white">
+                        <VolumeIcon className="size-3.5" />
+                      </button>
+                      <button type="button" aria-label="Captions" className="text-white/80 hover:text-white">
+                        <CaptionsIcon className="size-3.5" />
+                      </button>
+                      <button type="button" aria-label="Fullscreen" className="text-white/80 hover:text-white">
+                        <MaximizeIcon className="size-3.5" />
+                      </button>
+                      <button type="button" aria-label="More" className="text-white/80 hover:text-white">
+                        <MoreVerticalIcon className="size-3.5" />
+                      </button>
                     </div>
-                  ))}
-                  {Array.from({ length: Math.max(0, 6 - meeting.participants.length) }).map((_, i) => (
-                    <div key={`pad-${i}`} className="bg-gradient-to-br from-[#1e1e28] to-[#14141c]" />
-                  ))}
+                    {/* interactive progress bar */}
+                    <SeekBar currentTimeMs={currentTimeMs} durationMs={durationMs} />
+                  </div>
                 </div>
-                {/* center overlay — only when paused, like the real product */}
-                {!isPlaying && (
-                  <button
-                    type="button"
-                    aria-label="Play"
-                    onClick={toggle}
-                    className="absolute inset-0 m-auto flex size-12 items-center justify-center rounded-full bg-primary/90 text-primary-foreground shadow-lg transition-transform hover:scale-105"
-                  >
-                    <PlayIcon className="size-5 translate-x-[1px]" />
-                  </button>
-                )}
-              </div>
-              {/* interactive progress bar — click or drag to scrub (Seeks + auto-plays) */}
-              <div className="bg-black/40 px-2 py-1.5">
-                <SeekBar currentTimeMs={currentTimeMs} durationMs={durationMs} />
               </div>
             </div>
           )}
@@ -398,7 +437,7 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
           <ActionItemsSection meeting={meeting} />
 
           {/* "Did you like the summary?" feedback card */}
-          <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface px-4 py-3">
+          <div className="mx-auto flex w-full max-w-md items-center justify-between gap-3 rounded-lg border border-border bg-surface px-4 py-3">
             <span className="flex items-center gap-2 text-sm text-foreground">
               <span aria-hidden>🙂</span>
               Did you like the summary?
@@ -410,9 +449,9 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
                   type="button"
                   aria-label={`Rate ${n} star${n > 1 ? "s" : ""}`}
                   onClick={() => toast.success("Thanks for the feedback!")}
-                  className="text-muted-foreground transition-colors hover:text-primary-soft"
+                  className="text-primary transition-colors hover:text-primary-soft"
                 >
-                  <StarIcon className="size-4" />
+                  <StarIcon className="size-4" fill="currentColor" />
                 </button>
               ))}
             </span>
@@ -429,18 +468,20 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
               </div>
             )}
             <div className="flex flex-wrap gap-2">
-              {topics.slice(0, 3).map((t, i) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => toast.info("AI Skills — coming soon")}
-                  className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-ring/40"
-                  style={{ borderLeftColor: ["#7c5cff", "#ffd43b", "#74c0fc"][i % 3] }}
-                >
-                  <span className="text-primary-soft">+</span>
-                  {t.text}
-                </button>
-              ))}
+              {topics.slice(0, 3).map((t, i) => {
+                const chipColors = ["#7c5cff", "#ffd43b", "#74c0fc"];
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => toast.info("AI Skills — coming soon")}
+                    className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-ring/40"
+                  >
+                    <PlusIcon className="size-3" style={{ color: chipColors[i % 3] }} />
+                    {t.text}
+                  </button>
+                );
+              })}
             </div>
             <p className="flex items-center gap-1.5 text-[11px] text-subtle">
               <SparklesIcon className="size-3" />

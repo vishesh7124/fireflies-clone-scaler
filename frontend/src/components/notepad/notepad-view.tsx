@@ -20,6 +20,7 @@ import { SmartSearchPanel } from "./panels/smart-search-panel";
 import { SoundbitesPanel } from "./panels/soundbites-panel";
 import { CommentsPanel } from "./panels/comments-panel";
 import { BookmarksPanel } from "./panels/bookmarks-panel";
+import { Sidebar } from "@/components/layout/sidebar";
 
 /** Loading skeleton shaped like the Notepad. */
 function NotepadSkeleton() {
@@ -98,6 +99,8 @@ function ScheduledView({ meetingId }: { meetingId: number }) {
 export function NotepadView({ meetingId }: { meetingId: number }) {
   const activePanel = useNotepadStore((s) => s.activePanel);
   const transcriptHidden = useNotepadStore((s) => s.transcriptHidden);
+  const sidebarOpen = useNotepadStore((s) => s.sidebarOpen);
+  const setSidebarOpen = useNotepadStore((s) => s.setSidebarOpen);
 
   const { data: meeting, isPending } = useQuery({
     queryKey: qk.meeting(meetingId),
@@ -151,6 +154,22 @@ export function NotepadView({ meetingId }: { meetingId: number }) {
       </div>
 
       <TransportBar meeting={meeting} />
+
+      {/* slide-in sidebar overlay — the real Notepad's hamburger opens this */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ${
+          sidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        onClick={() => setSidebarOpen(false)}
+        aria-hidden
+      />
+      <div
+        className={`fixed left-0 top-0 z-50 h-dvh transition-transform duration-300 ease-in-out ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <Sidebar variant="full" />
+      </div>
     </div>
   );
 }

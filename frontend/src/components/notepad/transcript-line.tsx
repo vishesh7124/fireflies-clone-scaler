@@ -66,12 +66,7 @@ function TranscriptTurnComponent({
     }, 700);
   };
 
-  const initials = segment.speaker_name
-    .split(/\s+/)
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+  const initials = segment.speaker_name[0]?.toUpperCase() ?? "?"
 
   return (
     <div
@@ -187,7 +182,7 @@ function TranscriptTurnComponent({
           onClick={() => seekTo(segment.start_ms)}
           className="mt-1 block w-full text-left"
         >
-          <p className="text-sm leading-relaxed text-muted-foreground">
+          <p className="text-sm leading-relaxed text-foreground">
             <HighlightedText text={segment.text} query={findQuery} />
           </p>
         </button>

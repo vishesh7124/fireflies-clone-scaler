@@ -24,6 +24,7 @@ import { api } from "@/lib/api";
 import { downloadFile } from "@/lib/download";
 import { qk } from "@/lib/query-keys";
 import type { ExportFormat, Meeting } from "@/lib/types";
+import { useNotepadStore } from "@/store/notepad-store";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -61,6 +62,8 @@ const EXPORTS: { format: ExportFormat; label: string }[] = [
 export function NotepadHeader({ meeting }: { meeting: Meeting }) {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const sidebarOpen = useNotepadStore((s) => s.sidebarOpen);
+  const setSidebarOpen = useNotepadStore((s) => s.setSidebarOpen);
   const [infoOpen, setInfoOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -102,9 +105,9 @@ export function NotepadHeader({ meeting }: { meeting: Meeting }) {
       {/* hamburger + breadcrumb */}
       <button
         type="button"
-        aria-label="Back to Notebook"
-        title="Back to Notebook"
-        onClick={() => router.push("/meetings")}
+        aria-label="Toggle sidebar"
+        title="Toggle sidebar"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
         className="flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-elevated/60 hover:text-foreground"
       >
         <MenuIcon className="size-4" />
