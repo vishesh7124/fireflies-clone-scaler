@@ -10,6 +10,7 @@ import {
   CopyIcon,
   Loader2Icon,
   MaximizeIcon,
+  PauseIcon,
   PencilIcon,
   PlayIcon,
   RefreshCwIcon,
@@ -32,6 +33,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ActionItemsSection } from "./action-items-section";
+import { SeekBar } from "./seek-bar";
 
 const TEMPLATES: { value: SummaryTemplate; label: string }[] = [
   { value: "general", label: "General Summary" },
@@ -122,6 +124,7 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
   const transcriptHidden = useNotepadStore((s) => s.transcriptHidden);
   const currentTimeMs = usePlayerStore((s) => s.currentTimeMs);
   const durationMs = usePlayerStore((s) => s.durationMs);
+  const isPlaying = usePlayerStore((s) => s.isPlaying);
   const toggle = usePlayerStore((s) => s.toggle);
 
   const { data: summary } = useQuery({
@@ -185,7 +188,7 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
     toast.success("Summary copied to clipboard");
   };
 
-  const progress = durationMs > 0 ? (currentTimeMs / durationMs) * 100 : 0;
+
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -219,38 +222,48 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
         <div className="mx-auto w-full max-w-3xl space-y-4 p-5">
           {/* video surface (toggleable, like the original's Video area) */}
           {videoVisible && (
-            <div className="relative aspect-video overflow-hidden rounded-lg border border-border bg-black/70">
-              {/* mock participant grid (real video arrives with the backend) */}
-              <div className="absolute inset-0 grid grid-cols-3 gap-px p-px opacity-80">
-                {meeting.participants.slice(0, 9).map((p) => (
-                  <div
-                    key={p.id}
-                    className="flex items-center justify-center bg-gradient-to-br from-[#1e1e28] to-[#14141c] text-[11px] font-bold"
-                    style={{ color: p.avatar_color }}
-                  >
-                    {p.name
-                      .split(/\s+/)
-                      .map((w) => w[0])
-                      .slice(0, 2)
-                      .join("")
-                      .toUpperCase()}
-                  </div>
-                ))}
-                {Array.from({ length: Math.max(0, 6 - meeting.participants.length) }).map((_, i) => (
-                  <div key={`pad-${i}`} className="bg-gradient-to-br from-[#1e1e28] to-[#14141c]" />
-                ))}
+            <div className="relative overflow-hidden rounded-lg border border-border bg-black/70">
+              <div className="relative aspect-video">
+                {/* mock participant grid (real video arrives with the backend) */}
+                <div className="absolute inset-0 grid grid-cols-3 gap-px p-px opacity-80">
+                  {meeting.participants.slice(0, 9).map((p) => (
+                    <div
+                      key={p.id}
+                      className="flex items-center justify-center bg-gradient-to-br from-[#1e1e28] to-[#14141c] text-[11px] font-bold"
+                      style={{ color: p.avatar_color }}
+                    >
+                      {p.name
+                        .split(/\s+/)
+                        .map((w) => w[0])
+                        .slice(0, 2)
+                        .join("")
+                        .toUpperCase()}
+                    </div>
+                  ))}
+                  {Array.from({ length: Math.max(0, 6 - meeting.participants.length) }).map((_, i) => (
+                    <div key={`pad-${i}`} className="bg-gradient-to-br from-[#1e1e28] to-[#14141c]" />
+                  ))}
+                </div>
+                {/* center overlay — Play when paused, Pause when playing */}
+                <button
+                  type="button"
+                  aria-label={isPlaying ? "Pause" : "Play"}
+                  onClick={toggle}
+                  className={cn(
+                    "absolute inset-0 m-auto flex size-12 items-center justify-center rounded-full bg-primary/90 text-primary-foreground shadow-lg transition-opacity",
+                    isPlaying ? "opacity-40 hover:opacity-90" : "opacity-100 hover:scale-105",
+                  )}
+                >
+                  {isPlaying ? (
+                    <PauseIcon className="size-5" />
+                  ) : (
+                    <PlayIcon className="size-5 translate-x-[1px]" />
+                  )}
+                </button>
               </div>
-              <button
-                type="button"
-                aria-label="Play"
-                onClick={toggle}
-                className="absolute inset-0 m-auto flex size-12 items-center justify-center rounded-full bg-primary/90 text-primary-foreground shadow-lg transition-transform hover:scale-105"
-              >
-                <PlayIcon className="size-5 translate-x-[1px]" />
-              </button>
-              {/* progress */}
-              <div className="absolute inset-x-0 bottom-0 h-1 bg-white/10">
-                <div className="h-full bg-primary" style={{ width: `${progress}%` }} />
+              {/* interactive progress bar — click or drag to scrub */}
+              <div className="bg-black/40 px-1.5">
+                <SeekBar currentTimeMs={currentTimeMs} durationMs={durationMs} />
               </div>
             </div>
           )}

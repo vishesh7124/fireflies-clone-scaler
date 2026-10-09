@@ -78,12 +78,12 @@ function TranscriptTurnComponent({
       data-segment-id={segment.id}
       className={cn(
         "group/turn relative border-b border-border/60 px-4 py-3 transition-colors",
-        isActive && "bg-primary/5",
+        isActive && "bg-primary/10",
         dimmed && "opacity-40",
       )}
     >
-      {/* active accent — a thin left bar, like the original */}
-      {isActive && <span className="absolute inset-y-0 left-0 w-0.5 bg-primary" />}
+      {/* active accent — a 1px left bar, like the original */}
+      {isActive && <span className="absolute inset-y-0 left-0 w-1 bg-primary" />}
 
       {/* header row: avatar + name + · + timestamp + hover actions */}
       <div className="flex items-center gap-2">
@@ -103,7 +103,7 @@ function TranscriptTurnComponent({
             <ChevronDownIcon className="ml-0.5 inline size-2.5 text-subtle" />
           </span>
           <span className="shrink-0 text-[11px] text-subtle">·</span>
-          <span className="shrink-0 font-mono text-[11px] tabular-nums text-primary-soft underline decoration-primary-soft/40 hover:decoration-primary-soft">
+          <span className="shrink-0 cursor-pointer font-mono text-[11px] tabular-nums text-primary-soft underline decoration-primary-soft/40 transition-colors hover:bg-primary/15 hover:decoration-primary-soft">
             {msToClock(segment.start_ms)}
           </span>
         </button>
