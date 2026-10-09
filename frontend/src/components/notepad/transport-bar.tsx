@@ -66,8 +66,18 @@ export function TransportBar({ meeting }: { meeting: Meeting }) {
 
   return (
     <div className="flex h-14 shrink-0 items-center gap-2 border-t border-border px-4">
-      {/* timecode + speed */}
-      <span className="flex shrink-0 items-center gap-1 font-mono text-[11px] tabular-nums text-subtle">
+      {/* timecode + speed + "now playing" indicator */}
+      <span className="flex shrink-0 items-center gap-1.5 font-mono text-[11px] tabular-nums text-subtle">
+        {isPlaying && (
+          <span
+            className="relative flex size-2"
+            aria-label="Playing"
+            title="Playing"
+          >
+            <span className="absolute inset-0 animate-ping rounded-full bg-success/60" />
+            <span className="relative size-2 rounded-full bg-success" />
+          </span>
+        )}
         {msToClock(currentTimeMs)} / {msToClock(durationMs)}
       </span>
       <DropdownMenu>

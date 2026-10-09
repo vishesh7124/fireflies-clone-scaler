@@ -8,6 +8,10 @@ import { usePlayerStore } from "@/store/player-store";
  * playback if the player is currently paused (the standard "jump and play"
  * UX). Keyboard ←/→ skip ±5 s. Wired into the video surface, matching
  * the real product's progress bar under the video.
+ *
+ * Robustness: uses BOTH `onPointerDown` (instant, drag-aware with
+ * `setPointerCapture`) and `onClick` (fallback for any config where
+ * pointerdown doesn't fire) so seeking always works.
  */
 export function SeekBar({
   currentTimeMs,
@@ -25,11 +29,15 @@ export function SeekBar({
   const seconds = Math.round(currentTimeMs / 1000);
   const totalSeconds = Math.round(durationMs / 1000);
 
-  const seek = (clientX: number) => {
+  const seekFromClientX = (clientX: number) => {
     const rect = barRef.current?.getBoundingClientRect();
     if (!rect || rect.width === 0 || durationMs <= 0) return;
     const fraction = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
     seekTo(fraction * durationMs);
+  };
+
+  const startPlaybackIfPaused = () => {
+    if (!usePlayerStore.getState().isPlaying) play();
   };
 
   return (
@@ -41,14 +49,22 @@ export function SeekBar({
       aria-valuemax={totalSeconds}
       aria-valuenow={seconds}
       tabIndex={0}
-      className="group/sb relative z-10 flex h-3 cursor-pointer touch-none items-center"
+      className="group/sb relative z-10 flex h-4 cursor-pointer select-none items-center"
       onPointerDown={(e) => {
-        e.currentTarget.setPointerCapture(e.pointerId);
-        seek(e.clientX);
-        if (!usePlayerStore.getState().isPlaying) play();
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId);
+        } catch {
+          /* setPointerCapture can throw on some touch configs — safe to ignore */
+        }
+        seekFromClientX(e.clientX);
+        startPlaybackIfPaused();
       }}
       onPointerMove={(e) => {
-        if (e.currentTarget.hasPointerCapture(e.pointerId)) seek(e.clientX);
+        if (e.currentTarget.hasPointerCapture(e.pointerId)) seekFromClientX(e.clientX);
+      }}
+      onClick={(e) => {
+        seekFromClientX(e.clientX);
+        startPlaybackIfPaused();
       }}
       onKeyDown={(e) => {
         if (e.key === "ArrowLeft") skip(-5000);

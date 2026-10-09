@@ -10,7 +10,6 @@ import {
   CopyIcon,
   Loader2Icon,
   MaximizeIcon,
-  PauseIcon,
   PencilIcon,
   PlayIcon,
   RefreshCwIcon,
@@ -244,25 +243,20 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
                     <div key={`pad-${i}`} className="bg-gradient-to-br from-[#1e1e28] to-[#14141c]" />
                   ))}
                 </div>
-                {/* center overlay — Play when paused, Pause when playing */}
-                <button
-                  type="button"
-                  aria-label={isPlaying ? "Pause" : "Play"}
-                  onClick={toggle}
-                  className={cn(
-                    "absolute inset-0 m-auto flex size-12 items-center justify-center rounded-full bg-primary/90 text-primary-foreground shadow-lg transition-opacity",
-                    isPlaying ? "opacity-40 hover:opacity-90" : "opacity-100 hover:scale-105",
-                  )}
-                >
-                  {isPlaying ? (
-                    <PauseIcon className="size-5" />
-                  ) : (
+                {/* center overlay — only when paused, like the real product */}
+                {!isPlaying && (
+                  <button
+                    type="button"
+                    aria-label="Play"
+                    onClick={toggle}
+                    className="absolute inset-0 m-auto flex size-12 items-center justify-center rounded-full bg-primary/90 text-primary-foreground shadow-lg transition-transform hover:scale-105"
+                  >
                     <PlayIcon className="size-5 translate-x-[1px]" />
-                  )}
-                </button>
+                  </button>
+                )}
               </div>
-              {/* interactive progress bar — click or drag to scrub */}
-              <div className="bg-black/40 px-1.5">
+              {/* interactive progress bar — click or drag to scrub (Seeks + auto-plays) */}
+              <div className="bg-black/40 px-2 py-1.5">
                 <SeekBar currentTimeMs={currentTimeMs} durationMs={durationMs} />
               </div>
             </div>
