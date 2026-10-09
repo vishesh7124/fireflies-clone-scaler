@@ -1,49 +1,52 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { formatDuration, formatRowDate } from "@/lib/format";
+import { ArrowUpRightIcon, ChevronRightIcon } from "lucide-react";
+import { formatDate, formatDuration } from "@/lib/format";
 import type { MeetingListItem } from "@/lib/types";
 import { cn } from "cn";
 import { MeetingThumb } from "@/components/shared/meeting-thumb";
-import { ParticipantStack } from "@/components/shared/participant-stack";
 import { MeetingActions } from "./meeting-actions";
 
-/** Status badge for non-ready meetings (processing animates, like the real app). */
+/** Status badge for processing meetings (scheduled is shown in the meta line). */
 function StatusBadge({ status }: { status: MeetingListItem["status"] }) {
-  if (status === "ready") return null;
-  if (status === "processing")
-    return (
-      <span className="animate-pulse rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary-soft">
-        Processing…
-      </span>
-    );
+  if (status !== "processing") return null;
   return (
-    <span className="rounded-full bg-elevated px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
-      Scheduled
+    <span className="animate-pulse whitespace-nowrap rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary-soft">
+      Processing…
     </span>
   );
 }
 
 /**
- * One meeting row — thumb, title, date · duration · tags, participant stack,
- * 3-dot actions. Click navigates to the Notepad. Layout replicates the real
- * app's meeting list rows.
+ * One meeting row — replicates the real app's rows: muted thumbnail, title
+ * (with the small up-arrow), ONE meta line ("Oct 9 · 10:57 AM · 43 min · Host"),
+ * "..." overflow + "Details >" on the right. `compact` (Home) shows the meta
+ * date only. No tag pills, no participant stacks — like the original.
  */
 export function MeetingRow({
   meeting,
-  showTags = true,
+  meta = "full",
+  showActions = true,
   className,
 }: {
   meeting: MeetingListItem;
-  showTags?: boolean;
+  meta?: "full" | "compact";
+  showActions?: boolean;
   className?: string;
 }) {
   const router = useRouter();
 
+  const date = formatDate(meeting.meeting_date, "MMM d · h:mm a");
+  const duration =
+    meeting.duration_seconds != null ? formatDuration(meeting.duration_seconds) : "Scheduled";
+  const host = meeting.participants[0]?.name ?? "";
+  const metaLine = meta === "full" ? `${date} · ${duration} · ${host}` : date;
+
   return (
     <div
       className={cn(
-        "group flex items-center gap-3 rounded-lg border border-transparent p-3 transition-colors hover:border-border hover:bg-surface",
+        "group flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-surface",
         className,
       )}
     >
@@ -52,36 +55,30 @@ export function MeetingRow({
         onClick={() => router.push(`/meetings/${meeting.id}`)}
         className="flex min-w-0 flex-1 items-center gap-3 text-left"
       >
-        <MeetingThumb />
+        <MeetingThumb id={meeting.id} />
         <span className="min-w-0 flex-1">
-          <span className="flex items-center gap-2">
+          <span className="flex items-center gap-1.5">
             <span className="truncate text-sm font-medium text-foreground">{meeting.title}</span>
+            <ArrowUpRightIcon className="size-3 shrink-0 text-subtle" />
             <StatusBadge status={meeting.status} />
           </span>
-          <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-subtle">
-            <span className="whitespace-nowrap">{formatRowDate(meeting.meeting_date)}</span>
-            {meeting.duration_seconds != null && (
-              <>
-                <span aria-hidden>·</span>
-                <span className="whitespace-nowrap">{formatDuration(meeting.duration_seconds)}</span>
-              </>
-            )}
-            {showTags &&
-              meeting.tags.map((tag) => (
-                <span
-                  key={tag.name}
-                  className="whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] font-medium"
-                  style={{ backgroundColor: `${tag.color}22`, color: tag.color }}
-                >
-                  {tag.name}
-                </span>
-              ))}
-          </span>
+          <span className="mt-0.5 block truncate text-xs text-subtle">{metaLine}</span>
         </span>
       </button>
 
-      <ParticipantStack participants={meeting.participants} />
-      <MeetingActions meeting={meeting} />
+      {showActions && (
+        <span className="flex shrink-0 items-center gap-1">
+          <MeetingActions meeting={meeting} />
+          <button
+            type="button"
+            onClick={() => router.push(`/meetings/${meeting.id}`)}
+            className="hidden items-center gap-0.5 rounded-md px-2 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-elevated/60 hover:text-foreground sm:flex"
+          >
+            Details
+            <ChevronRightIcon className="size-3" />
+          </button>
+        </span>
+      )}
     </div>
   );
 }

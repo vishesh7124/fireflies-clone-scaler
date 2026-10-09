@@ -1,23 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { HashIcon, PlusIcon, SearchIcon, UploadIcon, VideoIcon } from "lucide-react";
+import { HashIcon, PlusIcon, SearchIcon } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "cn";
 import { Input } from "@/components/ui/input";
 
 export type ChannelId = "my" | "all" | "voice" | "uploads";
 
-const CHANNELS: { id: ChannelId; label: string; badge?: string }[] = [
-  { id: "my", label: "My Meetings" },
-  { id: "all", label: "All Meetings" },
+const CHANNELS: { id: ChannelId; label: string; prefix?: string; badge?: string }[] = [
+  { id: "my", label: "My Meetings", prefix: "#" },
+  { id: "all", label: "All Meetings", prefix: "#" },
   { id: "voice", label: "Voice Agent Meetings" },
   { id: "uploads", label: "Uploads", badge: "NEW" },
 ];
 
 /**
- * Left channels rail — replicates the real Meetings page rail (docs/01 §5.3):
- * channel search, channel pills, "All channels" section with + Channel.
+ * Left channels rail — replicates the real Meetings page rail: channel search,
+ * plain channel pills ("# My Meetings" highlighted purple when selected),
+ * "All channels" section with + Channel. No icons on channel items.
  */
 export function ChannelsRail({
   active,
@@ -48,18 +49,14 @@ export function ChannelsRail({
             type="button"
             onClick={() => onSelect(channel.id)}
             className={cn(
-              "flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-[13px] font-medium transition-colors",
+              "flex w-full items-center gap-1.5 rounded-md px-2.5 py-2 text-[13px] font-medium transition-colors",
               channel.id === active
-                ? "bg-accent text-foreground"
+                ? "bg-primary/20 text-primary"
                 : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
             )}
           >
-            {channel.id === "uploads" ? (
-              <UploadIcon className="size-3.5" />
-            ) : (
-              <VideoIcon className="size-3.5" />
-            )}
-            {channel.label}
+            {channel.prefix && <span aria-hidden>{channel.prefix}</span>}
+            <span className="truncate">{channel.label}</span>
             {channel.badge && (
               <span className="ml-auto rounded-full bg-success/15 px-1.5 py-0.5 text-[10px] font-semibold text-success">
                 {channel.badge}
@@ -75,7 +72,7 @@ export function ChannelsRail({
       <div className="mt-auto space-y-2 p-3">
         <div className="flex items-center justify-between px-1">
           <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-            <HashIcon className="size-3" /> All channels
+            <HashIcon className="size-3 opacity-50" /> All channels
           </span>
           <button
             type="button"

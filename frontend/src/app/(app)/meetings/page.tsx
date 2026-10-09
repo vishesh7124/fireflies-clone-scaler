@@ -3,50 +3,33 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { CheckIcon, ListChecksIcon, SparklesIcon, StarIcon, UploadIcon, VideoIcon } from "lucide-react";
+import { ListChecksIcon, SearchIcon, SparklesIcon, VideoIcon } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { qk } from "@/lib/query-keys";
 import { useDebounced } from "@/hooks/use-debounced";
 import type { MeetingListParams } from "@/lib/types";
+import { cn } from "cn";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChannelsRail, type ChannelId } from "@/components/meetings/channels-rail";
 import { MeetingRow } from "@/components/meetings/meeting-row";
-import {
-  EMPTY_FILTERS,
-  MeetingsFilters,
-  MeetingsSearch,
-  type FiltersState,
-} from "@/components/meetings/meetings-filters";
+import { EMPTY_FILTERS, MeetingsFilters, type FiltersState } from "@/components/meetings/meetings-filters";
 import { EmptyState } from "@/components/shared/empty-state";
-import { SegmentedTabs } from "@/components/shared/segmented-tabs";
-import { useUiStore } from "@/store/ui-store";
+import { AskFredRail } from "@/components/shared/askfred-rail";
 
-const CHANNEL_PARAMS: Record<ChannelId, Partial<MeetingListParams>> = {
+const CHANNEL_PARAMS: Record<Exclude<ChannelId, "uploads">, Partial<MeetingListParams>> = {
   my: { channel: "My Meetings" },
   all: {},
   // no voice-agent meetings in the seed — an honest empty state for now
   voice: { source: "api" },
-  // meetings created from uploads/paste land here
-  uploads: { source: "paste" },
 };
 
+const TABS = ["Hosted by me", "Shared with me"];
+
 /** Channel-specific empty states (copy mirrors the real app's tone). */
-function channelEmpty(channel: ChannelId, openUpload: () => void) {
-  if (channel === "uploads")
-    return (
-      <EmptyState
-        icon={UploadIcon}
-        title="No uploads yet"
-        subtitle="Upload a transcript file or paste one — Fred processes it into a summary with action items."
-        action={
-          <Button size="sm" onClick={openUpload}>
-            <UploadIcon /> Upload transcript
-          </Button>
-        }
-      />
-    );
+function channelEmpty(channel: ChannelId) {
   if (channel === "voice")
     return (
       <EmptyState
@@ -60,25 +43,21 @@ function channelEmpty(channel: ChannelId, openUpload: () => void) {
       icon={VideoIcon}
       title="Looks like you haven't recorded a meeting yet"
       subtitle="Once you record your first meeting with Fireflies, it'll show up right here."
-      action={
-        <Button size="sm" onClick={openUpload}>
-          <UploadIcon /> Upload transcript
-        </Button>
-      }
     />
   );
 }
 
 /**
- * Meetings — the Notebook (docs/01 §5.3): channels rail, search + tabs +
- * filters/sort toolbar, meeting rows, pagination, and the AskFred rail.
+ * Meetings — the Notebook (docs/01 §5.3): channels rail, plain-text tabs with
+ * the Filters pill, toggled inline search, meeting rows, and the docked
+ * AskFred rail. The shell collapses the sidebar to an icon strip here.
  */
 export default function MeetingsPage() {
   const router = useRouter();
-  const openUpload = useUiStore((s) => s.openUpload);
 
   const [channel, setChannel] = useState<ChannelId>("my");
-  const [tab, setTab] = useState("Hosted by me");
+  const [tab, setTab] = useState(TABS[0]);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<FiltersState>(EMPTY_FILTERS);
   const [sort, setSort] = useState<NonNullable<MeetingListParams["sort"]>>("recent");
@@ -87,14 +66,14 @@ export default function MeetingsPage() {
   const debouncedSearch = useDebounced(search);
 
   const params: MeetingListParams = {
-    ...CHANNEL_PARAMS[channel],
+    ...(channel === "uploads" ? {} : CHANNEL_PARAMS[channel]),
     q: debouncedSearch || undefined,
     participant: filters.participant || undefined,
     tag: filters.tag || undefined,
     status: filters.status || undefined,
     min_duration: filters.minDuration || undefined,
     sort,
-    order: sort === "title" ? "asc" : sort === "date" ? "asc" : "desc",
+    order: sort === "title" || sort === "date" ? "asc" : "desc",
     page,
     page_size: 20,
   };
@@ -105,33 +84,79 @@ export default function MeetingsPage() {
   });
 
   const totalPages = data ? Math.max(1, Math.ceil(data.total / data.page_size)) : 1;
+  const hasActiveFilters =
+    Boolean(debouncedSearch) ||
+    Boolean(filters.participant) ||
+    Boolean(filters.tag) ||
+    Boolean(filters.status) ||
+    Boolean(filters.minDuration);
+
+  const selectChannel = (id: ChannelId) => {
+    if (id === "uploads") {
+      router.push("/uploads");
+      return;
+    }
+    setChannel(id);
+    setPage(1);
+  };
 
   return (
     <div className="flex h-full min-h-0">
-      <ChannelsRail active={channel} onSelect={(c) => { setChannel(c); setPage(1); }} />
+      <ChannelsRail active={channel} onSelect={selectChannel} />
 
       {/* middle — the list */}
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* toolbar row 1: title + search */}
-        <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-          <h1 className="font-display text-lg font-semibold text-foreground">Meetings</h1>
-          <MeetingsSearch value={search} onChange={(v) => { setSearch(v); setPage(1); }} />
-        </div>
+        {/* tab row: plain text tabs + Filters pill + toggled search (like the original) */}
+        <div className="flex flex-wrap items-center gap-3 border-b border-border px-4 py-2.5">
+          {TABS.map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setTab(t)}
+              className={cn(
+                "text-sm transition-colors",
+                t === tab
+                  ? "font-medium text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {t}
+            </button>
+          ))}
 
-        {/* toolbar row 2: tabs + filters */}
-        <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-2">
-          <SegmentedTabs
-            options={["Hosted by me", "Shared with me"]}
-            value={tab}
-            onChange={setTab}
+          <MeetingsFilters
+            filters={filters}
+            onFiltersChange={(f) => {
+              setFilters(f);
+              setPage(1);
+            }}
+            sort={sort}
+            onSortChange={setSort}
           />
-          <div className="ml-auto">
-            <MeetingsFilters
-              filters={filters}
-              onFiltersChange={(f) => { setFilters(f); setPage(1); }}
-              sort={sort}
-              onSortChange={setSort}
-            />
+
+          <div className="ml-auto flex items-center gap-2">
+            {searchOpen && (
+              <Input
+                autoFocus
+                placeholder="Search by title or keyword"
+                className="h-8 w-52 text-xs"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+                onKeyDown={(e) => e.key === "Escape" && setSearch("")}
+              />
+            )}
+            <Button
+              variant="outline"
+              size="icon-sm"
+              aria-label="Search meetings"
+              className={cn(search && search.length > 0 && "border-ring/40")}
+              onClick={() => setSearchOpen((open) => !open)}
+            >
+              <SearchIcon className="size-3.5" />
+            </Button>
           </div>
         </div>
 
@@ -150,22 +175,34 @@ export default function MeetingsPage() {
               ))}
             </div>
           ) : !data || data.items.length === 0 ? (
-            debouncedSearch || filters.participant || filters.tag || filters.status || filters.minDuration ? (
+            hasActiveFilters ? (
               <EmptyState
                 icon={ListChecksIcon}
                 title="No meetings match your filters"
                 subtitle="Try clearing the search or filters to see all your meetings."
                 action={
-                  <Button variant="outline" size="sm" onClick={() => { setSearch(""); setFilters(EMPTY_FILTERS); }}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSearch("");
+                      setFilters(EMPTY_FILTERS);
+                    }}
+                  >
                     Clear search & filters
                   </Button>
                 }
               />
             ) : (
-              channelEmpty(channel, openUpload)
+              channelEmpty(channel)
             )
           ) : (
-            <div className={isFetching ? "space-y-1 opacity-60 transition-opacity" : "space-y-1 transition-opacity"}>
+            <div
+              className={cn(
+                "space-y-1 transition-opacity",
+                isFetching && "opacity-60",
+              )}
+            >
               {data.items.map((meeting) => (
                 <MeetingRow key={meeting.id} meeting={meeting} />
               ))}
@@ -204,49 +241,8 @@ export default function MeetingsPage() {
         )}
       </div>
 
-      {/* right — AskFred rail (presentational; the full chat lands in Phase 4) */}
-      <aside className="hidden w-80 shrink-0 flex-col border-l border-border lg:flex">
-        <div className="flex items-center gap-2 border-b border-border px-4 py-3">
-          <SparklesIcon className="size-4 text-primary-soft" />
-          <span className="text-sm font-medium text-foreground">AskFred</span>
-        </div>
-        <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
-          <p className="font-display text-lg font-semibold text-foreground">Hi VISHESH!</p>
-          <p className="text-sm text-muted-foreground">Get ready for your meeting</p>
-          <div className="flex flex-wrap justify-center gap-2">
-            <button
-              type="button"
-              onClick={() => router.push("/tasks")}
-              className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-ring/40"
-            >
-              <CheckIcon className="size-3 text-success" /> My action items
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push("/askfred")}
-              className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-ring/40"
-            >
-              <StarIcon className="size-3 text-primary-soft" /> Key decisions
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push("/askfred")}
-              className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-ring/40"
-            >
-              <SparklesIcon className="size-3 text-primary-soft" /> Key initiatives
-            </button>
-          </div>
-        </div>
-        <div className="p-3">
-          <button
-            type="button"
-            onClick={() => router.push("/askfred")}
-            className="w-full rounded-lg border border-border bg-elevated/60 px-3 py-2.5 text-left text-xs text-subtle transition-colors hover:border-ring/40"
-          >
-            Ask anything. Type / to run AI skills.
-          </button>
-        </div>
-      </aside>
+      {/* right — docked AskFred rail (live chat lands in Phase 4) */}
+      <AskFredRail />
     </div>
   );
 }

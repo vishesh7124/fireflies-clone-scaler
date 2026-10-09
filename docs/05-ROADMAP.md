@@ -54,6 +54,7 @@
 - [x] Turbopack fix: fixtures live in `shared/fixtures/` (single source of truth), synced into `src/mock/fixtures/` by `scripts/sync-fixtures.mjs` before dev/build/start/smoke
 - [x] `/meetings/[id]` placeholder page (Notepad lands in Phase 3)
 - **Checkpoint:** ✅ build green (14 routes incl. `/login` + `/meetings/[id]`), smoke green, login HTML verified against the real screen.
+- **Fidelity round (Oct 9, original-vs-clone screenshots for home/upload/meetings):** stripped invented elements and matched the real screens — Home = time-of-day greeting ("Good Morning, VISHESH 🌤️") + Feedback link, "Personal Assistant" row, Daily Brief / Meeting Prep / Tasks cards, compact rows + "All caught up!" badge, docked AskFred rail (Quick Start tiles, stats strip, hero card, topbar avatar all removed); Meetings = icon-strip sidebar + channels rail with "# My Meetings" purple pill, plain-text tabs + Filters pill + magnifier toggle-search (sort folded into Filters), rows = muted video thumb + title + up-arrow + one meta line (date · duration · host) + "..." + "Details >" (no tag pills / participant stacks); Uploads = real page (not a modal): "Uploads are moving" banner, big drop zone (MP3/M4A/WAV/MP4/WEBM + limits + Browse Files), right "Uploading N Files" panel (language, queued rows, Upload), "You have no recent uploads!" empty state, paste-transcript dialog; help bubble hidden on Meetings (rail owns that corner).
 
 ## Phase 3 — Notepad UI ★ (5h)
 

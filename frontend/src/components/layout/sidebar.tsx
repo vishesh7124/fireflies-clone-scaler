@@ -60,7 +60,50 @@ function NavLink({ href, label, icon: Icon }: { href: string; label: string; ico
   );
 }
 
-export function Sidebar() {
+/**
+ * Collapsed icon strip — the real app shows this thin rail on the Meetings
+ * page (icon-only nav: home, bot, video, list, sparkles, chart, voice, crown).
+ */
+function RailIcon({ href, label, icon: Icon }: { href: string; label: string; icon: LucideIcon }) {
+  const pathname = usePathname();
+  const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
+  return (
+    <Link
+      href={href}
+      title={label}
+      aria-label={label}
+      className={cn(
+        "flex size-9 items-center justify-center rounded-lg transition-colors",
+        active ? "bg-elevated text-primary" : "text-muted-foreground hover:bg-elevated/60 hover:text-foreground",
+      )}
+    >
+      <Icon className="size-4.5" />
+    </Link>
+  );
+}
+
+export function Sidebar({ variant = "full" }: { variant?: "full" | "rail" }) {
+  const pathname = usePathname();
+
+  if (variant === "rail") {
+    return (
+      <aside className="flex h-full w-14 shrink-0 flex-col items-center gap-1 border-r border-sidebar-border bg-sidebar py-3">
+        {MAIN_NAV.map((item) => (
+          <RailIcon key={item.label} {...item} />
+        ))}
+        <button
+          type="button"
+          title="Upgrade"
+          aria-label="Upgrade"
+          onClick={() => toast.info("Upgrade — coming soon")}
+          className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-elevated/60 hover:text-foreground"
+        >
+          <CrownIcon className="size-4.5" />
+        </button>
+      </aside>
+    );
+  }
+
   return (
     <aside className="flex h-full w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
       {/* workspace switcher — initials avatar (the original shows a user photo) */}

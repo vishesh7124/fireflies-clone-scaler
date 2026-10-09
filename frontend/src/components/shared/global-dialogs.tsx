@@ -1,19 +1,13 @@
 "use client";
 
 import { useUiStore } from "@/store/ui-store";
-import { UploadDialog } from "@/components/meetings/upload-dialog";
 import { ScheduleDialog } from "@/components/meetings/schedule-dialog";
 
 /**
- * Globally-mounted create dialogs — opened from the Capture menu (topbar),
- * Quick Start tiles (home) and list empty states via the ui store.
+ * Globally-mounted create dialogs — opened from the Capture menu (topbar)
+ * via the ui store. Uploads live on their own page (/uploads).
  */
 export function GlobalDialogs() {
-  const { uploadOpen, scheduleOpen } = useUiStore();
-  return (
-    <>
-      {uploadOpen && <UploadDialog />}
-      {scheduleOpen && <ScheduleDialog />}
-    </>
-  );
+  const { scheduleOpen } = useUiStore();
+  return <>{scheduleOpen && <ScheduleDialog />}</>;
 }

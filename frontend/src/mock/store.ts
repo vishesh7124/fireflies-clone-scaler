@@ -113,7 +113,9 @@ export function createMeetingRecord(input: {
     updated_at: new Date().toISOString(),
   });
 
-  const participants = input.participants.map((p, i) => ({
+  // uploaded/scheduled meetings with no named participants default to the user
+  const named = input.participants.length > 0 ? input.participants : [{ name: db.user.name }];
+  const participants = named.map((p, i) => ({
     id: ++db.seq.participants,
     meeting_id: meetingId,
     name: p.name,

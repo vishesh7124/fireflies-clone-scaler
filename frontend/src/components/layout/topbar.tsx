@@ -1,21 +1,9 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { BellIcon, LogOutIcon, SearchIcon, SettingsIcon, UserIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { BellIcon, SearchIcon } from "lucide-react";
 import { toast } from "sonner";
-import { api } from "@/lib/api";
-import { qk } from "@/lib/query-keys";
-import { signOut } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { CaptureMenu } from "./capture-menu";
 
 /** View label per route (left edge of the real app's top bar). */
@@ -29,19 +17,12 @@ const VIEW_LABELS: Record<string, string> = {
   "/voice-agents": "Voice Agents",
   "/settings": "Settings",
   "/integrations": "Integrations",
+  "/uploads": "Uploads",
 };
 
 export function Topbar() {
   const pathname = usePathname();
-  const router = useRouter();
   const viewLabel = VIEW_LABELS[pathname] ?? "Fireflies";
-  const { data: me } = useQuery({ queryKey: qk.me, queryFn: () => api.getMe() });
-  const initial = (me?.name ?? "V")
-    .split(/\s+/)
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
 
   return (
     <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border bg-background px-4">
@@ -90,43 +71,6 @@ export function Topbar() {
         </Button>
 
         <CaptureMenu />
-
-        {/* profile placeholder (assignment: "profile/settings placeholders") */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              aria-label="Profile"
-              className="flex size-8 shrink-0 items-center justify-center rounded-full bg-elevated text-xs font-bold text-foreground transition-colors hover:bg-accent"
-            >
-              {initial}
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>
-              <p className="text-sm font-medium text-foreground">{me?.name ?? "Vishesh Gupta"}</p>
-              <p className="text-xs font-normal text-subtle">{me?.email ?? ""}</p>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push("/settings")}>
-              <UserIcon /> Profile
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push("/settings")}>
-              <SettingsIcon /> Settings
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              variant="destructive"
-              onClick={() => {
-                signOut();
-                toast.info("Signed out");
-                router.replace("/login");
-              }}
-            >
-              <LogOutIcon /> Sign out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
     </header>
   );

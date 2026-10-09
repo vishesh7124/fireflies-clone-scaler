@@ -1,10 +1,17 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { CircleHelpIcon } from "lucide-react";
 import { toast } from "sonner";
 
-/** Lavender-filled help bubble pinned bottom-right (like the real app). */
+/**
+ * Lavender-filled help bubble pinned bottom-right (like the real app) —
+ * hidden on the Meetings page, where the docked AskFred rail owns that corner.
+ */
 export function HelpButton() {
+  const pathname = usePathname();
+  if (pathname?.startsWith("/meetings")) return null;
+
   return (
     <button
       type="button"

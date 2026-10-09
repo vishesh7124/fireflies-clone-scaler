@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import {
   CalendarPlusIcon,
   ChevronDownIcon,
@@ -19,12 +20,12 @@ import { useUiStore } from "@/store/ui-store";
 
 /**
  * "Capture" primary dropdown — items replicate the real app's menu.
- * Schedule / Upload open the real create dialogs; the bot-dependent items
- * stay "Coming Soon" placeholders (assignment: mocked sections).
+ * Schedule opens the real dialog; Upload routes to the Uploads page; the
+ * bot-dependent items stay "Coming Soon" placeholders (mocked sections).
  */
 export function CaptureMenu() {
+  const router = useRouter();
   const openSchedule = useUiStore((s) => s.openSchedule);
-  const openUpload = useUiStore((s) => s.openUpload);
 
   return (
     <DropdownMenu>
@@ -42,7 +43,7 @@ export function CaptureMenu() {
         <DropdownMenuItem onClick={openSchedule}>
           <CalendarPlusIcon /> Schedule new meeting
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={openUpload}>
+        <DropdownMenuItem onClick={() => router.push("/uploads")}>
           <UploadIcon /> Upload audio or video
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => toast.info("Start recording — coming soon")}>
