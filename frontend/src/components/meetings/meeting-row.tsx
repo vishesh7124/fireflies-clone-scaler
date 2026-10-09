@@ -21,8 +21,9 @@ function StatusBadge({ status }: { status: MeetingListItem["status"] }) {
 /**
  * One meeting row — replicates the real app's rows: muted thumbnail, title
  * (with the small up-arrow), ONE meta line ("Oct 9 · 10:57 AM · 43 min · Host"),
- * "..." overflow + "Details >" on the right. `compact` (Home) shows the meta
- * date only. No tag pills, no participant stacks — like the original.
+ * and always-visible "..." overflow + "Details >" on the right. The row gets
+ * a subtle rounded border on hover (like the original's card affordance).
+ * `compact` (Home) shows the meta date only.
  */
 export function MeetingRow({
   meeting,
@@ -46,7 +47,7 @@ export function MeetingRow({
   return (
     <div
       className={cn(
-        "group flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-surface",
+        "group flex items-center gap-3 rounded-lg border border-transparent p-3 transition-colors hover:border-border hover:bg-surface",
         className,
       )}
     >
@@ -72,7 +73,7 @@ export function MeetingRow({
           <button
             type="button"
             onClick={() => router.push(`/meetings/${meeting.id}`)}
-            className="hidden items-center gap-0.5 rounded-md px-2 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-elevated/60 hover:text-foreground sm:flex"
+            className="flex items-center gap-0.5 rounded-md px-2 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-elevated/60 hover:text-foreground"
           >
             Details
             <ChevronRightIcon className="size-3" />

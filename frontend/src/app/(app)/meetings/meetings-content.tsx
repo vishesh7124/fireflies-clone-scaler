@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { qk } from "@/lib/query-keys";
 import { useDebounced } from "@/hooks/use-debounced";
-import type { MeetingListParams } from "@/lib/types";
+import type { MeetingListItem, MeetingListParams } from "@/lib/types";
 import { cn } from "cn";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,33 @@ const CHANNEL_PARAMS: Record<Exclude<ChannelId, "uploads">, Partial<MeetingListP
 };
 
 const TABS = ["Hosted by me", "Shared with me"];
+
+/** Group meetings by date label (Today / Yesterday / date), preserving order. */
+function groupByDate(meetings: MeetingListItem[]): [string, MeetingListItem[]][] {
+  const groups: [string, MeetingListItem[]][] = [];
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const fmtDate = (d: Date) => d.toISOString().slice(0, 10);
+
+  for (const meeting of meetings) {
+    const d = new Date(meeting.meeting_date);
+    const label =
+      fmtDate(d) === fmtDate(today)
+        ? "Today"
+        : fmtDate(d) === fmtDate(yesterday)
+          ? "Yesterday"
+          : d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+    const last = groups[groups.length - 1];
+    if (last && last[0] === label) {
+      last[1].push(meeting);
+    } else {
+      groups.push([label, [meeting]]);
+    }
+  }
+  return groups;
+}
 
 /** Channel-specific empty states (copy mirrors the real app's tone). */
 function channelEmpty(channel: ChannelId) {
@@ -199,13 +226,32 @@ export default function MeetingsPage() {
           ) : (
             <div
               className={cn(
-                "space-y-1 transition-opacity",
+                "space-y-4 transition-opacity",
                 isFetching && "opacity-60",
               )}
             >
-              {data.items.map((meeting) => (
-                <MeetingRow key={meeting.id} meeting={meeting} />
+              {groupByDate(data.items).map(([label, meetings]) => (
+                <section key={label} className="space-y-1">
+                  <div className="flex items-center justify-between px-3 py-1.5">
+                    <h3 className="text-xs font-semibold uppercase tracking-wide text-subtle">
+                      {label}
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => toast.info("Feedback — coming soon")}
+                      className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      💬 Feedback
+                    </button>
+                  </div>
+                  {meetings.map((meeting) => (
+                    <MeetingRow key={meeting.id} meeting={meeting} />
+                  ))}
+                </section>
               ))}
+              <p className="py-6 text-center text-xs text-subtle">
+                You&apos;ve reached the end of your meetings.
+              </p>
             </div>
           )}
         </div>
