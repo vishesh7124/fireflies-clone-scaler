@@ -16,7 +16,7 @@ import { HelpButton } from "./help-button";
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "";
   const isNotepad = /^\/meetings\/\d+/.test(pathname);
-  const railMode = pathname.startsWith("/meetings") && !isNotepad;
+  const railMode = (pathname.startsWith("/meetings") && !isNotepad) || pathname.startsWith("/askfred");
 
   if (isNotepad) {
     return (

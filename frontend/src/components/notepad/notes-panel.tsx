@@ -17,6 +17,7 @@ import {
   PlayIcon,
   PlusIcon,
   RefreshCwIcon,
+  SmileIcon,
   SparklesIcon,
   StarIcon,
   VolumeIcon,
@@ -262,35 +263,35 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
                   )}
 
                   {/* video controls overlay (bottom of video) */}
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-3 pb-2 pt-8">
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent px-3 pb-2 pt-10">
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
                         aria-label={isPlaying ? "Pause" : "Play"}
                         onClick={toggle}
-                        className="flex size-6 shrink-0 items-center justify-center rounded-full bg-white/20 text-white transition-colors hover:bg-white/30"
+                        className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white/25 text-white transition-colors hover:bg-white/35"
                       >
                         {isPlaying ? (
-                          <PauseIcon className="size-3" />
+                          <PauseIcon className="size-3.5" />
                         ) : (
-                          <PlayIcon className="size-3 translate-x-[1px]" />
+                          <PlayIcon className="size-3.5 translate-x-[1px]" />
                         )}
                       </button>
-                      <span className="font-mono text-[11px] tabular-nums text-white">
+                      <span className="font-mono text-xs tabular-nums text-white">
                         {msToClock(currentTimeMs)} / {msToClock(durationMs)}
                       </span>
                       <div className="flex-1" />
                       <button type="button" aria-label="Volume" className="text-white/80 hover:text-white">
-                        <VolumeIcon className="size-3.5" />
+                        <VolumeIcon className="size-4" />
                       </button>
                       <button type="button" aria-label="Captions" className="text-white/80 hover:text-white">
-                        <CaptionsIcon className="size-3.5" />
+                        <CaptionsIcon className="size-4" />
                       </button>
                       <button type="button" aria-label="Fullscreen" className="text-white/80 hover:text-white">
-                        <MaximizeIcon className="size-3.5" />
+                        <MaximizeIcon className="size-4" />
                       </button>
                       <button type="button" aria-label="More" className="text-white/80 hover:text-white">
-                        <MoreVerticalIcon className="size-3.5" />
+                        <MoreVerticalIcon className="size-4" />
                       </button>
                     </div>
                     {/* interactive progress bar */}
@@ -301,20 +302,11 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
             </div>
           )}
 
-          {/* title + Video toggle */}
+          {/* title */}
           <div className="flex items-start justify-between gap-3">
             <h1 className="min-w-0 font-display text-xl font-bold leading-tight text-foreground">
               {meeting.title}
             </h1>
-            <Button
-              variant="outline"
-              size="sm"
-              className="shrink-0 gap-1.5 text-xs"
-              onClick={() => setVideoVisible(!videoVisible)}
-            >
-              {videoVisible ? <CameraOffIcon className="size-3.5" /> : <CameraIcon className="size-3.5" />}
-              Video
-            </Button>
           </div>
 
           {/* author / date / language meta row */}
@@ -387,7 +379,21 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
             >
               <CopyIcon className="size-3.5" />
             </Button>
-            <span className="ml-auto">
+            <span className="ml-auto flex items-center gap-0.5">
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={videoVisible ? "Hide video" : "Show video"}
+                title={videoVisible ? "Hide video" : "Show video"}
+                className="text-muted-foreground"
+                onClick={() => setVideoVisible(!videoVisible)}
+              >
+                {videoVisible ? (
+                  <CameraOffIcon className="size-3.5" />
+                ) : (
+                  <CameraIcon className="size-3.5" />
+                )}
+              </Button>
               <Button
                 variant={editMode ? "secondary" : "ghost"}
                 size="icon-sm"
@@ -439,7 +445,7 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
           {/* "Did you like the summary?" feedback card */}
           <div className="mx-auto flex w-full max-w-md items-center justify-between gap-3 rounded-lg border border-border bg-surface px-4 py-3">
             <span className="flex items-center gap-2 text-sm text-foreground">
-              <span aria-hidden>🙂</span>
+              <SmileIcon className="size-4 text-muted-foreground" />
               Did you like the summary?
             </span>
             <span className="flex items-center gap-1">
@@ -475,9 +481,14 @@ export function NotesPanel({ meeting }: { meeting: Meeting }) {
                     key={t.id}
                     type="button"
                     onClick={() => toast.info("AI Skills — coming soon")}
-                    className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-ring/40"
+                    className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-xs font-medium text-foreground transition-colors hover:border-ring/40"
                   >
-                    <PlusIcon className="size-3" style={{ color: chipColors[i % 3] }} />
+                    <span
+                      className="flex size-5 shrink-0 items-center justify-center rounded text-white"
+                      style={{ backgroundColor: chipColors[i % 3] }}
+                    >
+                      <PlusIcon className="size-3" />
+                    </span>
                     {t.text}
                   </button>
                 );

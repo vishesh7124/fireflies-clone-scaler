@@ -80,8 +80,9 @@ export function TransportBar({ meeting }: { meeting: Meeting }) {
           </span>
         )}
         {msToClock(currentTimeMs)} / {msToClock(durationMs)}
+        <ChevronDownIcon className="size-3 text-subtle" />
       </span>
-      <div className="w-28 shrink-0 sm:w-48 lg:w-72">
+      <div className="hidden w-28 shrink-0 sm:block sm:w-40 lg:w-56">
         <SeekBar currentTimeMs={currentTimeMs} durationMs={durationMs} />
       </div>
       <DropdownMenu>
