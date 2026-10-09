@@ -1,28 +1,47 @@
-"""FastAPI application entrypoint.
+"""FastAPI application entrypoint (docs/03-LLD §2)."""
 
-Phase 0: liveness endpoint only. Routers, database, seeding and engines land in
-Phases 5-6 (see docs/05-ROADMAP.md).
-"""
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.config import settings
+from app.database import init_db
+from app.routers import action_items, meetings, meta, summaries
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Create tables + seed demo data on startup (Phase 5)."""
+    init_db()
+    if settings.seed_on_start:
+        try:
+            from app.seed.seed import seed_all
+            from app.database import SessionLocal
+            with SessionLocal() as db:
+                seed_all(db)
+        except Exception as exc:  # don't block boot on seed errors
+            print(f"[seed] skipped: {exc}")
+    yield
+
+
 app = FastAPI(
     title="Fireflies Clone API",
-    version="0.1.0",
+    version="0.5.0",
     description="Meeting notes & transcription platform — REST API",
+    lifespan=lifespan,
 )
 
-# TODO(phase-5): move allowed origins to settings (CORS_ORIGINS env var).
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=settings.cors_origin_list,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-@app.get("/api/v1/health")
-def health() -> dict:
-    """Liveness + seed status. Full wiring (db counts, llm_enabled) lands in Phase 5."""
-    return {"ok": True, "db": "pending", "meetings": 0, "seed": "pending", "llm_enabled": False}
+# mount all routers under /api/v1
+app.include_router(meta.router, prefix="/api/v1")
+app.include_router(meetings.router, prefix="/api/v1")
+app.include_router(summaries.router, prefix="/api/v1")
+app.include_router(action_items.router, prefix="/api/v1")

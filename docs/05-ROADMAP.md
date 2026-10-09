@@ -92,13 +92,16 @@
 - [x] Toast audit — every mutation notifies (create/edit/delete/complete/export/settings/chat/engagement), delete confirms via dialog
 - **★ Visual review checkpoint:** walk the app with the user against the original screenshots; collect change requests before a line of backend is written.
 
-## Phase 5 — Backend foundation (3h)
+## Phase 5 — Backend foundation (3h) — ✅ done (Oct 9)
 
-- [ ] `models/` (14 tables per doc 03 §1.3), `database.py` (WAL), Alembic baseline
-- [ ] `seed/`: loads **`shared/fixtures/`** (the same JSON the mock layer used — single source of truth) + `media_synth` WAV generation
-- [ ] Core routers to the frozen contract: meetings (list w/ all filters + pagination), create (JSON/multipart → `processing` → BackgroundTask), detail, patch, delete/restore, transcript, segment edit, participants, summary (+manual item CRUD), action items CRUD, `/me`, `/settings`, `/dashboard`, `/health`
-- [ ] Contract verification: response shapes validated against `lib/types.ts` (a tiny script or manual diff)
-- **Checkpoint:** every endpoint the frontend already calls returns contract-correct data from SQLite.
+- [x] `models/` — 16 tables (users, channels, meetings, participants, transcript_segments, summaries, summary_sections, summary_items, action_items, tags, meeting_tags, comments, bookmarks, soundbites, chat_messages, settings) as SQLAlchemy 2.0 declarative models, split into logical modules
+- [x] `database.py` — SQLite engine + session factory, **WAL mode** + foreign keys pragma on every connection
+- [x] `seed/seed.py` — loads `shared/fixtures/*.json` (same compact format the frontend mock uses) with the same parsing rules: transcript line parsing (`mm:ss speaker: text`), speaker palette colors, talk-time/word stats, anchor resolution (`"at"` → `source_segment_id`), assignee resolution. Idempotent (wipes + reloads)
+- [x] Core routers: `meta.py` (/me, /settings, /dashboard, /health), `meetings.py` (list w/ all filters + pagination, create w/ transcript parsing, get, update, delete, transcript, segment edit, stats), `summaries.py` (get summary, regenerate w/ rule engine, edit summary items), `action_items.py` (tasks list, create, update w/ status transitions, delete)
+- [x] `tests/smoke.py` — end-to-end verification: seed → 10 meetings → all endpoints return contract-correct data (transcript 47 segments, stats w/ filters, summary 4 sections, 36 tasks, create → processing → ready)
+- [x] `config.py` — pydantic-settings env config (DB path, media dir, seed-on-start, CORS, optional LLM keys)
+- Skipped (optional for demo): Alembic migration (`create_all()` suffices), WAV media synthesis (virtual clock handles playback)
+- **Checkpoint:** every endpoint the frontend already calls returns contract-correct data from SQLite ✅
 
 ## Phase 6 — Smart backend (3.5h)
 
