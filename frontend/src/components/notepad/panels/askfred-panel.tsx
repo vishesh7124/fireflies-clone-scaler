@@ -20,7 +20,8 @@ const SUGGESTIONS = [
 /**
  * AskFred panel (meeting-scoped) — "ChatGPT for this meeting": suggested
  * prompts, a threaded chat, and citations that seek the player to the exact
- * moment (docs/03 §5.4).
+ * moment (docs/03 §5.4). Rendered as the AskFred tab of the right column
+ * (notepad4.png).
  */
 export function AskFredPanel({ meeting }: { meeting: Meeting }) {
   const queryClient = useQueryClient();
@@ -47,7 +48,7 @@ export function AskFredPanel({ meeting }: { meeting: Meeting }) {
   };
 
   return (
-    <div className="flex h-full w-80 shrink-0 flex-col border-r border-border">
+    <div className="flex h-full min-h-0 flex-1 flex-col">
       <div className="flex items-center gap-2 border-b border-border px-4 py-3">
         <BotIcon className="size-4 text-primary-soft" />
         <span className="text-sm font-medium text-foreground">AskFred</span>
@@ -56,16 +57,17 @@ export function AskFredPanel({ meeting }: { meeting: Meeting }) {
 
       <div className="flex-1 space-y-4 overflow-y-auto p-3">
         {(messages ?? []).length === 0 && (
-          <div className="flex flex-col items-center gap-3 py-8 text-center">
+          <div className="flex flex-col items-center gap-3 py-6 text-center">
             <p className="font-display text-base font-semibold text-foreground">
-              Ask anything about this meeting
+              Hi VISHESH!
             </p>
+            <p className="text-sm text-muted-foreground">Ask anything about this meeting</p>
             {SUGGESTIONS.map((s) => (
               <button
                 key={s}
                 type="button"
                 onClick={() => send(s)}
-                className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-left text-xs font-medium text-foreground transition-colors hover:border-ring/40"
+                className="w-full rounded-full border border-border bg-surface px-3 py-2 text-center text-xs font-medium text-foreground transition-colors hover:border-ring/40"
               >
                 {s}
               </button>

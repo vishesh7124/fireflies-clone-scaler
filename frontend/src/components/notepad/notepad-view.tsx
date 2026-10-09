@@ -12,42 +12,38 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ParticipantStack } from "@/components/shared/participant-stack";
 import { NotepadHeader } from "./notepad-header";
 import { IconRail } from "./icon-rail";
-import { SplitLayout } from "./split-layout";
-import { SummaryPanel } from "./summary-panel";
+import { NotesPanel } from "./notes-panel";
 import { TranscriptPanel } from "./transcript-panel";
+import { TransportBar } from "./transport-bar";
 import { PlayerEngine } from "./player-engine";
 import { SmartSearchPanel } from "./panels/smart-search-panel";
-import { IndexPanel } from "./panels/index-panel";
 import { SoundbitesPanel } from "./panels/soundbites-panel";
 import { CommentsPanel } from "./panels/comments-panel";
 import { BookmarksPanel } from "./panels/bookmarks-panel";
-import { AskFredPanel } from "./panels/askfred-panel";
 
 /** Loading skeleton shaped like the Notepad. */
 function NotepadSkeleton() {
   return (
     <div className="flex h-full flex-col">
-      <div className="space-y-2 border-b border-border px-4 py-3">
-        <Skeleton className="h-5 w-2/3" />
-        <Skeleton className="h-3 w-1/3" />
+      <div className="flex h-12 items-center gap-3 border-b border-border px-3">
+        <Skeleton className="h-5 w-64" />
       </div>
       <div className="flex min-h-0 flex-1">
-        <div className="flex-1 space-y-3 p-4">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-16 w-full" />
-          <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-24 w-full" />
+        <div className="w-72 space-y-3 border-r border-border p-3">
+          <Skeleton className="h-8 w-full" />
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-6 w-full" />
+          ))}
         </div>
-        <div className="flex flex-1 flex-col">
-          <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-            <Skeleton className="size-9 rounded-full" />
-            <Skeleton className="h-1.5 flex-1" />
-          </div>
-          <div className="space-y-3 p-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-10 w-full" />
-            ))}
-          </div>
+        <div className="flex-1 space-y-4 p-5">
+          <Skeleton className="aspect-video w-full rounded-lg" />
+          <Skeleton className="h-6 w-2/3" />
+          <Skeleton className="h-16 w-full" />
+        </div>
+        <div className="w-80 space-y-3 border-l border-border p-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-14 w-full" />
+          ))}
         </div>
       </div>
     </div>
@@ -94,17 +90,18 @@ function ScheduledView({ meetingId }: { meetingId: number }) {
 }
 
 /**
- * NotepadView — the core screen (docs/01 §5.4): two-panel layout (summary left,
- * transcript right), collapsible icon rail, side panels, and the headless
- * player engine that drives transcript sync.
+ * NotepadView — the core screen, rebuilt to the original's 4-zone layout
+ * (notepad1-4.png): breadcrumb header bar, icon rail + Smart Search side
+ * panel, the center Notes column (video + summary + action items), the
+ * right Transcript/AskFred column, and the bottom transport bar.
  */
 export function NotepadView({ meetingId }: { meetingId: number }) {
   const activePanel = useNotepadStore((s) => s.activePanel);
+  const transcriptHidden = useNotepadStore((s) => s.transcriptHidden);
 
   const { data: meeting, isPending } = useQuery({
     queryKey: qk.meeting(meetingId),
     queryFn: () => api.getMeeting(meetingId),
-    // poll while the mock BackgroundTask processes a fresh upload
     refetchInterval: (query) =>
       query.state.data?.status === "processing" ? 1200 : false,
   });
@@ -141,17 +138,19 @@ export function NotepadView({ meetingId }: { meetingId: number }) {
         {activePanel === "smart-search" && (
           <SmartSearchPanel meeting={meeting} transcript={transcript} />
         )}
-        {activePanel === "index" && <IndexPanel meetingId={meeting.id} />}
         {activePanel === "soundbites" && <SoundbitesPanel meetingId={meeting.id} />}
-        {activePanel === "comments" && <CommentsPanel meetingId={meeting.id} transcript={transcript} />}
-        {activePanel === "bookmarks" && <BookmarksPanel meetingId={meeting.id} transcript={transcript} />}
-        {activePanel === "askfred" && <AskFredPanel meeting={meeting} />}
+        {activePanel === "comments" && (
+          <CommentsPanel meetingId={meeting.id} transcript={transcript} />
+        )}
+        {activePanel === "bookmarks" && (
+          <BookmarksPanel meetingId={meeting.id} transcript={transcript} />
+        )}
 
-        <SplitLayout
-          summary={<SummaryPanel meeting={meeting} />}
-          transcript={<TranscriptPanel meeting={meeting} transcript={transcript} />}
-        />
+        <NotesPanel meeting={meeting} />
+        {!transcriptHidden && <TranscriptPanel meeting={meeting} transcript={transcript} />}
       </div>
+
+      <TransportBar meeting={meeting} />
     </div>
   );
 }

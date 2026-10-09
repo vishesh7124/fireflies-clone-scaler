@@ -394,12 +394,20 @@ function loadFixtureMeeting(db: MockDb, fx: FixtureMeeting, ensureTag: (n: strin
       });
     };
 
-    addSection("overview", "Overview", [{ text: summary.overview, timestamp_ms: null, end_timestamp_ms: null, source_segment_id: segments[0]?.id ?? null }]);
+    addSection("overview", "Overview", [{ text: summary.overview, timestamp_ms: segments[0]?.start_ms ?? null, end_timestamp_ms: null, source_segment_id: segments[0]?.id ?? null }]);
 
     addSection(
       "notes",
       summary.template === "one_on_one" ? "Wins & notes" : "Notes",
-      summary.notes.map((text) => ({ text, timestamp_ms: null, end_timestamp_ms: null, source_segment_id: null })),
+      summary.notes.map((text) => {
+        const seg = resolveNoteAnchor(text, segments);
+        return {
+          text,
+          timestamp_ms: seg?.start_ms ?? null,
+          end_timestamp_ms: null,
+          source_segment_id: seg?.id ?? null,
+        };
+      }),
     );
 
     addSection(
@@ -504,4 +512,33 @@ export function recomputeParticipantStats(db: MockDb, meetingId: number) {
     p.talk_time_ms = own.reduce((acc, s) => acc + (s.end_ms - s.start_ms), 0);
     p.word_count = own.reduce((acc, s) => acc + s.text.split(/\s+/).filter(Boolean).length, 0);
   }
+}
+
+/**
+ * Resolve a hand-written note bullet to the transcript moment it summarizes:
+ * the first segment sharing ≥2 distinct content words gets to anchor it.
+ * (Gives the real Notepad's "(MM:SS)" bullet timestamps; deterministic.)
+ */
+function resolveNoteAnchor(note: string, segments: DbSegment[]): DbSegment | null {
+  const STOP = new Set(
+    "a an the and or but of to for with on in at by from is are was were be been this that these those we you they it our your their will would can could should shall do does did have has had not no yes so if then about into over under more most some such only own same too very just".split(" "),
+  );
+  const words = [
+    ...new Set(
+      note
+        .toLowerCase()
+        .replace(/[^a-z0-9 ]+/g, " ")
+        .split(/\s+/)
+        .filter((w) => w.length > 3 && !STOP.has(w)),
+    ),
+  ].slice(0, 6);
+  if (words.length === 0) return null;
+
+  let best: { seg: DbSegment; score: number } | null = null;
+  for (const seg of segments) {
+    const tl = seg.text.toLowerCase();
+    const score = words.reduce((acc, w) => acc + (tl.includes(w) ? 1 : 0), 0);
+    if (score >= 2 && (!best || score > best.score)) best = { seg, score };
+  }
+  return best?.seg ?? null;
 }

@@ -7,13 +7,24 @@ import { TrialBanner } from "./trial-banner";
 import { HelpButton } from "./help-button";
 
 /**
- * Global app chrome — trial strip, sidebar, topbar. On the Meetings page the
- * real app collapses the sidebar to a thin icon strip (channels rail takes
- * over), so the variant is route-driven. Layout replicates the real shell.
+ * Global app chrome. Route-driven:
+ * - `/meetings/:id` (the Notepad) → full-screen: the page owns all chrome
+ *   (breadcrumb header, icon rail, transport bar — like the real product)
+ * - `/meetings` → the sidebar collapses to an icon strip (channels rail takes over)
+ * - everything else → the full sidebar + topbar shell
  */
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const railMode = pathname?.startsWith("/meetings") ?? false;
+  const pathname = usePathname() ?? "";
+  const isNotepad = /^\/meetings\/\d+/.test(pathname);
+  const railMode = pathname.startsWith("/meetings") && !isNotepad;
+
+  if (isNotepad) {
+    return (
+      <div className="flex h-dvh flex-col overflow-hidden bg-background text-foreground">
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-background text-foreground">

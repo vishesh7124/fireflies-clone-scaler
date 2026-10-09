@@ -1,16 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import { ChevronUpIcon } from "lucide-react";
 import type { TranscriptSegment } from "@/lib/types";
 import { usePlayerStore } from "@/store/player-store";
 import { useNotepadStore } from "@/store/notepad-store";
 import { findActiveSegment } from "@/hooks/use-transcript-sync";
 import { classifySegment } from "@/mock/engine";
-import { TranscriptLine } from "./transcript-line";
-import { Button } from "@/components/ui/button";
+import { TranscriptTurn } from "./transcript-line";
 
 /**
- * Headless tracker — derives the active segment from the playhead (binary
+ * Headless tracker — derives the active turn from the playhead (binary
  * search) and publishes it to the player store. Only this tiny component
  * re-renders at playback rate.
  */
@@ -34,27 +34,31 @@ function ActiveSegmentTracker({ segments }: { segments: TranscriptSegment[] }) {
   return null;
 }
 
-/** Does a segment satisfy the active smart-search filter? (docs/03 §5.2) */
-function matchesSmartFilter(segment: TranscriptSegment, filter: string): boolean {
+/** Does a turn satisfy the active smart-search filter? */
+function matchesFilter(segment: TranscriptSegment, filter: string): boolean {
   const c = classifySegment(segment.text);
-  if (filter === "sentiment") return Math.abs(c.sentimentScore) > 0.15;
-  return Boolean(c[filter as keyof typeof c]);
+  switch (filter) {
+    case "questions":
+      return c.question;
+    case "tasks":
+      return c.task;
+    case "dates":
+      return c.date;
+    case "metrics":
+      return c.metric;
+    case "sentiment-positive":
+      return c.sentimentScore > 0.15;
+    case "sentiment-negative":
+      return c.sentimentScore < -0.15;
+    default:
+      return false;
+  }
 }
 
-const FILTER_LABELS: Record<string, string> = {
-  questions: "Questions",
-  tasks: "Tasks",
-  dates: "Dates",
-  metrics: "Metrics",
-  pricing: "Pricing",
-  sentiment: "Sentiment",
-  fillers: "Fillers",
-};
-
 /**
- * TranscriptView — the scrolling transcript with the two-way sync: playhead →
- * active line highlight + auto-scroll (docs/03 §5.1), smart-search filtering,
- * and the memoized lines.
+ * TranscriptView — the scrolling transcript: playhead → active turn
+ * highlight + auto-scroll (docs/03 §5.1), smart-search filtering, and the
+ * floating "Sync with audio" button from the original.
  */
 export function TranscriptView({
   meetingId,
@@ -72,7 +76,7 @@ export function TranscriptView({
   const setSmartFilter = useNotepadStore((s) => s.setSmartFilter);
   const seekTo = usePlayerStore((s) => s.seekTo);
 
-  // auto-scroll the active line into view while playing / after seeks
+  // auto-scroll the active turn into view while playing / after seeks
   useEffect(() => {
     if (activeSegmentId == null) return;
     document
@@ -80,52 +84,67 @@ export function TranscriptView({
       ?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }, [activeSegmentId]);
 
-  // applying a smart filter jumps to the first match (like the real product)
+  // applying a smart filter jumps to the first match
   const prevFilter = useRef<string | null>(null);
   useEffect(() => {
     if (smartFilter && smartFilter !== prevFilter.current) {
-      const first = segments.find((s) => matchesSmartFilter(s, smartFilter));
+      const first = segments.find((s) => matchesFilter(s, smartFilter));
       if (first) seekTo(first.start_ms);
     }
     prevFilter.current = smartFilter;
   }, [smartFilter, segments, seekTo]);
 
-  const visible = smartFilter
-    ? segments.filter((s) => matchesSmartFilter(s, smartFilter))
-    : segments;
+  const visible = smartFilter ? segments.filter((s) => matchesFilter(s, smartFilter)) : segments;
 
   return (
-    <div className="flex-1 overflow-y-auto px-2 py-2">
+    <div className="relative flex-1 overflow-y-auto">
       <ActiveSegmentTracker segments={segments} />
 
       {smartFilter && (
-        <div className="mb-2 flex items-center gap-2 rounded-lg border border-primary/25 bg-primary/10 px-3 py-1.5 text-xs">
+        <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-primary/25 bg-primary/10 px-4 py-1.5 text-xs backdrop-blur">
           <span className="text-primary-soft">
-            {FILTER_LABELS[smartFilter] ?? smartFilter} · showing {visible.length} of {segments.length}
+            {smartFilter.replace("-", " ")} · showing {visible.length} of {segments.length}
           </span>
-          <Button variant="ghost" size="xs" className="ml-auto text-xs" onClick={() => setSmartFilter(null)}>
+          <button
+            type="button"
+            onClick={() => setSmartFilter(null)}
+            className="ml-auto text-xs font-medium text-primary-soft hover:underline"
+          >
             Clear
-          </Button>
+          </button>
         </div>
       )}
 
-      <div className="space-y-0.5">
-        {visible.map((segment) => (
-          <TranscriptLine
-            key={segment.id}
-            segment={segment}
-            meetingId={meetingId}
-            editMode={editMode}
-            findQuery={findQuery}
-            smartFilter={smartFilter}
-          />
-        ))}
-        {visible.length === 0 && (
-          <p className="px-3 py-8 text-center text-sm text-muted-foreground">
-            No lines match this filter.
-          </p>
-        )}
-      </div>
+      {visible.map((segment) => (
+        <TranscriptTurn
+          key={segment.id}
+          segment={segment}
+          meetingId={meetingId}
+          editMode={editMode}
+          findQuery={findQuery}
+          dimmed={Boolean(smartFilter)}
+        />
+      ))}
+      {visible.length === 0 && (
+        <p className="px-4 py-8 text-center text-sm text-muted-foreground">
+          No turns match this filter.
+        </p>
+      )}
+
+      {/* "Sync with audio" — scrolls the transcript to the playhead */}
+      <button
+        type="button"
+        onClick={() => {
+          if (activeSegmentId == null) return;
+          document
+            .querySelector(`[data-segment-id="${activeSegmentId}"]`)
+            ?.scrollIntoView({ block: "center", behavior: "smooth" });
+        }}
+        className="sticky bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground shadow-lg transition-colors hover:border-ring/40"
+      >
+        <ChevronUpIcon className="size-3.5 text-primary-soft" />
+        Sync with audio
+      </button>
     </div>
   );
 }

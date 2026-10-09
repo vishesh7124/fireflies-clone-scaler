@@ -1,49 +1,48 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type NotepadPanel =
-  | "smart-search"
-  | "index"
-  | "soundbites"
-  | "comments"
-  | "bookmarks"
-  | "askfred";
+export type NotepadPanel = "smart-search" | "soundbites" | "bookmarks" | "comments";
 
 /**
- * Notepad UI state — which icon-rail panel is open, the active smart-search
- * filter, and the split-pane geometry (persisted so the layout survives
- * refreshes, like the real product).
+ * Notepad UI state — which icon-rail panel is open (Smart Search by default,
+ * like the real product), the active smart-search filter, the shared
+ * find-in-transcript query, and view toggles. Geometry persists.
  */
 interface NotepadState {
   activePanel: NotepadPanel | null;
-  smartFilter: string | null; // "questions" | "tasks" | "dates" | "metrics" | "pricing" | "sentiment" | "fillers"
+  smartFilter: string | null; // "questions" | "tasks" | "dates" | "metrics" | "sentiment-positive" | "sentiment-negative"
+  findQuery: string; // shared by the Smart Search input + Find or Replace bar
+  videoVisible: boolean;
+  transcriptHidden: boolean;
   commentAnchorSegmentId: number | null;
-  leftPct: number; // summary pane width 20–80
-  collapsed: "none" | "summary" | "transcript";
   setActivePanel: (panel: NotepadPanel | null) => void;
   setSmartFilter: (filter: string | null) => void;
+  setFindQuery: (q: string) => void;
+  setVideoVisible: (v: boolean) => void;
+  setTranscriptHidden: (v: boolean) => void;
   setCommentAnchor: (segmentId: number | null) => void;
-  setLeftPct: (pct: number) => void;
-  setCollapsed: (c: NotepadState["collapsed"]) => void;
 }
 
 export const useNotepadStore = create<NotepadState>()(
   persist(
     (set) => ({
-      activePanel: null,
+      activePanel: "smart-search",
       smartFilter: null,
+      findQuery: "",
+      videoVisible: true,
+      transcriptHidden: false,
       commentAnchorSegmentId: null,
-      leftPct: 42,
-      collapsed: "none",
       setActivePanel: (activePanel) => set({ activePanel }),
       setSmartFilter: (smartFilter) => set({ smartFilter }),
+      setFindQuery: (findQuery) => set({ findQuery }),
+      setVideoVisible: (videoVisible) => set({ videoVisible }),
+      setTranscriptHidden: (transcriptHidden) => set({ transcriptHidden }),
       setCommentAnchor: (commentAnchorSegmentId) => set({ commentAnchorSegmentId }),
-      setLeftPct: (leftPct) => set({ leftPct: Math.min(80, Math.max(20, leftPct)) }),
-      setCollapsed: (collapsed) => set({ collapsed }),
     }),
     {
       name: "fireflies-notepad",
-      partialize: (s) => ({ leftPct: s.leftPct, collapsed: s.collapsed }) as NotepadState,
+      partialize: (s) =>
+        ({ videoVisible: s.videoVisible, transcriptHidden: s.transcriptHidden }) as NotepadState,
     },
   ),
 );

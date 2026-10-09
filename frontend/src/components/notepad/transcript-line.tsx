@@ -2,7 +2,7 @@
 
 import { memo, useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { BookmarkIcon, MessageSquareIcon, PencilIcon, AudioLinesIcon } from "lucide-react";
+import { AudioLinesIcon, BookmarkIcon, ChevronDownIcon, MessageSquareIcon } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { qk } from "@/lib/query-keys";
@@ -11,29 +11,29 @@ import type { Transcript, TranscriptSegment } from "@/lib/types";
 import { cn } from "cn";
 import { usePlayerStore } from "@/store/player-store";
 import { useNotepadStore } from "@/store/notepad-store";
-import { classifySegment } from "@/mock/engine";
 import { HighlightedText } from "@/components/shared/highlighted-text";
 
 /**
- * One transcript line — speaker avatar + colored name + mm:ss on the first
- * row, text below (like the real Notepad). Subscribes narrowly to the player
- * so only the active line re-renders during playback.
+ * One transcript turn — replicates the original's blocks: square colored
+ * avatar + speaker name (neutral, with a chevron) + "·" + a purple
+ * underlined timestamp link, body text flush-left below, a hairline divider
+ * between turns, and a thin left-bar accent (not a filled card) when active.
  *
- * Interactions (docs/01 §5.4): click → seek the player; edit mode → inline
- * autosave; hover actions → comment / soundbite / bookmark this moment.
+ * Interactions (docs/01 §5.4): click anywhere → seek; edit mode → inline
+ * autosave; hover actions → comment / soundbite / bookmark the moment.
  */
-function TranscriptLineComponent({
+function TranscriptTurnComponent({
   segment,
   meetingId,
   editMode,
   findQuery,
-  smartFilter,
+  dimmed,
 }: {
   segment: TranscriptSegment;
   meetingId: number;
   editMode: boolean;
   findQuery: string | null;
-  smartFilter: string | null;
+  dimmed: boolean;
 }) {
   const isActive = usePlayerStore((s) => s.activeSegmentId === segment.id);
   const seekTo = usePlayerStore((s) => s.seekTo);
@@ -49,7 +49,6 @@ function TranscriptLineComponent({
   const editMutation = useMutation({
     mutationFn: (text: string) => api.updateSegment(segment.id, text),
     onSuccess: (updated) => {
-      // optimistic: patch the transcript cache without a refetch
       queryClient.setQueryData<Transcript>(qk.transcript(meetingId), (old) =>
         old
           ? { ...old, segments: old.segments.map((s) => (s.id === updated.id ? updated : s)) }
@@ -67,46 +66,49 @@ function TranscriptLineComponent({
     }, 700);
   };
 
-  const smartMatch = smartFilter
-    ? segmentMatchesFilter(segment.text, smartFilter)
-    : false;
+  const initials = segment.speaker_name
+    .split(/\s+/)
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   return (
     <div
       data-segment-id={segment.id}
       className={cn(
-        "group/line rounded-lg border border-transparent px-3 py-2 transition-colors",
-        isActive ? "border-primary/40 bg-primary/10" : "hover:bg-surface/70",
+        "group/turn relative border-b border-border/60 px-4 py-3 transition-colors",
+        isActive && "bg-primary/5",
+        dimmed && "opacity-40",
       )}
     >
+      {/* active accent — a thin left bar, like the original */}
+      {isActive && <span className="absolute inset-y-0 left-0 w-0.5 bg-primary" />}
+
+      {/* header row: avatar + name + · + timestamp + hover actions */}
       <div className="flex items-center gap-2">
-        <span className="flex size-6 shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-background" style={{ backgroundColor: segment.avatar_color }}>
-          {segment.speaker_name
-            .split(/\s+/)
-            .map((w) => w[0])
-            .slice(0, 2)
-            .join("")
-            .toUpperCase()}
-        </span>
         <button
           type="button"
           onClick={() => seekTo(segment.start_ms)}
-          className="flex min-w-0 items-center gap-2 text-left"
+          className="flex min-w-0 items-center gap-2"
         >
-          <span className="truncate text-[13px] font-semibold" style={{ color: segment.avatar_color }}>
-            {segment.speaker_name}
+          <span
+            className="flex size-6 shrink-0 items-center justify-center rounded text-[9px] font-bold text-background"
+            style={{ backgroundColor: segment.avatar_color }}
+          >
+            {initials}
           </span>
-          <span className="shrink-0 font-mono text-[11px] tabular-nums text-subtle hover:text-primary-soft">
+          <span className="truncate text-[13px] font-medium text-foreground">
+            {segment.speaker_name}
+            <ChevronDownIcon className="ml-0.5 inline size-2.5 text-subtle" />
+          </span>
+          <span className="shrink-0 text-[11px] text-subtle">·</span>
+          <span className="shrink-0 font-mono text-[11px] tabular-nums text-primary-soft underline decoration-primary-soft/40 hover:decoration-primary-soft">
             {msToClock(segment.start_ms)}
           </span>
         </button>
 
-        <span className="ml-auto flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover/line:opacity-100">
-          {segment.is_edited && (
-            <span title="Edited" aria-label="Edited">
-              <PencilIcon className="size-3 text-subtle" />
-            </span>
-          )}
+        <span className="ml-auto flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover/turn:opacity-100">
           <button
             type="button"
             aria-label="Comment on this moment"
@@ -163,65 +165,35 @@ function TranscriptLineComponent({
         </span>
       </div>
 
-      <button
-        type="button"
-        onClick={() => seekTo(segment.start_ms)}
-        className="mt-0.5 block w-full text-left"
-      >
-        {editMode ? (
-          <span
-            role="textbox"
-            tabIndex={0}
-            contentEditable
-            suppressContentEditableWarning
-            className={cn(
-              "rounded-md border border-border bg-elevated/50 px-2 py-1 text-sm leading-relaxed text-foreground outline-none focus:border-ring",
-              smartMatch && "ring-1 ring-primary/50",
-            )}
-            onInput={(e) => onEditInput(e.currentTarget.textContent ?? "")}
-            onBlur={(e) => {
-              const text = (e.currentTarget.textContent ?? "").trim();
-              if (text && text !== segment.text) editMutation.mutate(text);
-            }}
-          >
-            {draft}
-          </span>
-        ) : (
-          <p
-            className={cn(
-              "px-1 text-sm leading-relaxed text-muted-foreground",
-              smartFilter && !smartMatch && "opacity-40",
-            )}
-          >
+      {/* body — flush left, like the original */}
+      {editMode ? (
+        <div
+          role="textbox"
+          tabIndex={0}
+          contentEditable
+          suppressContentEditableWarning
+          className="mt-1.5 rounded-md border border-border bg-elevated/40 px-2 py-1 text-sm leading-relaxed text-foreground outline-none focus:border-ring"
+          onInput={(e) => onEditInput(e.currentTarget.textContent ?? "")}
+          onBlur={(e) => {
+            const text = (e.currentTarget.textContent ?? "").trim();
+            if (text && text !== segment.text) editMutation.mutate(text);
+          }}
+        >
+          {draft}
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => seekTo(segment.start_ms)}
+          className="mt-1 block w-full text-left"
+        >
+          <p className="text-sm leading-relaxed text-muted-foreground">
             <HighlightedText text={segment.text} query={findQuery} />
           </p>
-        )}
-      </button>
+        </button>
+      )}
     </div>
   );
 }
 
-/** Smart-search filter matching (rules ported from docs/03 §5.2). */
-function segmentMatchesFilter(text: string, filter: string): boolean {
-  const c = classifySegment(text);
-  switch (filter) {
-    case "questions":
-      return c.question;
-    case "tasks":
-      return c.task;
-    case "dates":
-      return c.date;
-    case "metrics":
-      return c.metric;
-    case "pricing":
-      return c.pricing;
-    case "fillers":
-      return c.filler;
-    case "sentiment":
-      return Math.abs(c.sentimentScore) > 0.15;
-    default:
-      return false;
-  }
-}
-
-export const TranscriptLine = memo(TranscriptLineComponent);
+export const TranscriptTurn = memo(TranscriptTurnComponent);
