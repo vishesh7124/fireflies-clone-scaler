@@ -82,7 +82,7 @@ export function AskFredRail() {
   const isEmpty = thread.length === 0;
 
   return (
-    <aside className="hidden w-[350px] shrink-0 flex-col border-l border-border lg:flex">
+    <aside className="hidden w-[30rem] shrink-0 flex-col border-l border-border lg:flex">
       {/* header */}
       <div className="flex items-center gap-2 border-b border-border px-4 py-3">
         <BotIcon className="size-4 text-primary-soft" />

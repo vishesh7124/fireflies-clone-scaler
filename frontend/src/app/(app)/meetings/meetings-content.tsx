@@ -230,20 +230,20 @@ export default function MeetingsPage() {
                 isFetching && "opacity-60",
               )}
             >
+              <div className="flex items-center justify-end px-3 py-1.5">
+                {/* <h3 className="text-xs font-semibold uppercase tracking-wide text-subtle">
+                  {label}
+                </h3> */}
+                <button
+                  type="button"
+                  onClick={() => toast.info("Feedback — coming soon")}
+                  className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  💬 Feedback
+                </button>
+              </div>
               {groupByDate(data.items).map(([label, meetings]) => (
                 <section key={label} className="space-y-1">
-                  <div className="flex items-center justify-between px-3 py-1.5">
-                    <h3 className="text-xs font-semibold uppercase tracking-wide text-subtle">
-                      {label}
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={() => toast.info("Feedback — coming soon")}
-                      className="text-xs text-muted-foreground transition-colors hover:text-foreground"
-                    >
-                      💬 Feedback
-                    </button>
-                  </div>
                   {meetings.map((meeting) => (
                     <MeetingRow key={meeting.id} meeting={meeting} />
                   ))}

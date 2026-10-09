@@ -47,7 +47,7 @@ export function MeetingRow({
   return (
     <div
       className={cn(
-        "group flex items-center gap-3 rounded-lg border border-transparent p-3 transition-colors hover:border-border hover:bg-surface",
+        "group flex items-center gap-3 rounded-lg border border-transparent p-3 transition-colors bg-[#292929] hover:border-border hover:bg-surface",
         className,
       )}
     >
@@ -68,7 +68,7 @@ export function MeetingRow({
       </button>
 
       {showActions && (
-        <span className="flex shrink-0 items-center gap-1">
+        <span className=" hidden group-hover:flex  shrink-0 items-center gap-1">
           <MeetingActions meeting={meeting} />
           <button
             type="button"
