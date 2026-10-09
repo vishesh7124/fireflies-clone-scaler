@@ -31,12 +31,13 @@ export function PlayerEngine({ durationMs, mediaUrl }: { durationMs: number; med
     if (mediaUrl || !isPlaying) return;
     let raf = 0;
     let last = performance.now();
-    let lastMs = usePlayerStore.getState().currentTimeMs;
     const tick = (now: number) => {
       const dt = now - last;
       last = now;
       const s = usePlayerStore.getState();
-      let next = lastMs + dt * s.speed;
+      // Advance from the store's CURRENT time (not a cached closure value), so
+      // user seeks take effect immediately instead of being overwritten.
+      let next = s.currentTimeMs + dt * s.speed;
       if (s.playUntilMs != null && next >= s.playUntilMs) {
         next = s.playUntilMs;
         s.pause();
@@ -45,7 +46,6 @@ export function PlayerEngine({ durationMs, mediaUrl }: { durationMs: number; med
         next = s.durationMs;
         s.pause();
       }
-      lastMs = next;
       s._tick(next);
       if (usePlayerStore.getState().isPlaying) raf = requestAnimationFrame(tick);
     };
