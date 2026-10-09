@@ -39,7 +39,9 @@ Chen) — deliberately written to exercise every AI feature:
 | Format | Pattern |
 |---|---|
 | `.txt` (native) | `00:04 Sarah Watts: Hi Tom…` — `mm:ss` (or `h:mm:ss`) + speaker + text |
-| `.vtt` / `.srt` | Standard WebVTT/SubRip cues; speaker parsed from `Name: text` lines |
+| `.txt` (Google Meet) | `Sarah Watts (10:30 AM): Hi Tom…` — speaker + clock time + text |
+| `.txt` (plain / Whisper output) | `Sarah Watts: Hi Tom…` or bare paragraphs — **timestamps estimated** (~4s/turn) |
+| `.vtt` / `.srt` | Standard WebVTT/SubRip cues incl. Zoom's `<v Name>` tags |
 | `.json` | `[{ "speaker": "…", "start": 0, "end": 14, "text": "…" }]` (or `segments`/`utterances` wrappers; seconds or ms) |
 
 ## Where to find more real transcripts
