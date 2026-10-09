@@ -16,20 +16,22 @@ def synthesize_wav(
     segments: list[dict],
     speaker_ids: dict[int, int],
     out_path: Path,
-    max_seconds: int = 180,
+    max_seconds: int | None = None,
 ) -> str:
     """Generate a WAV file with soft tones per speaker turn.
 
     segments: [{start_ms, end_ms, speaker_id}]
     speaker_ids: {speaker_id: index} → unique pitch per speaker
     out_path: destination .wav path
+    max_seconds: optional cap (None = full transcript duration)
     Returns the relative media path (e.g. "media/meeting_1.wav").
     """
     if not segments:
         return ""
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    total_ms = min(max_seconds * 1000, (segments[-1]["end_ms"] or 0) + 500)
+    full_ms = (segments[-1]["end_ms"] or 0) + 500
+    total_ms = min(max_seconds * 1000, full_ms) if max_seconds else full_ms
     n_samples = int(SAMPLE_RATE * total_ms / 1000)
 
     # precompute a pitch per speaker (pentatonic scale for pleasant tones)
