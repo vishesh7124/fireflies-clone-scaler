@@ -82,7 +82,7 @@ export function MeetingActions({ meeting }: { meeting: MeetingListItem }) {
             variant="ghost"
             size="icon-sm"
             aria-label="Meeting actions"
-            className="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 data-open:opacity-100"
+            className="text-muted-foreground transition-colors hover:text-foreground"
           >
             <EllipsisIcon className="size-4" />
           </Button>

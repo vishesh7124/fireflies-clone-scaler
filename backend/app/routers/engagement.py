@@ -127,3 +127,17 @@ def get_global_chat(db: Session = Depends(get_db)):
     msgs = db.scalars(select(ChatMessage).where(ChatMessage.meeting_id == None).order_by(ChatMessage.created_at)).all()  # noqa: E711
     return [{"id": m.id, "meeting_id": m.meeting_id, "role": m.role, "content": m.content,
              "citations": None, "created_at": m.created_at.isoformat()} for m in msgs]
+
+
+@router.delete("/chat", status_code=204)
+def clear_global_chat(db: Session = Depends(get_db)):
+    """Clear the global AskFred thread (New Chat button)."""
+    db.query(ChatMessage).filter(ChatMessage.meeting_id == None).delete()  # noqa: E711
+    db.commit()
+
+
+@router.delete("/meetings/{meeting_id}/chat", status_code=204)
+def clear_meeting_chat(meeting_id: int, db: Session = Depends(get_db)):
+    """Clear a meeting-scoped AskFred thread (New Chat button)."""
+    db.query(ChatMessage).filter(ChatMessage.meeting_id == meeting_id).delete()
+    db.commit()

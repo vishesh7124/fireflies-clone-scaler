@@ -377,6 +377,7 @@ export interface ApiClient {
   // chat (AskFred — meeting-scoped when id set, global when null)
   getChat(meetingId?: number | null): Promise<ChatMessage[]>;
   sendChat(meetingId: number | null, question: string): Promise<ChatResponse>;
+  clearChat(meetingId: number | null): Promise<void>;
   // search
   search(q: string): Promise<SearchResult>;
   // tags

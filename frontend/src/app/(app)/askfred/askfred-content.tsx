@@ -77,7 +77,12 @@ export default function AskFredContent() {
         <div className="space-y-0.5 p-3">
           <button
             type="button"
-            onClick={() => toast.info("New chat — coming soon")}
+            onClick={() => {
+              api.clearChat(null).then(() => {
+                queryClient.invalidateQueries({ queryKey: qk.chat(null) });
+                toast.success("Started a new chat");
+              });
+            }}
             className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-[13px] font-medium text-foreground transition-colors hover:bg-accent/60"
           >
             <PlusIcon className="size-4 text-muted-foreground" />

@@ -110,6 +110,8 @@ export const httpApi: ApiClient = {
     req<ChatMessage[]>(meetingId != null ? `/meetings/${meetingId}/chat` : "/chat"),
   sendChat: (meetingId, question) =>
     post<ChatResponse>(meetingId != null ? `/meetings/${meetingId}/chat` : "/chat", { question }),
+  clearChat: (meetingId) =>
+    del<void>(meetingId != null ? `/meetings/${meetingId}/chat` : "/chat"),
 
   search: (q) => req<SearchResult>(`/search?q=${encodeURIComponent(q)}`),
 

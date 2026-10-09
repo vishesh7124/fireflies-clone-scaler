@@ -101,7 +101,12 @@ export function AskFredRail() {
             type="button"
             aria-label="New chat"
             title="New chat"
-            onClick={() => toast.info("New chat — coming soon")}
+            onClick={() => {
+              api.clearChat(null).then(() => {
+                queryClient.invalidateQueries({ queryKey: qk.chat(null) });
+                toast.success("Started a new chat");
+              });
+            }}
             className="flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-elevated/60 hover:text-foreground"
           >
             <PlusIcon className="size-4" />

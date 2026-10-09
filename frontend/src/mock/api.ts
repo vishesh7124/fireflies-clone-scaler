@@ -556,6 +556,13 @@ export const mockApi: ApiClient = {
     return { answer, citations };
   },
 
+  async clearChat(meetingId: number | null): Promise<void> {
+    await latency();
+    const db = getDb();
+    db.chat_messages = db.chat_messages.filter((m) => m.meeting_id !== meetingId);
+    persist();
+  },
+
   // ----- search -----
 
   async search(q: string): Promise<SearchResult> {
