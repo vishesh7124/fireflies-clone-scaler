@@ -9,7 +9,7 @@
 
 | | |
 |---|---|
-| 🌐 **Live demo** | _\[https://fireflies.vishesh.site]_ |
+| 🌐 **Live demo** | _\https://fireflies.vishesh.site_ |
 | 📦 **Repo** | `frontend/` + `backend/` + `shared/` + `docs/` |
 | ⏱ **Build time** | ~24 hours |
 
