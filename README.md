@@ -9,7 +9,7 @@
 
 | | |
 |---|---|
-| 🌐 **Live demo** | _\[deployed URL — see Hosting below\]_ |
+| 🌐 **Live demo** | _\[https://fireflies.vishesh.site]_ |
 | 📦 **Repo** | `frontend/` + `backend/` + `shared/` + `docs/` |
 | ⏱ **Build time** | ~24 hours |
 
