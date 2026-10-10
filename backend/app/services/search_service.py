@@ -9,6 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models import Meeting, Participant, TranscriptSegment
+from app.time_utils import utc_iso
 
 
 def _snippet(text: str, q: str, radius: int = 60) -> str:
@@ -49,7 +50,7 @@ def search(q: str, db: Session, limit: int = 12) -> dict:
     def meeting_item(m: Meeting) -> dict:
         participants = db.scalars(select(Participant).where(Participant.meeting_id == m.id)).all()
         return {
-            "id": m.id, "title": m.title, "meeting_date": m.meeting_date.isoformat(),
+            "id": m.id, "title": m.title, "meeting_date": utc_iso(m.meeting_date),
             "duration_seconds": m.duration_seconds, "status": m.status, "source": m.source,
             "channel": "My Meetings", "language": m.language, "media_type": m.media_type,
             "participants": [{"name": p.name, "avatar_color": p.avatar_color} for p in participants],

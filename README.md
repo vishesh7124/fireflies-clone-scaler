@@ -24,7 +24,7 @@
 | **Data** | TanStack Query v5 · zustand | Server cache/invalidation; high-frequency player state |
 | **Backend** | FastAPI · SQLAlchemy 2.0 · Pydantic v2 · uvicorn | Clean REST layer, typed ORM + schemas |
 | **Database** | SQLite (WAL mode) | Assignment-mandated; zero-config persistence |
-| **AI** | Rule-based engines (stdlib) + optional LLM branch | Deterministic + offline; LLM via `LLM_API_KEY` (assignment: LLM is optional) |
+| **AI** | Rule engines + opt-in Groq; SQL/FTS5/vector retrieval | Deterministic fallback; backend-only credentials and usage guards |
 | **Fonts** | DM Sans (headings) · Inter (body) | The actual Notepad fonts used by Fireflies |
 
 ---
@@ -34,7 +34,7 @@
 ```
 ┌──────────────────────────┐        ┌─────────────────────────────────┐
 │  Next.js frontend (SPA)  │  REST  │  FastAPI backend                │
-│  Vercel                  │ ─────► │  Render                         │
+│  Vercel                  │ ─────► │  Azure VM + nginx + systemd      │
 │  - App Router pages      │  JSON  │  - routers/  (HTTP layer)       │
 │  - TanStack Query cache  │        │  - services/ (AI engines)       │
 │  - zustand player store  │        │  - models/   (SQLAlchemy ORM)   │
@@ -64,8 +64,8 @@ interface (`frontend/src/lib/types.ts`) is the frozen contract — two
 implementations (mock + HTTP) swapped by `NEXT_PUBLIC_USE_MOCKS`.
 
 **Backend** — layered FastAPI: `routers/` (HTTP) → `services/` (business
-logic/engines) → `models/` (SQLAlchemy). Auto-seeds on boot from
-`shared/fixtures/` so the demo is always populated.
+logic/engines) → `models/` (SQLAlchemy). Seeds a new workspace from
+`shared/fixtures/`; ordinary restarts preserve existing records.
 
 **Shared data** — `shared/fixtures/` is the **single source of truth** for demo
 content: the same JSON feeds the frontend mock layer (dev) and the backend
@@ -81,7 +81,9 @@ seeder (prod). `shared/samples/` has real-format transcripts for testing upload.
 
 ## Database schema
 
-16 tables + FTS-ready indexes. Full DDL in `docs/03-LOW-LEVEL-DESIGN.md` §1.3.
+21 ORM tables, including isolated LLM task suggestions, provider usage counters and three derived retrieval
+tables, plus a SQLite FTS5 virtual table where supported. Core planned DDL is in
+`docs/03-LOW-LEVEL-DESIGN.md` §1.3; the ORM models are the implemented schema.
 
 ```mermaid
 erDiagram
@@ -94,6 +96,10 @@ erDiagram
   summaries ||--o{ summary_sections : "has"
   summary_sections ||--o{ summary_items : "has"
   meetings ||--o{ action_items : "yields"
+  meetings ||--o{ task_suggestions : "proposes"
+  meetings ||--|| retrieval_states : "tracks revision"
+  meetings ||--o{ retrieval_chunks : "indexes"
+  retrieval_chunks ||--o| retrieval_embeddings : "embeds"
   participants |o--o{ action_items : "assigned to"
   transcript_segments |o--o{ action_items : "sourced from"
   tags ||--o{ meeting_tags : ""
@@ -115,6 +121,11 @@ erDiagram
 | `summary_sections` | Overview / Notes / Topics / Metrics blocks | FK → `summaries` |
 | `summary_items` | Bullet lines with optional `(MM:SS)` anchors | FK → `summary_sections`, `transcript_segments` (source) |
 | `action_items` | Tasks w/ assignee, status, due date, provenance | FK → `meetings`, `participants`, `transcript_segments` |
+| `task_suggestions` | LLM proposals requiring explicit acceptance; source hash guards against stale transcript text | FK → `meetings`, `participants`, `transcript_segments`, accepted `action_items` |
+| `retrieval_states` | Current/indexed revisions, chunk/model profile, retry status | FK → `meetings` |
+| `retrieval_chunks` | Derived transcript/summary passages with original source IDs and timestamps | FK → `meetings` |
+| `retrieval_embeddings` | Versioned normalized float32 vectors; scoped exact cosine search through sqlite-vec | PK/FK → `retrieval_chunks` |
+| `provider_usage` | Persistent UTC-day/minute request and token reservations; no prompts or keys | Shared application provider quota |
 | `tags` + `meeting_tags` | N↔N tags for filtering | junction table |
 | `comments` | Timestamped comments anchored to segments | FK → `meetings`, `transcript_segments`, `users` |
 | `bookmarks` | Saved moments | FK → `meetings`, `transcript_segments` |
@@ -136,7 +147,7 @@ when the backend runs.
 
 | Area | Endpoints |
 |---|---|
-| **Meetings** | `GET /meetings` (filters: q, participant, tag, status, date range, sort, pagination) · `POST /meetings` (JSON / multipart transcript) · `GET/PATCH/DELETE /meetings/{id}` |
+| **Meetings** | `GET /meetings` (filters: q, participant, tag, status, date range, sort, pagination) · `POST /meetings` (JSON; file formats parsed by frontend) · `GET/PATCH/DELETE /meetings/{id}` |
 | **Transcript** | `GET /meetings/{id}/transcript` · `PATCH /transcript-segments/{id}` (autosave edit) |
 | **Summary** | `GET /meetings/{id}/summary` · `POST /meetings/{id}/regenerate` · `PATCH /summary-items/{id}` |
 | **Tasks** | `GET /tasks` (cross-meeting) · `POST /meetings/{id}/action-items` · `PATCH/DELETE /action-items/{id}` |
@@ -173,32 +184,33 @@ npm run dev
 | | `NEXT_PUBLIC_USE_MOCKS` | `false` (set `true` to run without the backend) |
 | `backend/.env` | `CORS_ORIGINS` | `http://localhost:3000` |
 | | `SEED_ON_START` | `true` |
-| | `LLM_API_KEY` (optional) | _empty_ — rule-based engines run when absent |
+| | `LLM_API_KEY` (optional) | _empty_; also needs model and explicit `LLM_ALLOW_EXTERNAL=true` |
 
 **Sample data**: `shared/fixtures/` (8 rich meetings) seeds automatically.
 Real-format transcripts for testing upload: `shared/samples/`.
 
 ---
 
-## Hosting (Vercel + Render)
+## Hosting (Vercel + Azure VM)
 
-**Backend — Render (Web Service)**
-1. render.com → **New → Web Service** → connect this repo
-2. **Root directory**: `backend`
-3. **Build command**: `pip install -r requirements.txt`
-4. **Start command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-5. **Env**: `CORS_ORIGINS=https://<your-vercel-app>.vercel.app` · `SEED_ON_START=true`
-6. Deploy → note the URL `https://<app>.onrender.com`
+**Backend — existing Azure VM**
+1. Clone the **whole repository**; the backend uses root `shared/fixtures/`.
+2. Install `backend/requirements.txt` in the backend virtual environment.
+3. Run one uvicorn process on loopback under systemd; nginx exposes it over HTTPS.
+4. Keep SQLite/media on persistent VM storage, preserve existing CORS/env values,
+   and back up the database before updating.
+5. Configure Groq only in the ignored `backend/.env` or service environment.
+   See [operations and verification](docs/09-GROQ-OPERATIONS.md).
 
 **Frontend — Vercel**
 1. vercel.com → **New Project** → import this repo
 2. **Root directory**: `frontend` (framework preset: Next.js, auto-detected)
-3. **Env**: `NEXT_PUBLIC_API_URL=https://<app>.onrender.com/api/v1` · `NEXT_PUBLIC_USE_MOCKS=false`
+3. **Env**: `NEXT_PUBLIC_API_URL=https://<backend-domain>/api/v1` · `NEXT_PUBLIC_USE_MOCKS=false`
 4. Deploy
 
-> **Note on Render free tier**: the disk is ephemeral — SQLite resets on
-> redeploy. `SEED_ON_START=true` auto-reseeds demo data on boot, so the demo
-> self-heals. For durable data, mount a persistent disk or use a managed DB.
+> Do not reseed a deployed workspace to apply updates. `create_all()` creates
+> missing tables but is not a general schema migration system. Existing naive
+> meeting timestamps are assumed UTC; they are not rewritten by deployment.
 
 ---
 
@@ -208,29 +220,34 @@ Real-format transcripts for testing upload: `shared/samples/`.
 |---|---|---|
 | 1 | **Auth is mocked** (one default user: Vishesh Gupta) | Assignment: "assume a default logged-in user" |
 | 2 | **Real speech-to-text is out of scope** | Assignment lists it under "Mocked / Placeholder Sections"; we accept uploaded transcript files (`.txt`/`.vtt`/`.srt`/`.json`) instead |
-| 3 | **LLM is optional** | Assignment: "optionally call an LLM". Rule-based engines (keyword scoring, regex classification, intent retrieval) run offline/deterministically; `LLM_API_KEY` enables the LLM branch |
+| 3 | **LLM is optional** | Rules work offline; Groq requires a backend key/model and explicit external-data opt-in |
 | 4 | **Audio is synthesized** (soft tones per speaker turn) | Real recordings aren't shipped; WAVs are generated at seed time so the player/seek/transcript-sync behave for real |
 | 5 | **Integrations / live bot / team sharing are placeholders** | Assignment lists them as mocked ("Coming Soon" toasts) |
 | 6 | **SQLite** (not Postgres) | Assignment mandates SQLite; WAL mode + indexing handles the demo scale |
 | 7 | **Single-user workspace** | Multi-tenancy/user management out of scope |
-| 8 | **Rule-based summary quality** | Summaries are extractive (top-ranked sentences + keyword chapters), not abstractive — LLM upgrades output quality when a key is provided |
+| 8 | **AI quality/fallback** | Groq was verified on synthetic samples and a full seeded transcript. Outputs still require source/schema validation; provider failures/budgets fall back to rules |
 
 ---
 
 ## Testing
 
 ```bash
-# Backend — isolated core/reliability regression tests (temporary SQLite DB)
-cd backend && python tests/test_core.py
+# From repository root: isolated core/reliability tests (temporary SQLite)
+cd backend
+python tests/test_core.py
+python tests/test_parse.py
 
-# Backend — 21-check end-to-end smoke test
-cd backend && python tests/smoke.py
+# Isolated AI/retrieval/provider-safety tests (no live calls)
+python tests/test_llm_client.py
+python tests/test_meeting_ai.py
+python tests/test_retrieval.py
+python tests/test_global_ai.py
+python tests/test_ai_safety.py
 
-# Backend — transcript parser tests
-cd backend && python tests/test_parse.py
-
-# Frontend — build + typecheck
-cd frontend && npm run build
+# Frontend — build + lint
+cd ../frontend
+npm run lint
+npm run build
 ```
 
 **Safety:** `tests/smoke.py` wipes and reseeds the configured database. Do not run
@@ -250,7 +267,7 @@ The smoke test covers: seed → meetings list/filters → transcript/stats → s
 │   ├── src/hooks/ · src/store/ · src/lib/  # sync hooks, zustand stores, api client
 │   └── scripts/              # fixture sync, smoke test
 ├── backend/                  # FastAPI + SQLAlchemy
-│   ├── app/models/           # 16 ORM models
+│   ├── app/models/           # 21 ORM tables including AI proposals/indexes/quotas
 │   ├── app/routers/          # meta · meetings · summaries · action-items · search · engagement
 │   ├── app/services/         # summary engine · chat engine · search · export · media synth
 │   ├── app/seed/             # fixtures loader + WAV generation
@@ -276,10 +293,19 @@ The smoke test covers: seed → meetings list/filters → transcript/stats → s
 
 ## Extension: Planned LLM Integration
 
-**Status: future work — not implemented.** The current application uses seeded
-summaries and deterministic rule-based summary/chat engines. Although LLM settings
-already exist, setting `LLM_API_KEY` currently does **not** enable model calls;
-any earlier references to an active LLM branch describe the intended extension.
+**Status: Phases 1–5 implemented; live Groq verified on bounded samples and a full seeded transcript.** See
+[`docs/08-LLM-IMPLEMENTATION.md`](docs/08-LLM-IMPLEMENTATION.md) for phases and
+verification. Meeting imports, summary regeneration, and meeting-scoped chat can
+now call Groq when `LLM_ALLOW_EXTERNAL=true`, `LLM_API_KEY`, and `LLM_MODEL` are
+configured on the backend. A key alone does not enable external calls. Otherwise
+the deterministic engines remain active; provider/validation failures also fall
+back to them. The hybrid retrieval/indexing layer is now implemented, with
+lightweight lexical indexing enabled by default and model inference disabled by
+default. Global AskFred now uses validated query planning, exact task/meeting SQL,
+and scoped retrieval/context expansion with persisted citations. Live Groq checks
+and browser roundtrips are recorded in [the verification report](docs/10-GROQ-QUALITY-REPORT.md).
+Real embedding/reranker quality and worker RAM sizing remain unverified; the
+small VM should stay lexical-only until a suitable inference worker is configured.
 Real speech-to-text would remain out of scope.
 
 ### What would be added
@@ -413,8 +439,9 @@ flowchart TD
 ```
 
 Only the necessary transcript/context would leave the backend for Groq. The API
-key would never pass through the frontend. This diagram describes future work,
-not the current deployed implementation.
+key never passes through the frontend. The pipeline is implemented; real semantic
+embedding/reranking mode remains opt-in and unverified on the small deployed VM.
+Whole-transcript hierarchical LLM summary chunking is still future work.
 
 ### Reliability, privacy, and verification
 
@@ -441,3 +468,33 @@ not the current deployed implementation.
 - Version embeddings and rebuild indexes when their model or chunking changes.
   Store only needed context, apply the same scope restrictions to every retrieval
   branch, and document any external embedding/reranking service's data handling.
+
+### Current global AskFred behavior and limits
+
+- Relative dates use `WORKSPACE_TIMEZONE` (UTC by default) and a Monday-start week.
+  Meeting times are treated as UTC in storage and serialized with `Z`; due dates
+  are calendar dates. Existing naive meeting timestamps are assumed UTC, not
+  rewritten. Set the workspace timezone explicitly to match users' expectations.
+- Task lists/counts and meeting counts come from predefined parameterized SQL,
+  not a top-K semantic sample or model arithmetic. A capped displayed task list
+  still reports the full matching count. Current overdue/unfinished tasks include
+  in-progress work and exclude completed tasks.
+- Discussion retrieval respects resolved IDs, dates, participants and current
+  revisions. Small selected meetings may supply full transcripts; large/global
+  queries use bounded, source-linked windows and disclose partial coverage.
+- Ambiguous first names, unknown meeting IDs, unsupported tag/channel/team scope,
+  and exhaustive topic-based meeting counts require clarification. Conservative
+  fallback supports ISO date ranges and the documented relative-date presets;
+  unsupported calendar phrases ask for explicit dates instead of dropping filters.
+- History is bounded to six global messages and is not transcript evidence. Long,
+  truncated prior questions require restatement before scope-dependent follow-ups.
+- There is no new UI: existing AskFred surfaces call the same endpoints. Cosmetic
+  model-selector labels are placeholders; backend environment settings determine
+  the actual Groq model. Pending task suggestions still use explicit API acceptance.
+- Offline regression tests use fake providers. Separate opt-in live Groq checks
+  and browser roundtrips passed on synthetic/seeded content; pretrained embedding
+  and reranking models have not been loaded or measured. Enable those only after
+  separate privacy/resource checks.
+- Provider daily/minute counters survive restarts; concurrency, response/input
+  limits, conservative token reservations and per-IP AI throttling bound usage.
+  Groq spend/project limits are still needed for currency-level billing controls.

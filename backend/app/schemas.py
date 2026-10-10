@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, field_serializer, field_validator
+from pydantic import BaseModel, Field, field_serializer, field_validator
 
 
 # ---------- primitives ----------
@@ -305,7 +305,7 @@ class ChatMessageOut(BaseModel):
 
 
 class ChatRequest(BaseModel):
-    question: str
+    question: str = Field(max_length=4000)
 
     @field_validator("question")
     @classmethod

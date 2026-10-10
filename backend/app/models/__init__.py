@@ -1,12 +1,14 @@
-"""SQLAlchemy ORM models — 16 tables (docs/03-LLD §1.3)."""
+"""SQLAlchemy ORM models — core schema plus isolated LLM task suggestions."""
 
 from app.models.user import User
 from app.models.meeting import Channel, Meeting, Participant
 from app.models.transcript import TranscriptSegment
 from app.models.summary import Summary, SummarySection, SummaryItem
-from app.models.task import ActionItem, MeetingTag, Tag
+from app.models.task import ActionItem, MeetingTag, Tag, TaskSuggestion
 from app.models.engagement import Bookmark, ChatMessage, Comment, Soundbite
 from app.models.settings import Settings
+from app.models.retrieval import RetrievalState, RetrievalChunk, RetrievalEmbedding
+from app.models.provider_usage import ProviderUsage
 
 __all__ = [
     "User",
@@ -18,6 +20,7 @@ __all__ = [
     "SummarySection",
     "SummaryItem",
     "ActionItem",
+    "TaskSuggestion",
     "Tag",
     "MeetingTag",
     "Comment",
@@ -25,4 +28,8 @@ __all__ = [
     "Soundbite",
     "ChatMessage",
     "Settings",
+    "RetrievalState",
+    "RetrievalChunk",
+    "RetrievalEmbedding",
+    "ProviderUsage",
 ]

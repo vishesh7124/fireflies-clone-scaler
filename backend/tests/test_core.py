@@ -14,6 +14,10 @@ TEMP = tempfile.TemporaryDirectory(prefix="fireflies-core-")
 os.environ["FI_REFLIES_DB_PATH"] = str(Path(TEMP.name) / "test.db")
 os.environ["MEDIA_DIR"] = str(Path(TEMP.name) / "media")
 os.environ["SEED_ON_START"] = "true"
+os.environ["LLM_ALLOW_EXTERNAL"] = "false"  # regression tests must never call a real provider
+os.environ["RAG_INDEXING_ENABLED"] = "false"
+os.environ["RAG_INFERENCE_MODE"] = "disabled"
+os.environ["AI_REQUESTS_PER_IP_MINUTE"] = "300"
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from fastapi.testclient import TestClient

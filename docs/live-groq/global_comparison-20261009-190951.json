@@ -1,0 +1,73 @@
+{
+  "date": "2026-10-09T19:09:49.620863+00:00",
+  "model": "openai/gpt-oss-20b",
+  "response_format": "json_schema",
+  "data": "synthetic temporary database only",
+  "inference_mode": "disabled",
+  "cases": [
+    {
+      "name": "global_comparison",
+      "status": 200,
+      "elapsed_seconds": 2.15,
+      "provider_requests": 2,
+      "validated_outputs": 2,
+      "fallbacks": [],
+      "expected_facts_pass": true,
+      "result": {
+        "answer": "Since last month, the subscription price has increased from $100 per user (approved in the September meeting) to $120 per user (approved in the October meeting). The $150 proposal discussed in October was rejected.",
+        "citations": [
+          {
+            "meeting_id": 1,
+            "meeting_title": "Synthetic Current Pricing",
+            "segment_id": 1,
+            "start_ms": 0,
+            "speaker": "Ada",
+            "quote": "We considered a subscription price of $150 per user."
+          },
+          {
+            "meeting_id": 1,
+            "meeting_title": "Synthetic Current Pricing",
+            "segment_id": 2,
+            "start_ms": 10000,
+            "speaker": "Bob",
+            "quote": "We rejected the $150 proposal and approved a price of $120 per user."
+          },
+          {
+            "meeting_id": 2,
+            "meeting_title": "Synthetic Prior Pricing",
+            "segment_id": 5,
+            "start_ms": 0,
+            "speaker": "Ada",
+            "quote": "We approved a subscription price of $100 per user for the September contract."
+          }
+        ]
+      },
+      "plans": [
+        {
+          "intent": "discussion",
+          "scope": "workspace",
+          "meeting_ids": [],
+          "participant_names": [],
+          "participant_role": "speaker",
+          "meeting_status": "ready",
+          "count_target": "meetings",
+          "date_preset": "since_last_month",
+          "date_from": null,
+          "date_to": null,
+          "date_field": "meeting_date",
+          "task_status": null,
+          "search_terms": [
+            "subscription pricing",
+            "pricing change"
+          ],
+          "clarification": null
+        }
+      ]
+    }
+  ],
+  "provider_budget": {
+    "requests": 2,
+    "token_reservations_or_usage": 3670
+  },
+  "existing_task_preserved": true
+}

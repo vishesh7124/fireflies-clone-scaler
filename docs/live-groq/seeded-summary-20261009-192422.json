@@ -1,0 +1,129 @@
+{
+  "date": "2026-10-09T19:24:17.255516+00:00",
+  "model": "openai/gpt-oss-120b",
+  "response_format": "json_schema",
+  "data": "synthetic temporary database only",
+  "inference_mode": "disabled",
+  "cases": [
+    {
+      "name": "summary",
+      "status": 200,
+      "elapsed_seconds": 5.2,
+      "provider_requests": 1,
+      "validated_outputs": 0,
+      "fallbacks": [
+        "Meeting summary fallback: provider_rejected"
+      ],
+      "expected_facts_pass": false,
+      "result": {
+        "meeting_id": 3,
+        "template": "general",
+        "generated_by": "rules",
+        "sections": [
+          {
+            "id": 1,
+            "section_type": "overview",
+            "heading": "Overview",
+            "items": [
+              {
+                "id": 1,
+                "text": "The 8-minute meeting covered transcript, design, plan, meetings. Clicking any transcript line seeks the player to that timestamp, and the active line highlights while audio plays. The new Notepad layout is the priority \u2014 the two-panel view with the summary on the left and transcript on the right.",
+                "timestamp_ms": 4000,
+                "end_timestamp_ms": null,
+                "source_segment_id": 6
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "section_type": "notes",
+            "heading": "Notes",
+            "items": [
+              {
+                "id": 2,
+                "text": "Clicking any transcript line seeks the player to that timestamp, and the active line highlights while audio plays.",
+                "timestamp_ms": 108000,
+                "end_timestamp_ms": null,
+                "source_segment_id": 15
+              },
+              {
+                "id": 3,
+                "text": "We're looking at meetings, participants, transcript segments, summaries, and action items as the core tables.",
+                "timestamp_ms": 144000,
+                "end_timestamp_ms": null,
+                "source_segment_id": 18
+              },
+              {
+                "id": 4,
+                "text": "Sprint one is foundations \u2014 schema, scaffolding, design tokens, and the app shell.",
+                "timestamp_ms": 338000,
+                "end_timestamp_ms": null,
+                "source_segment_id": 36
+              },
+              {
+                "id": 5,
+                "text": "I own the research plan by Monday and the interviews next week.",
+                "timestamp_ms": 432000,
+                "end_timestamp_ms": null,
+                "source_segment_id": 46
+              },
+              {
+                "id": 6,
+                "text": "That means we can demo the interactive transcript even on scheduled meetings.",
+                "timestamp_ms": 331000,
+                "end_timestamp_ms": null,
+                "source_segment_id": 35
+              },
+              {
+                "id": 7,
+                "text": "Absolutely, I'll schedule those for next Tuesday through Thursday and share a research plan by Monday.",
+                "timestamp_ms": 225000,
+                "end_timestamp_ms": null,
+                "source_segment_id": 25
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "section_type": "topics",
+            "heading": "Topics",
+            "items": [
+              {
+                "id": 8,
+                "text": "Transcript & plan",
+                "timestamp_ms": 4000,
+                "end_timestamp_ms": 306720,
+                "source_segment_id": 6
+              },
+              {
+                "id": 9,
+                "text": "Sprint & transcript",
+                "timestamp_ms": 312000,
+                "end_timestamp_ms": 498300,
+                "source_segment_id": 33
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "section_type": "metrics",
+            "heading": "Metrics",
+            "items": []
+          }
+        ]
+      },
+      "provider_rejections": [
+        {
+          "status": 400,
+          "type": "invalid_request_error",
+          "code": "json_validate_failed"
+        }
+      ]
+    }
+  ],
+  "provider_budget": {
+    "requests": 1,
+    "token_reservations_or_usage": 17397
+  },
+  "existing_task_preserved": true
+}

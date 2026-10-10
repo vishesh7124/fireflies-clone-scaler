@@ -1,0 +1,388 @@
+{
+  "date": "2026-10-09T19:32:21.245540+00:00",
+  "model": "openai/gpt-oss-20b",
+  "response_format": "json_schema",
+  "data": "synthetic temporary database only",
+  "inference_mode": "disabled",
+  "cases": [
+    {
+      "name": "summary",
+      "status": 200,
+      "elapsed_seconds": 3.0,
+      "provider_requests": 1,
+      "validated_outputs": 1,
+      "fallbacks": [],
+      "expected_facts_pass": true,
+      "result": {
+        "meeting_id": 3,
+        "template": "general",
+        "generated_by": "llm",
+        "sections": [
+          {
+            "id": 1,
+            "section_type": "overview",
+            "heading": "Overview",
+            "items": [
+              {
+                "id": 1,
+                "text": "The team officially launched v2 of the platform, confirming an October 30th release and outlining a three-sprint roadmap.",
+                "timestamp_ms": null,
+                "end_timestamp_ms": null,
+                "source_segment_id": null
+              },
+              {
+                "id": 2,
+                "text": "Key priorities include a two-panel Notepad layout, interactive transcript, and a database schema with Alembic migrations.",
+                "timestamp_ms": null,
+                "end_timestamp_ms": null,
+                "source_segment_id": null
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "section_type": "notes",
+            "heading": "Notes",
+            "items": [
+              {
+                "id": 3,
+                "text": "Kickoff and launch date confirmed for October 30th.",
+                "timestamp_ms": 29000,
+                "end_timestamp_ms": 37200,
+                "source_segment_id": 8
+              },
+              {
+                "id": 4,
+                "text": "Notepad is the priority feature, featuring a two-panel view with summary left and transcript right.",
+                "timestamp_ms": 49000,
+                "end_timestamp_ms": 60240,
+                "source_segment_id": 10
+              },
+              {
+                "id": 5,
+                "text": "Priya presented the Figma layout, highlighting a collapsible icon rail for smart search, soundbites, and comments.",
+                "timestamp_ms": 65000,
+                "end_timestamp_ms": 75480,
+                "source_segment_id": 11
+              },
+              {
+                "id": 6,
+                "text": "Interactive transcript will allow clicking a line to seek audio and highlight the active line.",
+                "timestamp_ms": 108000,
+                "end_timestamp_ms": 116960,
+                "source_segment_id": 15
+              },
+              {
+                "id": 7,
+                "text": "Playback sync will be event-driven, using binary search over sorted segments for smooth performance.",
+                "timestamp_ms": 128000,
+                "end_timestamp_ms": 139620,
+                "source_segment_id": 17
+              },
+              {
+                "id": 8,
+                "text": "Rahul will design the database schema this week, covering meetings, participants, transcripts, summaries, and action items.",
+                "timestamp_ms": 144000,
+                "end_timestamp_ms": 154480,
+                "source_segment_id": 18
+              },
+              {
+                "id": 9,
+                "text": "AI summaries will start with a rules engine for keyword extraction and topic detection, with LLM generation behind a feature flag.",
+                "timestamp_ms": 189000,
+                "end_timestamp_ms": 199860,
+                "source_segment_id": 22
+              },
+              {
+                "id": 10,
+                "text": "Sprint one focuses on foundations: schema, scaffolding, design tokens, and app shell; sprint two on Notepad; sprint three on polish, search, and exports.",
+                "timestamp_ms": 338000,
+                "end_timestamp_ms": 350000,
+                "source_segment_id": 36
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "section_type": "topics",
+            "heading": "Topics",
+            "items": [
+              {
+                "id": 11,
+                "text": "Scope and roadmap alignment",
+                "timestamp_ms": 4000,
+                "end_timestamp_ms": 13720,
+                "source_segment_id": 6
+              },
+              {
+                "id": 12,
+                "text": "Design direction and Figma layout",
+                "timestamp_ms": 65000,
+                "end_timestamp_ms": 75480,
+                "source_segment_id": 11
+              },
+              {
+                "id": 13,
+                "text": "Notepad feature set and priority",
+                "timestamp_ms": 49000,
+                "end_timestamp_ms": 60240,
+                "source_segment_id": 10
+              },
+              {
+                "id": 14,
+                "text": "Interactive transcript functionality",
+                "timestamp_ms": 108000,
+                "end_timestamp_ms": 116960,
+                "source_segment_id": 15
+              },
+              {
+                "id": 15,
+                "text": "Database schema design and migrations",
+                "timestamp_ms": 144000,
+                "end_timestamp_ms": 154480,
+                "source_segment_id": 18
+              },
+              {
+                "id": 16,
+                "text": "AI summaries strategy and feature flag",
+                "timestamp_ms": 189000,
+                "end_timestamp_ms": 199860,
+                "source_segment_id": 22
+              },
+              {
+                "id": 17,
+                "text": "User research planning for summary validation",
+                "timestamp_ms": 210000,
+                "end_timestamp_ms": 220480,
+                "source_segment_id": 24
+              },
+              {
+                "id": 18,
+                "text": "Milestone and sprint planning",
+                "timestamp_ms": 338000,
+                "end_timestamp_ms": 350000,
+                "source_segment_id": 36
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "section_type": "metrics",
+            "heading": "Metrics",
+            "items": [
+              {
+                "id": 19,
+                "text": "Target launch date: October 30th",
+                "timestamp_ms": 29000,
+                "end_timestamp_ms": 37200,
+                "source_segment_id": 8
+              },
+              {
+                "id": 20,
+                "text": "Three sprints planned",
+                "timestamp_ms": 29000,
+                "end_timestamp_ms": 37200,
+                "source_segment_id": 8
+              },
+              {
+                "id": 21,
+                "text": "Two-panel Notepad layout",
+                "timestamp_ms": 49000,
+                "end_timestamp_ms": 60240,
+                "source_segment_id": 10
+              },
+              {
+                "id": 22,
+                "text": "Three to four user research interviews",
+                "timestamp_ms": 210000,
+                "end_timestamp_ms": 220480,
+                "source_segment_id": 24
+              },
+              {
+                "id": 23,
+                "text": "Design review scheduled for October 16th",
+                "timestamp_ms": 366000,
+                "end_timestamp_ms": 374960,
+                "source_segment_id": 38
+              },
+              {
+                "id": 24,
+                "text": "Alembic baseline migration for schema",
+                "timestamp_ms": 392000,
+                "end_timestamp_ms": 400960,
+                "source_segment_id": 41
+              },
+              {
+                "id": 25,
+                "text": "Demo data seeding on startup",
+                "timestamp_ms": 392000,
+                "end_timestamp_ms": 400960,
+                "source_segment_id": 41
+              },
+              {
+                "id": 26,
+                "text": "Weekly status updates to leadership channel",
+                "timestamp_ms": 438000,
+                "end_timestamp_ms": 448100,
+                "source_segment_id": 47
+              }
+            ]
+          }
+        ]
+      },
+      "model_summary_drafts": [
+        {
+          "overview": [
+            {
+              "text": "The team officially launched v2 of the platform, confirming an October 30th release and outlining a three-sprint roadmap.",
+              "source_segment_id": null
+            },
+            {
+              "text": "Key priorities include a two-panel Notepad layout, interactive transcript, and a database schema with Alembic migrations.",
+              "source_segment_id": null
+            }
+          ],
+          "notes": [
+            {
+              "text": "Kickoff and launch date confirmed for October 30th.",
+              "source_segment_id": 8
+            },
+            {
+              "text": "Notepad is the priority feature, featuring a two-panel view with summary left and transcript right.",
+              "source_segment_id": 10
+            },
+            {
+              "text": "Priya presented the Figma layout, highlighting a collapsible icon rail for smart search, soundbites, and comments.",
+              "source_segment_id": 11
+            },
+            {
+              "text": "Interactive transcript will allow clicking a line to seek audio and highlight the active line.",
+              "source_segment_id": 15
+            },
+            {
+              "text": "Playback sync will be event-driven, using binary search over sorted segments for smooth performance.",
+              "source_segment_id": 17
+            },
+            {
+              "text": "Rahul will design the database schema this week, covering meetings, participants, transcripts, summaries, and action items.",
+              "source_segment_id": 18
+            },
+            {
+              "text": "AI summaries will start with a rules engine for keyword extraction and topic detection, with LLM generation behind a feature flag.",
+              "source_segment_id": 22
+            },
+            {
+              "text": "Sprint one focuses on foundations: schema, scaffolding, design tokens, and app shell; sprint two on Notepad; sprint three on polish, search, and exports.",
+              "source_segment_id": 36
+            }
+          ],
+          "topics": [
+            {
+              "text": "Scope and roadmap alignment",
+              "source_segment_id": 6
+            },
+            {
+              "text": "Design direction and Figma layout",
+              "source_segment_id": 11
+            },
+            {
+              "text": "Notepad feature set and priority",
+              "source_segment_id": 10
+            },
+            {
+              "text": "Interactive transcript functionality",
+              "source_segment_id": 15
+            },
+            {
+              "text": "Database schema design and migrations",
+              "source_segment_id": 18
+            },
+            {
+              "text": "AI summaries strategy and feature flag",
+              "source_segment_id": 22
+            },
+            {
+              "text": "User research planning for summary validation",
+              "source_segment_id": 24
+            },
+            {
+              "text": "Milestone and sprint planning",
+              "source_segment_id": 36
+            }
+          ],
+          "metrics": [
+            {
+              "text": "Target launch date: October 30th",
+              "source_segment_id": 8
+            },
+            {
+              "text": "Three sprints planned",
+              "source_segment_id": 8
+            },
+            {
+              "text": "Two-panel Notepad layout",
+              "source_segment_id": 10
+            },
+            {
+              "text": "Three to four user research interviews",
+              "source_segment_id": 24
+            },
+            {
+              "text": "Design review scheduled for October 16th",
+              "source_segment_id": 38
+            },
+            {
+              "text": "Alembic baseline migration for schema",
+              "source_segment_id": 41
+            },
+            {
+              "text": "Demo data seeding on startup",
+              "source_segment_id": 41
+            },
+            {
+              "text": "Weekly status updates to leadership channel",
+              "source_segment_id": 47
+            }
+          ],
+          "action_suggestions": [
+            {
+              "description": "Share Figma screens and two-panel layout spec by Wednesday.",
+              "source_segment_id": 43,
+              "assignee_id": 5,
+              "due_date": null
+            },
+            {
+              "description": "Own repo setup, CI, and frontend scaffold by Friday.",
+              "source_segment_id": 44,
+              "assignee_id": 6,
+              "due_date": null
+            },
+            {
+              "description": "Draft database schema and seeder by Friday.",
+              "source_segment_id": 45,
+              "assignee_id": 8,
+              "due_date": null
+            },
+            {
+              "description": "Plan research plan by Monday and conduct interviews next week.",
+              "source_segment_id": 46,
+              "assignee_id": 7,
+              "due_date": null
+            },
+            {
+              "description": "Send weekly status updates to leadership channel every Friday.",
+              "source_segment_id": 47,
+              "assignee_id": 4,
+              "due_date": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "provider_budget": {
+    "requests": 1,
+    "token_reservations_or_usage": 6473
+  },
+  "existing_task_preserved": true
+}

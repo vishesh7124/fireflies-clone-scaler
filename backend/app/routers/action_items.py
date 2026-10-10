@@ -3,11 +3,11 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import ActionItem, Meeting, Participant, TranscriptSegment
+from app.models import ActionItem, Meeting, Participant, TaskSuggestion, TranscriptSegment
 from app.schemas import ActionItemCreate, ActionItemOut, ActionItemUpdate
 
 router = APIRouter(tags=["action-items"])
@@ -112,4 +112,64 @@ def delete_action_item(item_id: int, db: Session = Depends(get_db)):
     if not a:
         raise HTTPException(status_code=404, detail="Action item not found")
     db.delete(a)
+    db.commit()
+
+
+@router.get("/meetings/{meeting_id}/action-suggestions")
+def list_suggestions(meeting_id: int, db: Session = Depends(get_db)):
+    if not db.get(Meeting, meeting_id):
+        raise HTTPException(404, "Meeting not found")
+    suggestions = db.scalars(select(TaskSuggestion).where(TaskSuggestion.meeting_id == meeting_id)
+                              .order_by(TaskSuggestion.id)).all()
+    return [{"id": s.id, "meeting_id": s.meeting_id, "description": s.description,
+             "source_segment_id": s.source_segment_id, "assignee_id": s.assignee_id,
+             "due_date": s.due_date.isoformat() if s.due_date else None,
+             "status": s.status, "action_item_id": s.action_item_id} for s in suggestions]
+
+
+@router.post("/meetings/{meeting_id}/action-suggestions/{suggestion_id}/accept")
+def accept_suggestion(meeting_id: int, suggestion_id: int, db: Session = Depends(get_db)):
+    import hashlib
+    db.execute(text("BEGIN IMMEDIATE"))
+    suggestion = db.get(TaskSuggestion, suggestion_id)
+    if not suggestion or suggestion.meeting_id != meeting_id:
+        raise HTTPException(404, "Suggestion not found")
+    if suggestion.status == "accepted":
+        action = db.get(ActionItem, suggestion.action_item_id) if suggestion.action_item_id else None
+        if not action:
+            raise HTTPException(409, "The accepted task was deleted")
+        return _item_out(action, db)
+    if suggestion.status != "suggested":
+        raise HTTPException(409, "Suggestion is no longer pending")
+    source = db.get(TranscriptSegment, suggestion.source_segment_id) if suggestion.source_segment_id else None
+    if not source or source.meeting_id != meeting_id or hashlib.sha256(source.text.encode()).hexdigest() != suggestion.source_text_hash:
+        raise HTTPException(409, "Source transcript changed. Regenerate suggestions first.")
+    if suggestion.assignee_id is not None:
+        participant = db.get(Participant, suggestion.assignee_id)
+        if not participant or participant.meeting_id != meeting_id:
+            raise HTTPException(409, "Suggested assignee no longer exists")
+    # Accepting twice must not create two tasks, even after repeated generations.
+    action = db.scalar(select(ActionItem).where(ActionItem.meeting_id == meeting_id,
+        ActionItem.source_segment_id == source.id, ActionItem.description == suggestion.description))
+    if action is None:
+        action = ActionItem(meeting_id=meeting_id, description=suggestion.description,
+                            source_segment_id=source.id, assignee_id=suggestion.assignee_id,
+                            due_date=suggestion.due_date, status="open")
+        db.add(action)
+        db.flush()
+    suggestion.status = "accepted"
+    suggestion.action_item_id = action.id
+    db.commit()
+    return _item_out(action, db)
+
+
+@router.post("/meetings/{meeting_id}/action-suggestions/{suggestion_id}/dismiss", status_code=204)
+def dismiss_suggestion(meeting_id: int, suggestion_id: int, db: Session = Depends(get_db)):
+    db.execute(text("BEGIN IMMEDIATE"))
+    suggestion = db.get(TaskSuggestion, suggestion_id)
+    if not suggestion or suggestion.meeting_id != meeting_id:
+        raise HTTPException(404, "Suggestion not found")
+    if suggestion.status == "accepted":
+        raise HTTPException(409, "Already accepted; manage the existing task instead")
+    suggestion.status = "dismissed"
     db.commit()

@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-09T19:03:11.737713+00:00",
+  "model": "openai/gpt-oss-20b",
+  "response_format": "json_schema",
+  "data": "synthetic temporary database only",
+  "inference_mode": "disabled",
+  "cases": [
+    {
+      "name": "global_tasks",
+      "status": 200,
+      "elapsed_seconds": 1.27,
+      "provider_requests": 1,
+      "validated_outputs": 1,
+      "fallbacks": [],
+      "expected_facts_pass": true,
+      "result": {
+        "answer": "1 matching tasks (due date: 2026-10-05 to 2026-10-11). Assignee: Ada.\n\u2022 Send approved quote \u2014 Ada \u00b7 open \u00b7 due 2026-10-09",
+        "citations": [
+          {
+            "meeting_id": 1,
+            "meeting_title": "Synthetic Current Pricing",
+            "segment_id": 3,
+            "start_ms": 20000,
+            "speaker": "Ada",
+            "quote": "I will send the approved quote on 2026-10-09."
+          }
+        ]
+      },
+      "plans": [
+        {
+          "intent": "tasks",
+          "scope": "workspace",
+          "meeting_ids": [],
+          "participant_names": [],
+          "participant_role": "assignee",
+          "meeting_status": "all",
+          "count_target": "tasks",
+          "date_preset": "this_week",
+          "date_from": null,
+          "date_to": null,
+          "date_field": "due_date",
+          "task_status": null,
+          "search_terms": [],
+          "clarification": null
+        }
+      ]
+    }
+  ],
+  "provider_budget": {
+    "requests": 1,
+    "token_reservations_or_usage": 2045
+  },
+  "existing_task_preserved": true
+}

@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-09T19:07:00.836754+00:00",
+  "model": "openai/gpt-oss-20b",
+  "response_format": "json_schema",
+  "data": "synthetic temporary database only",
+  "inference_mode": "disabled",
+  "cases": [
+    {
+      "name": "abstention",
+      "status": 200,
+      "elapsed_seconds": 0.98,
+      "provider_requests": 1,
+      "validated_outputs": 1,
+      "fallbacks": [],
+      "expected_facts_pass": true,
+      "result": {
+        "answer": "I couldn't find enough evidence in this meeting to answer that question.",
+        "citations": []
+      }
+    }
+  ],
+  "provider_budget": {
+    "requests": 1,
+    "token_reservations_or_usage": 1114
+  },
+  "existing_task_preserved": true
+}

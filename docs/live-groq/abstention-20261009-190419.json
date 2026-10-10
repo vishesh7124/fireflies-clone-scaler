@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-09T19:04:18.292951+00:00",
+  "model": "openai/gpt-oss-20b",
+  "response_format": "json_schema",
+  "data": "synthetic temporary database only",
+  "inference_mode": "disabled",
+  "cases": [
+    {
+      "name": "abstention",
+      "status": 200,
+      "elapsed_seconds": 0.92,
+      "provider_requests": 1,
+      "validated_outputs": 1,
+      "fallbacks": [],
+      "expected_facts_pass": false,
+      "result": {
+        "answer": "$120 per user.",
+        "citations": [
+          {
+            "meeting_id": 1,
+            "meeting_title": "Synthetic Current Pricing",
+            "segment_id": 2,
+            "start_ms": 10000,
+            "speaker": "Bob",
+            "quote": "We rejected the $150 proposal and approved a price of $120 per user."
+          }
+        ]
+      }
+    }
+  ],
+  "provider_budget": {
+    "requests": 1,
+    "token_reservations_or_usage": 1053
+  },
+  "existing_task_preserved": true
+}

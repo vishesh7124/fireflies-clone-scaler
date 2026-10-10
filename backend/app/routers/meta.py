@@ -7,7 +7,9 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import ActionItem, Meeting, MeetingTag, Participant, Settings, Summary, SummaryItem, SummarySection, Tag, TranscriptSegment, User
+from app.config import settings as config
+from app.time_utils import utc_iso
+from app.models import ActionItem, Meeting, MeetingTag, Participant, RetrievalState, Settings, Summary, SummaryItem, SummarySection, Tag, TranscriptSegment, User
 from app.schemas import DashboardOut, SettingsOut, SettingsUpdate, UserOut
 
 router = APIRouter(tags=["meta"])
@@ -78,7 +80,7 @@ def get_dashboard(db: Session = Depends(get_db)):
         open_c = db.scalar(select(func.count(ActionItem.id)).where(ActionItem.meeting_id == m.id, ActionItem.status != "done")) or 0
         done_c = db.scalar(select(func.count(ActionItem.id)).where(ActionItem.meeting_id == m.id, ActionItem.status == "done")) or 0
         return {
-            "id": m.id, "title": m.title, "meeting_date": m.meeting_date.isoformat(),
+            "id": m.id, "title": m.title, "meeting_date": utc_iso(m.meeting_date),
             "duration_seconds": m.duration_seconds, "status": m.status, "source": m.source,
             "channel": "My Meetings", "language": m.language, "media_type": m.media_type,
             "participants": [{"name": p.name, "avatar_color": p.avatar_color} for p in participants],
@@ -104,7 +106,7 @@ def get_dashboard(db: Session = Depends(get_db)):
                     SummarySection.summary_id == summary.id, SummarySection.section_type == "notes"
                 ).limit(3)
             ).all()
-        ai_feed.append({"meeting_id": m.id, "title": m.title, "meeting_date": m.meeting_date.isoformat(),
+        ai_feed.append({"meeting_id": m.id, "title": m.title, "meeting_date": utc_iso(m.meeting_date),
                         "headline": headline, "bullets": list(bullets)})
 
     return {
@@ -119,7 +121,18 @@ def get_dashboard(db: Session = Depends(get_db)):
 @router.get("/health")
 def health(db: Session = Depends(get_db)):
     meetings = db.scalar(select(func.count(Meeting.id))) or 0
-    return {"ok": True, "db": "sqlite", "meetings": meetings, "seed": "loaded" if meetings else "empty", "llm_enabled": False}
+    ready_states = select(func.count()).select_from(RetrievalState).join(Meeting).where(
+        Meeting.is_deleted == False, Meeting.status == "ready")
+    return {"ok": True, "db": "sqlite", "meetings": meetings, "seed": "loaded" if meetings else "empty",
+            "llm_enabled": config.llm_enabled, "llm_scope": "meeting_and_workspace" if config.llm_enabled else None,
+            "retrieval": {"inference_mode": config.rag_inference_mode,
+                "indexed_meetings": db.scalar(ready_states.where(
+                    RetrievalState.revision == RetrievalState.indexed_revision)) or 0,
+                "pending_meetings": db.scalar(ready_states.where(
+                    RetrievalState.revision != RetrievalState.indexed_revision)) or 0,
+                "vector_meetings": db.scalar(ready_states.where(
+                    RetrievalState.revision == RetrievalState.indexed_revision,
+                    RetrievalState.vector_model.is_not(None))) or 0}}
 
 
 @router.post("/admin/reseed")

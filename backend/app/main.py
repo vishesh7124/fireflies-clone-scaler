@@ -2,6 +2,7 @@
 
 from contextlib import asynccontextmanager
 from pathlib import Path
+import httpx
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +10,13 @@ from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.database import init_db
+from app.services.llm_client import LLMClient
+from app.services.provider_budget import SQLiteBudget
+from app.services.retrieval_inference import Inference
+from app.services.retrieval_indexer import Indexer, IndexWorker
+from app.services.hybrid_retrieval import Retriever
+from starlette.concurrency import run_in_threadpool
+from app.ai_rate_limit import AIRateLimitMiddleware
 from app.routers import action_items, engagement, meetings, meta, search, summaries, tags
 
 
@@ -24,7 +32,22 @@ async def lifespan(app: FastAPI):
                 seed_if_empty(db)
         except Exception as exc:  # don't block boot on seed errors
             print(f"[seed] skipped: {exc}")
-    yield
+    # Shared connections, closed on shutdown. Creating this client sends no data.
+    async with httpx.AsyncClient(trust_env=False, limits=httpx.Limits(
+        max_connections=10, max_keepalive_connections=5,
+    )) as http:
+        app.state.llm_client = LLMClient(settings, http, SQLiteBudget(settings))
+        inference = Inference(settings)
+        app.state.retriever = Retriever(settings, inference)
+        worker = IndexWorker(Indexer(settings, inference)) if settings.rag_indexing_enabled else None
+        if worker:
+            worker.start()
+        try:
+            yield
+        finally:
+            if worker:
+                await run_in_threadpool(worker.stop)
+            inference.close()
 
 
 app = FastAPI(
@@ -34,6 +57,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.add_middleware(AIRateLimitMiddleware, limit=settings.ai_requests_per_ip_minute)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origin_list,

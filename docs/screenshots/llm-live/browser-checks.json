@@ -1,0 +1,39 @@
+{
+  "errors": [],
+  "api": [
+    {
+      "path": "/api/v1/meetings/1/chat",
+      "status": 200,
+      "body": {
+        "answer": "$120 per user",
+        "citations": [
+          {
+            "meeting_id": 1,
+            "meeting_title": "Synthetic Current Pricing",
+            "segment_id": 2,
+            "start_ms": 10000,
+            "speaker": "Bob",
+            "quote": "We rejected the $150 proposal and approved a price of $120 per user."
+          }
+        ]
+      }
+    },
+    {
+      "path": "/api/v1/chat",
+      "status": 200,
+      "body": {
+        "answer": "1 matching tasks (due date: 2026-10-05 to 2026-10-11). Assignee: Ada.\n• Send approved quote — Ada · open · due 2026-10-09",
+        "citations": [
+          {
+            "meeting_id": 1,
+            "meeting_title": "Synthetic Current Pricing",
+            "segment_id": 3,
+            "start_ms": 20000,
+            "speaker": "Ada",
+            "quote": "I will send the approved quote on 2026-10-09."
+          }
+        ]
+      }
+    }
+  ]
+}

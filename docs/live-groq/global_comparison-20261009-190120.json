@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-09T19:01:17.816750+00:00",
+  "model": "openai/gpt-oss-20b",
+  "response_format": "json_schema",
+  "data": "synthetic temporary database only",
+  "inference_mode": "disabled",
+  "cases": [
+    {
+      "name": "global_comparison",
+      "status": 200,
+      "elapsed_seconds": 2.78,
+      "provider_requests": 2,
+      "validated_outputs": 2,
+      "fallbacks": [
+        "Global planning fallback: unrequested_participant_filter"
+      ],
+      "expected_facts_pass": true,
+      "result": {
+        "answer": "Since last month, the subscription price increased from $100 per user (approved in the September meeting) to $120 per user (approved in the October meeting).",
+        "citations": [
+          {
+            "meeting_id": 1,
+            "meeting_title": "Synthetic Current Pricing",
+            "segment_id": 1,
+            "start_ms": 0,
+            "speaker": "Ada",
+            "quote": "We considered a subscription price of $150 per user."
+          },
+          {
+            "meeting_id": 1,
+            "meeting_title": "Synthetic Current Pricing",
+            "segment_id": 2,
+            "start_ms": 10000,
+            "speaker": "Bob",
+            "quote": "We rejected the $150 proposal and approved a price of $120 per user."
+          },
+          {
+            "meeting_id": 2,
+            "meeting_title": "Synthetic Prior Pricing",
+            "segment_id": 5,
+            "start_ms": 0,
+            "speaker": "Ada",
+            "quote": "We approved a subscription price of $100 per user for the September contract."
+          }
+        ]
+      }
+    }
+  ],
+  "provider_budget": {
+    "requests": 2,
+    "token_reservations_or_usage": 3961
+  },
+  "existing_task_preserved": true
+}

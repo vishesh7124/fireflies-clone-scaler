@@ -1,0 +1,204 @@
+{
+  "date": "2026-10-09T18:56:43.862191+00:00",
+  "model": "openai/gpt-oss-20b",
+  "response_format": "json_schema",
+  "data": "synthetic temporary database only",
+  "inference_mode": "disabled",
+  "cases": [
+    {
+      "name": "summary",
+      "status": 200,
+      "elapsed_seconds": 1.73,
+      "provider_requests": 1,
+      "validated_outputs": 1,
+      "fallbacks": [],
+      "expected_facts_pass": true,
+      "result": {
+        "meeting_id": 1,
+        "template": "general",
+        "generated_by": "llm",
+        "sections": [
+          {
+            "id": 1,
+            "section_type": "overview",
+            "heading": "Overview",
+            "items": [
+              {
+                "id": 1,
+                "text": "Meeting discussed subscription pricing and launch timeline.",
+                "timestamp_ms": null,
+                "end_timestamp_ms": null,
+                "source_segment_id": null
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "section_type": "notes",
+            "heading": "Key Points",
+            "items": [
+              {
+                "id": 2,
+                "text": "Ada proposed a subscription price of $150 per user.",
+                "timestamp_ms": 0,
+                "end_timestamp_ms": 9000,
+                "source_segment_id": 1
+              },
+              {
+                "id": 3,
+                "text": "Bob rejected $150 and approved $120 per user.",
+                "timestamp_ms": 10000,
+                "end_timestamp_ms": 19000,
+                "source_segment_id": 2
+              },
+              {
+                "id": 4,
+                "text": "Ada will send the approved quote on 2026-10-09.",
+                "timestamp_ms": 20000,
+                "end_timestamp_ms": 29000,
+                "source_segment_id": 3
+              },
+              {
+                "id": 5,
+                "text": "Bob set launch deadline October 30; no IPO valuation discussed.",
+                "timestamp_ms": 30000,
+                "end_timestamp_ms": 39000,
+                "source_segment_id": 4
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "section_type": "topics",
+            "heading": "Topics",
+            "items": [
+              {
+                "id": 6,
+                "text": "Subscription pricing",
+                "timestamp_ms": 0,
+                "end_timestamp_ms": 9000,
+                "source_segment_id": 1
+              },
+              {
+                "id": 7,
+                "text": "Launch timeline",
+                "timestamp_ms": 30000,
+                "end_timestamp_ms": 39000,
+                "source_segment_id": 4
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "section_type": "metrics",
+            "heading": "Metrics",
+            "items": [
+              {
+                "id": 8,
+                "text": "Approved subscription price: $120 per user.",
+                "timestamp_ms": 10000,
+                "end_timestamp_ms": 19000,
+                "source_segment_id": 2
+              },
+              {
+                "id": 9,
+                "text": "Launch deadline: October 30.",
+                "timestamp_ms": 30000,
+                "end_timestamp_ms": 39000,
+                "source_segment_id": 4
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "meeting_chat",
+      "status": 200,
+      "elapsed_seconds": 0.67,
+      "provider_requests": 1,
+      "validated_outputs": 1,
+      "fallbacks": [],
+      "expected_facts_pass": true,
+      "result": {
+        "answer": "The final subscription price approved was $120 per user.",
+        "citations": [
+          {
+            "meeting_id": 1,
+            "meeting_title": "Synthetic Current Pricing",
+            "segment_id": 2,
+            "start_ms": 10000,
+            "speaker": "Bob",
+            "quote": "We rejected the $150 proposal and approved a price of $120 per user."
+          }
+        ]
+      }
+    },
+    {
+      "name": "global_comparison",
+      "status": 200,
+      "elapsed_seconds": 2.38,
+      "provider_requests": 2,
+      "validated_outputs": 2,
+      "fallbacks": [
+        "Global planning fallback: unrequested_meeting_filter"
+      ],
+      "expected_facts_pass": false,
+      "result": {
+        "answer": "I couldn't find enough evidence in the selected meeting context to answer that question.\n\nCoverage: Evidence covers 1 of 2 matching meetings; selected passages, not an exhaustive workspace review.",
+        "citations": []
+      }
+    },
+    {
+      "name": "global_tasks",
+      "status": 200,
+      "elapsed_seconds": 0.14,
+      "provider_requests": 1,
+      "validated_outputs": 0,
+      "fallbacks": [
+        "Global planning fallback: rate_limit"
+      ],
+      "expected_facts_pass": true,
+      "result": {
+        "answer": "1 matching tasks (due date: 2026-10-05 to 2026-10-11). Assignee: Ada.\n\u2022 Send approved quote \u2014 Ada \u00b7 open \u00b7 due 2026-10-09",
+        "citations": [
+          {
+            "meeting_id": 1,
+            "meeting_title": "Synthetic Current Pricing",
+            "segment_id": 3,
+            "start_ms": 20000,
+            "speaker": "Ada",
+            "quote": "I will send the approved quote on 2026-10-09."
+          }
+        ]
+      }
+    },
+    {
+      "name": "abstention",
+      "status": 200,
+      "elapsed_seconds": 0.58,
+      "provider_requests": 1,
+      "validated_outputs": 1,
+      "fallbacks": [],
+      "expected_facts_pass": false,
+      "result": {
+        "answer": "No IPO valuation was discussed.",
+        "citations": [
+          {
+            "meeting_id": 1,
+            "meeting_title": "Synthetic Current Pricing",
+            "segment_id": 4,
+            "start_ms": 30000,
+            "speaker": "Bob",
+            "quote": "The launch deadline is October 30. No IPO valuation was discussed."
+          }
+        ]
+      }
+    }
+  ],
+  "provider_budget": {
+    "requests": 6,
+    "token_reservations_or_usage": 16735
+  },
+  "existing_task_preserved": true
+}

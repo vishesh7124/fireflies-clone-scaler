@@ -28,6 +28,22 @@ class ActionItem(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, onupdate=utcnow)
 
 
+class TaskSuggestion(Base):
+    """LLM proposals are separate from user-managed action items."""
+    __tablename__ = "task_suggestions"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    meeting_id: Mapped[int] = mapped_column(ForeignKey("meetings.id", ondelete="CASCADE"), nullable=False)
+    description: Mapped[str] = mapped_column(String, nullable=False)
+    source_segment_id: Mapped[int | None] = mapped_column(ForeignKey("transcript_segments.id", ondelete="SET NULL"))
+    assignee_id: Mapped[int | None] = mapped_column(ForeignKey("participants.id", ondelete="SET NULL"))
+    due_date: Mapped[datetime | None] = mapped_column(DateTime)
+    status: Mapped[str] = mapped_column(String(16), default="suggested")
+    action_item_id: Mapped[int | None] = mapped_column(ForeignKey("action_items.id", ondelete="SET NULL"))
+    source_text_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+
 class Tag(Base):
     __tablename__ = "tags"
 

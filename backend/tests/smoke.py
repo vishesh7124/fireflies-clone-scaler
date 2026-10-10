@@ -1,9 +1,13 @@
 """Backend smoke test — verify seed + core endpoints work (docs/05 Phase 5)."""
 
 import sys
+import os
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+os.environ["LLM_ALLOW_EXTERNAL"] = "false"
+os.environ["RAG_INFERENCE_MODE"] = "disabled"
+os.environ["RAG_INDEXING_ENABLED"] = "false"
 
 from fastapi.testclient import TestClient
 
@@ -17,6 +21,7 @@ with SessionLocal() as db:
     seed_all(db)
 
 client = TestClient(app)
+client.__enter__()  # initialize the same lifecycle-managed clients as production
 
 
 def check(name: str, cond: bool, detail: str = ""):
@@ -140,4 +145,5 @@ r = client.get(f"/api/v1/meetings/{mid}/chat")
 ok &= check("chat history", r.status_code == 200 and len(r.json()) > 0)
 
 print(f"\n{'All green' if ok else 'FAILURES'}")
+client.__exit__(None, None, None)
 sys.exit(0 if ok else 1)

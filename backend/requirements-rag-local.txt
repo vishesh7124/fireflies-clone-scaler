@@ -1,0 +1,4 @@
+# Optional: install ONLY on a machine sized for PyTorch and two model weights.
+# Not required on the small API VM when inference is disabled or remote.
+-r requirements.txt
+sentence-transformers>=5.1,<6

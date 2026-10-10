@@ -1,13 +1,15 @@
 """Meetings router — list/create/get/update/delete + transcript + stats
 (docs/03-LLD §2.1-2.2)."""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
+from starlette.concurrency import run_in_threadpool
 
 from app.config import settings
+from app.time_utils import utc_iso
 
 from app.database import get_db
 from app.models import (
@@ -57,7 +59,7 @@ def _item(m: Meeting, db: Session) -> MeetingListItem:
         )
         preview = first
     return {
-        "id": m.id, "title": m.title, "meeting_date": m.meeting_date.isoformat(),
+        "id": m.id, "title": m.title, "meeting_date": utc_iso(m.meeting_date),
         "duration_seconds": m.duration_seconds, "status": m.status, "source": m.source,
         "channel": "My Meetings", "language": m.language, "media_type": m.media_type,
         "participants": [{"name": p.name, "avatar_color": p.avatar_color} for p in participants],
@@ -68,7 +70,8 @@ def _item(m: Meeting, db: Session) -> MeetingListItem:
 
 def _parse_date(value: str) -> datetime:
     try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        return parsed.astimezone(timezone.utc).replace(tzinfo=None) if parsed.tzinfo else parsed
     except ValueError:
         raise HTTPException(status_code=422, detail="Invalid date")
 
@@ -147,7 +150,21 @@ def list_meetings(
 
 
 @router.post("/meetings", status_code=201)
-def create_meeting(data: CreateMeetingInput, db: Session = Depends(get_db)):
+async def create_meeting(data: CreateMeetingInput, request: Request, db: Session = Depends(get_db)):
+    result = await run_in_threadpool(_create_meeting, data, db)
+    client = request.app.state.llm_client
+    if result["status"] == "ready" and client.config.llm_enabled:
+        from app.services.meeting_ai import regenerate_meeting
+        try:
+            # Baseline data is committed first; provider failures retain a usable meeting.
+            await regenerate_meeting(result["id"], "general", client)
+        except HTTPException as error:
+            if error.status_code not in {404, 409}:
+                raise
+    return result
+
+
+def _create_meeting(data: CreateMeetingInput, db: Session):
     user = db.scalar(select(User).where(User.is_default == True))  # noqa: E712
     if not user:
         raise HTTPException(status_code=500, detail="Default user missing")
